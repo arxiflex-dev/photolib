@@ -35,7 +35,7 @@ libheif-plugin-libde265`), [Flutter](https://docs.flutter.dev/get-started/instal
 a dev container (VS Code or Codespaces) and it runs the bootstrap for you.
 
 ```sh
-git clone https://github.com/Arxiflex/photolib.git && cd photolib
+git clone https://github.com/arxiflex-dev/photolib.git && cd photolib
 just bootstrap    # secrets, dev stack, seed data, git hooks (the first run pulls three container images)
 just run-server   # in one terminal
 just run-app      # in another

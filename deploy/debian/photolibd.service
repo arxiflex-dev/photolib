@@ -1,7 +1,7 @@
 # photolibd as a system service with its own PostgreSQL cluster (docs/admin/install.md#without-docker).
 [Unit]
 Description=Photolib server
-Documentation=https://arxiflex.github.io/photolib/admin/install/
+Documentation=https://arxiflex-dev.github.io/photolib/admin/install/
 After=network-online.target
 Wants=network-online.target
 

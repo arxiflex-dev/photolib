@@ -1,7 +1,7 @@
 # The origin people and apps reach photolibd at, such as https://photos.example.com (required).
 publicUrl: ""
 image:
-  repository: ghcr.io/arxiflex/photolib
+  repository: ghcr.io/arxiflex-dev/photolib
   # Defaults to the chart's appVersion.
   tag: ""
 database:

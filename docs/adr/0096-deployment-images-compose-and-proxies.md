@@ -20,7 +20,7 @@ variant; decision 20 towards an all-in-one image plus compose, an embedded Postg
    the weekly `image-parity` job proves it on the corpus. Every base image is pinned by digest. The image runs as
    `1000:1000`, declares no volume, needs only `/data` and `/tmp` writable, takes its settings from `PHOTOLIB_*`
    variables and carries a source offer for the GPL and LGPL programs. It is published as
-   `ghcr.io/arxiflex/photolib`, tagged by channel (`stable`, `beta`, `nightly`) and version.
+   `ghcr.io/arxiflex-dev/photolib`, tagged by channel (`stable`, `beta`, `nightly`) and version.
 2. **No static binary yet.** photolibd links libvips (ADR-0084), which ADR-0013 allows only as a dynamically linked
    system library, so a static photolibd needs a build without libvips: the owner's call. Until then the image is
    the one package, and the codecs-free variant of decision 7 is not built.

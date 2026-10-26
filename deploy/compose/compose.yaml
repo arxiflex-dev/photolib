@@ -12,7 +12,7 @@ x-hardened: &hardened
 services:
   photolibd:
     <<: *hardened
-    image: ghcr.io/arxiflex/photolib:${PHOTOLIB_VERSION:-stable}
+    image: ghcr.io/arxiflex-dev/photolib:${PHOTOLIB_VERSION:-stable}
     environment:
       PHOTOLIB_BASE_PATH: ${PHOTOLIB_BASE_PATH:-/}
       PHOTOLIB_DATABASE__URL: postgres://photolib:${POSTGRES_PASSWORD:?run setup.sh}@postgres/photolib

@@ -12,7 +12,7 @@ from checklib import ROOT, check, finish, read
 
 NAS = os.path.join(ROOT, "deploy", "nas")
 VERSION = re.search(r"^version: *([0-9.]+)", read("app/pubspec.yaml"), re.MULTILINE)[1]
-IMAGE = f"ghcr.io/arxiflex/photolib:{VERSION}"
+IMAGE = f"ghcr.io/arxiflex-dev/photolib:{VERSION}"
 POSTGRES = re.search(r"image: (postgres:\S+)", read("deploy/compose/compose.yaml"))[1]
 ENV = {"POSTGRES_PASSWORD": "secret", "PHOTOLIB_PUBLIC_URL": "http://nas.local:8080", "PUID": "1026", "PGID": "100",
        "AppID": "photolib", "APP_DATA_DIR": "/umbrel/app-data/photolib", "APP_PASSWORD": "secret",

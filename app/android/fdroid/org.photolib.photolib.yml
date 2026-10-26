@@ -7,13 +7,13 @@ Categories:
   - Gallery
 License: AGPL-3.0-only
 AuthorName: Photolib
-SourceCode: https://github.com/Arxiflex/photolib
-IssueTracker: https://github.com/Arxiflex/photolib/issues
+SourceCode: https://github.com/arxiflex-dev/photolib
+IssueTracker: https://github.com/arxiflex-dev/photolib/issues
 
 AutoName: Photolib
 
 RepoType: git
-Repo: https://github.com/Arxiflex/photolib.git
+Repo: https://github.com/arxiflex-dev/photolib.git
 
 Builds:
   - versionName: 0.1.0

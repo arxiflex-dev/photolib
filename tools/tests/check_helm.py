@@ -47,7 +47,7 @@ check(bare.returncode != 0 and "publicUrl" in bare.stderr and "database.secret" 
 one = render(*REQUIRED)
 spec = pod(one, "Deployment", "photos-all")
 container = spec.get("containers", [{}])[0]
-check(container.get("image") == f"ghcr.io/arxiflex/photolib:{version}", "photolibd's image of the release")
+check(container.get("image") == f"ghcr.io/arxiflex-dev/photolib:{version}", "photolibd's image of the release")
 check(env(spec).get("PHOTOLIB_ROLES") == "all" and env(spec).get("PHOTOLIB_PUBLIC_URL") == "https://photos.example.com",
       "one Deployment runs every role at the public URL by default")
 check(env(spec).get("PHOTOLIB_DATABASE__URL") == {"secretKeyRef": {"name": "photolib-db", "key": "url"}},

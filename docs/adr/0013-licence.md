@@ -135,6 +135,6 @@ Changing the licence takes an ADR that supersedes this one, and the same change 
 entry in `deny.toml`, the `license` field of every manifest, and the statements in `README.md` and
 `AGENTS.md`; `tools/tests/test_licence_policy.sh` fails until they agree.
 
-[license]: https://github.com/Arxiflex/photolib/blob/main/LICENSE
-[dco]: https://github.com/Arxiflex/photolib/blob/main/DCO
-[deny]: https://github.com/Arxiflex/photolib/blob/main/deny.toml
+[license]: https://github.com/arxiflex-dev/photolib/blob/main/LICENSE
+[dco]: https://github.com/arxiflex-dev/photolib/blob/main/DCO
+[deny]: https://github.com/arxiflex-dev/photolib/blob/main/deny.toml

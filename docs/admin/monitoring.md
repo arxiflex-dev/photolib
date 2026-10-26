@@ -64,4 +64,4 @@ reports, update checks, news feed and Gravatar are off. For another `listen`, ch
 With [`traces.otlp_endpoint`](configuration.md#settings) set, `photolibd` also sends its spans over OTLP/HTTP to that
 OpenTelemetry collector. Unset, the default, nothing leaves the process.
 
-[bundle]: https://github.com/Arxiflex/photolib/tree/main/deploy/observability
+[bundle]: https://github.com/arxiflex-dev/photolib/tree/main/deploy/observability

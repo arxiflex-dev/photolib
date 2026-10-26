@@ -1,7 +1,7 @@
 site_name: Photolib
 site_description: User, administrator and developer documentation and architecture decision records
-site_url: https://arxiflex.github.io/photolib/
-repo_url: https://github.com/Arxiflex/photolib
+site_url: https://arxiflex-dev.github.io/photolib/
+repo_url: https://github.com/arxiflex-dev/photolib
 strict: true
 
 theme:

@@ -104,4 +104,4 @@ The node needs no database and no `data_dir`; it sends its self-test to the serv
 `ml` check warns of a node silent for 15 minutes. The jobs a node runs arrive with the first models that index (M5-04).
 The container image cannot run models yet: its Alpine base lacks the glibc ONNX Runtime's builds need.
 
-[registry]: https://github.com/Arxiflex/photolib/blob/main/server/crates/photolib-models/registry.json
+[registry]: https://github.com/arxiflex-dev/photolib/blob/main/server/crates/photolib-models/registry.json

@@ -5,5 +5,5 @@ type: application
 # Both are the release's version (app/pubspec.yaml); the image tag defaults to appVersion.
 version: 0.1.0
 appVersion: "0.1.0"
-home: https://github.com/Arxiflex/photolib
-sources: [https://github.com/Arxiflex/photolib]
+home: https://github.com/arxiflex-dev/photolib
+sources: [https://github.com/arxiflex-dev/photolib]

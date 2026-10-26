@@ -30,7 +30,7 @@ tools=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 cd "$tools/../app"
 version=$(sed -n 's/^version: *\([0-9.]*\).*/\1/p' pubspec.yaml)
 
-RELEASES=https://github.com/Arxiflex/photolib/releases/download
+RELEASES=https://github.com/arxiflex-dev/photolib/releases/download
 sha256() { if command -v sha256sum >/dev/null; then sha256sum <"$1"; else shasum -a 256 <"$1"; fi | cut -d' ' -f1; }
 
 # fetch <file in the cache> <url> <sha256>: the cached file, downloaded once.
@@ -47,8 +47,8 @@ deb() {
 Package: $3
 Version: $version
 Architecture: $(dpkg --print-architecture)
-Maintainer: Photolib <https://github.com/Arxiflex/photolib/issues>
-Homepage: https://github.com/Arxiflex/photolib
+Maintainer: Photolib <https://github.com/arxiflex-dev/photolib/issues>
+Homepage: https://github.com/arxiflex-dev/photolib
 Depends: $4
 Description: $5
  Photolib keeps photos and videos on a server of your own; its apps browse, back up and share them.
@@ -159,7 +159,7 @@ cask "photolib" do
   url "$RELEASES/v#{version}/Photolib.dmg"
   name "Photolib"
   desc "Your own photo and video library"
-  homepage "https://github.com/Arxiflex/photolib"
+  homepage "https://github.com/arxiflex-dev/photolib"
 
   depends_on macos: ">= :ventura"
 

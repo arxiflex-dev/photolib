@@ -85,7 +85,7 @@ def fetch(name, archive=False):
             return paths
         download, digest = Path(tmp, "download"), hashlib.sha256()
         # Wikimedia refuses the default user agent; every host gets a name and where to ask.
-        request = urllib.request.Request(url, headers={"User-Agent": "photolib-tools/1 (https://github.com/Arxiflex/photolib)"})
+        request = urllib.request.Request(url, headers={"User-Agent": "photolib-tools/1 (https://github.com/arxiflex-dev/photolib)"})
         with urllib.request.urlopen(request) as response, open(download, "wb") as sink:
             while chunk := response.read(1 << 20):
                 digest.update(chunk)

@@ -3,13 +3,13 @@
 ## Development environment
 
 Start with `just bootstrap`; the
-[README](https://github.com/Arxiflex/photolib/blob/main/README.md#development-environment) covers prerequisites,
+[README](https://github.com/arxiflex-dev/photolib/blob/main/README.md#development-environment) covers prerequisites,
 endpoints, seed data and recipes. [ADR-0018](../adr/0018-dev-s3-store.md) records the dev-store choice.
 
 ## Checking your work
 
 Run `bash tools/check.sh`: it is the only check before a merge, and CI runs it again after check-in. See
-[AGENTS.md](https://github.com/Arxiflex/photolib/blob/main/AGENTS.md) for checks, conventions, the PR workflow and
+[AGENTS.md](https://github.com/arxiflex-dev/photolib/blob/main/AGENTS.md) for checks, conventions, the PR workflow and
 commit rules. [Lint rules](lint.md) lists every language's rules and how the baseline of their
 findings shrinks. The [pre-queue backtest](prequeue-backtest.md) replays `tools/prequeue.sh` against the red
 merge-queue runs of 2026-10-25.
@@ -17,7 +17,7 @@ merge-queue runs of 2026-10-25.
 ## Protobuf and generated code
 
 Follow the [protobuf style guide](protobuf-style-guide.md) in `proto/`.
-The [tooling guide](https://github.com/Arxiflex/photolib/blob/main/tools/README.md#generated-files) documents
+The [tooling guide](https://github.com/arxiflex-dev/photolib/blob/main/tools/README.md#generated-files) documents
 `tools/codegen.sh`, pinned plugins and drift checks; regenerate and commit outputs with each `.proto` change.
 Toolchain decisions are in
 [ADR-0019](../adr/0019-protobuf-toolchain.md).
@@ -50,7 +50,7 @@ private CA and mutual TLS that `openssl` makes for each run (`flutter test` in t
 
 ## Synthetic libraries
 
-Use [tools/synthlib](https://github.com/Arxiflex/photolib/blob/main/tools/synthlib/README.md)
+Use [tools/synthlib](https://github.com/arxiflex-dev/photolib/blob/main/tools/synthlib/README.md)
 for reproducible large-library performance and client tests.
 
 ## Performance budgets
@@ -65,7 +65,7 @@ far and the detection runs.
 
 ## The kernel
 
-The [kernel guide](https://github.com/Arxiflex/photolib/blob/main/kernel/README.md)
+The [kernel guide](https://github.com/arxiflex-dev/photolib/blob/main/kernel/README.md)
 documents the pure Rust API, C ABI, WASM module and shared Rust/Dart conformance vectors.
 `bash tools/check.sh web` runs the vectors in Chrome, initially fetching the WASM target and pinned `wasm-bindgen`.
 

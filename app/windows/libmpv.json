@@ -27,7 +27,7 @@
     "libmpv/swresample-6.dll": "7dd6bfd7e96f9c9d0f8e0b2a94022f8ababa96e669f9b2427d4f0601abef0cd1",
     "libmpv/swscale-9.dll": "3671a4475a069209baef4b83bb39c085ee0d853ca966e768ceb6f476e1dcf7fd"
   },
-  "url": "https://github.com/Arxiflex/photolib/releases/download/libmpv-windows-b3ad106ec963/libmpv-0.41.0-ffmpeg-8.1.3-windows-x64.tar.xz",
+  "url": "https://github.com/arxiflex-dev/photolib/releases/download/libmpv-windows-b3ad106ec963/libmpv-0.41.0-ffmpeg-8.1.3-windows-x64.tar.xz",
   "toolchain": {
     "llvm-mingw": "llvm-mingw-20261006-ucrt-ubuntu-22.04-x86_64",
     "clang": "clang version 23.1.3 (https://github.com/llvm/llvm-project.git 0d261d1ca552c95a8f007e061c787ac7132fbcbc)",

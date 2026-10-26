@@ -9,7 +9,7 @@ import sys
 from checklib import ROOT, check, finish, read
 
 DIR = os.path.join(ROOT, "deploy", "compose")
-IMAGE = "ghcr.io/arxiflex/photolib"
+IMAGE = "ghcr.io/arxiflex-dev/photolib"
 
 
 def config(env_file):

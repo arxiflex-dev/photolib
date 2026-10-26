@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
   s.name             = 'photolib_video'
   s.version          = '0.0.1'
   s.summary          = 'Prototype AVFoundation executor of the M0-35 spike.'
-  s.homepage         = 'https://github.com/Arxiflex/photolib'
+  s.homepage         = 'https://github.com/arxiflex-dev/photolib'
   s.license          = { :type => 'AGPL-3.0-only' }
   s.author           = 'Photolib'
   s.source           = { :path => '.' }
