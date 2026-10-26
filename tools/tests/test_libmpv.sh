@@ -122,7 +122,7 @@ python3 - "$PINS" <<'EOF' && ok "$PINS pins the archive, its files and the toolc
 import json, re, sys
 pins = json.load(open(sys.argv[1]))
 assert re.fullmatch(r"[0-9a-f]{64}", pins["sha256"])
-assert pins["url"].startswith("https://github.com/Arxiflex/photolib/releases/download/")
+assert pins["url"].startswith("https://github.com/arxiflex-dev/photolib/releases/download/")
 assert pins["url"].endswith("/" + pins["archive"])
 for f in ("libmpv/libmpv-2.dll", "libmpv/libmpv.dll.a", "libmpv/include/client.h", "libmpv/libmpv-notices.txt",
           "ANGLE/lib/libEGL.dll.lib", "ANGLE/lib/libGLESv2.dll.lib", "ANGLE/include/EGL/eglext.h"):

@@ -37,7 +37,7 @@ smoke (hide and show the window 20 times, a 360° video plays) and the known iss
 ## Upgrading Flutter
 
 1. Move the version in `app/.fvmrc` and nothing else that is unrelated, in a pull request that uses the
-   [Flutter upgrade template](https://github.com/Arxiflex/photolib/blob/main/.github/PULL_REQUEST_TEMPLATE/flutter-upgrade.md).
+   [Flutter upgrade template](https://github.com/arxiflex-dev/photolib/blob/main/.github/PULL_REQUEST_TEMPLATE/flutter-upgrade.md).
 2. The weekly workflow (`flutter-beta.yml`) builds, tests and smoke-tests the app on the beta channel, so a breaking
    change is known before the stable release; run it by hand (`workflow_dispatch`) when needed.
 3. Tick every gate in the template with the evidence beside it: all test layers, performance within 10 %, goldens

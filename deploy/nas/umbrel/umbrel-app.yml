@@ -7,9 +7,9 @@ tagline: Your own photo and video library
 description: >-
   Back up, browse and share photos and videos from every device, on your own server.
 developer: Photolib
-website: https://github.com/Arxiflex/photolib
-repo: https://github.com/Arxiflex/photolib
-support: https://github.com/Arxiflex/photolib/issues
+website: https://github.com/arxiflex-dev/photolib
+repo: https://github.com/arxiflex-dev/photolib
+support: https://github.com/arxiflex-dev/photolib/issues
 port: 3843
 dependencies: []
 gallery: []
@@ -17,4 +17,4 @@ path: ""
 defaultUsername: ""
 defaultPassword: ""
 submitter: Photolib
-submission: https://github.com/Arxiflex/photolib
+submission: https://github.com/arxiflex-dev/photolib

@@ -50,8 +50,8 @@
     <p xml:lang="sv">Photolib förvarar dina foton och videor på en server som du själv driver. Bläddra i hela biblioteket, på den här enheten och på servern, säkerhetskopiera nya foton och videor så fort du tar dem och dela album med de personer du väljer.</p>
   </description>
   <launchable type="desktop-id">org.photolib.photolib.desktop</launchable>
-  <url type="homepage">https://github.com/Arxiflex/photolib</url>
-  <url type="bugtracker">https://github.com/Arxiflex/photolib/issues</url>
+  <url type="homepage">https://github.com/arxiflex-dev/photolib</url>
+  <url type="bugtracker">https://github.com/arxiflex-dev/photolib/issues</url>
   <developer id="org.photolib">
     <name>Photolib</name>
   </developer>

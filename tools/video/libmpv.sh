@@ -258,7 +258,7 @@ built = {
     "sha256": digest(archive),
     "files": {str(p.relative_to(out)): digest(p) for p in sorted(pathlib.Path(out).rglob("*")) if p.is_file()},
 }
-built["url"] = ("https://github.com/Arxiflex/photolib/releases/download/"
+built["url"] = ("https://github.com/arxiflex-dev/photolib/releases/download/"
                 f"libmpv-windows-{built['sha256'][:12]}/{built['archive']}")
 built["toolchain"] = {
     "llvm-mingw": pathlib.Path(toolchain).name,

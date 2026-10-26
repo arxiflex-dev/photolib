@@ -15,7 +15,7 @@ bash tools/perf/run.sh                                    # the budgets, on this
 PERF_HISTORY=~/perf/history.jsonl bash tools/perf/run.sh  # a reference machine: also regressions and the dashboard
 ```
 
-`run.sh` generates the [synthlib](https://github.com/Arxiflex/photolib/blob/main/tools/synthlib/README.md)
+`run.sh` generates the [synthlib](https://github.com/arxiflex-dev/photolib/blob/main/tools/synthlib/README.md)
 fixtures (1M assets, a 300k timeline, 100k near-duplicates, 100k with one timestamp, 50k on one day, 5k folders,
 10k albums), measures photolibd's idle RSS without ML, its ingest throughput (the kernel's metadata, `thumb_s`,
 `thumb_m` and ThumbHash of 12 MP JPEGs, in CPU time on the fastest cores, [calibrated](#calibration)) and the sync of a

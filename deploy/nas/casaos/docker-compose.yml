@@ -3,7 +3,7 @@ name: photolib
 
 services:
   photolibd:
-    image: ghcr.io/arxiflex/photolib:0.1.0
+    image: ghcr.io/arxiflex-dev/photolib:0.1.0
     user: $PUID:$PGID
     read_only: true
     restart: unless-stopped
@@ -53,7 +53,7 @@ x-casaos:
   category: Gallery
   author: Photolib
   developer: Photolib
-  icon: https://raw.githubusercontent.com/Arxiflex/photolib/main/app/web/icons/Icon-512.png
+  icon: https://raw.githubusercontent.com/arxiflex-dev/photolib/main/app/web/icons/Icon-512.png
   tagline:
     en_us: Your own photo and video library
   description:

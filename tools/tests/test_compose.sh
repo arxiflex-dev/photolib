@@ -55,7 +55,7 @@ assert_patterns assert_prose docs/admin/install.md \
   'docker compose logs photolibd' "says where the setup token is" \
   'keys/` holds the OPAQUE key: back it up apart' "says to back the key up apart from the database dumps" \
   'docker compose pull' "upgrades with the new release's compose files and no edits" \
-  'ghcr\.io/arxiflex/photolib' "names the image for other setups" \
+  'ghcr\.io/arxiflex-dev/photolib' "names the image for other setups" \
   'Docker Desktop on Windows or macOS, WSL2 or a NAS.s container manager' "runs the image on any OS (#374)" \
   'no native Windows or macOS[[:space:]]+photolibd, as its media sandbox \(\[ADR-0024\]\([^)]*\)\) needs Linux' \
   "says photolibd runs natively on Linux only, as its media sandbox needs Linux" \

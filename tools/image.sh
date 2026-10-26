@@ -6,7 +6,7 @@
 # weekly workflow compares between amd64 and arm64.
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
-image=ghcr.io/arxiflex/photolib:check
+image=ghcr.io/arxiflex-dev/photolib:check
 scratch=$(mktemp -d)
 compose() { docker compose --project-directory "$scratch/compose" "$@"; }
 trap 'compose down >/dev/null 2>&1 || true; rm -rf "$scratch"' EXIT

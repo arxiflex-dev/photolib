@@ -39,7 +39,7 @@ checksums:
 ```sh
 cosign verify-blob --bundle SHA256SUMS.sigstore.json \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  --certificate-identity-regexp '^https://github\.com/Arxiflex/photolib/\.github/workflows/flutter-beta\.yml@refs/tags/kernel-v' \
+  --certificate-identity-regexp '^https://github\.com/arxiflex-dev/photolib/\.github/workflows/flutter-beta\.yml@refs/tags/kernel-v' \
   SHA256SUMS
 sha256sum --ignore-missing -c SHA256SUMS
 ```

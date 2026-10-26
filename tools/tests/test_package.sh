@@ -108,7 +108,7 @@ has "of the app as signed" "codesign -d --entitlements - --xml build/macos/Build
 sha=$(sha256sum <"$APP/build/Photolib.dmg" | cut -d' ' -f1)
 cask=$(<"$APP/build/photolib.rb")
 [[ $cask == *"version \"$version\""* && $cask == *"sha256 \"$sha\""* && $cask == *'app "photolib.app"'* &&
-  $cask == *'url "https://github.com/Arxiflex/photolib/releases/download/v#{version}/Photolib.dmg"'* ]] &&
+  $cask == *'url "https://github.com/arxiflex-dev/photolib/releases/download/v#{version}/Photolib.dmg"'* ]] &&
   ok "with the Homebrew cask of the release's DMG" || fail "the cask: $cask"
 APPLE_SIGNING_IDENTITY="Developer ID Application: Photolib (TEAM)" APPLE_NOTARY_PROFILE=photolib package dmg
 [[ $STATUS == 0 ]] && ok "a signed DMG builds" || fail "signed dmg failed ($STATUS): $(<"$TMP/out")"
@@ -131,7 +131,7 @@ package msix
 sha=$(sha256sum <"$APP/build/Photolib.msix" | cut -d' ' -f1)
 winget=$APP/build/winget
 grep -qx "InstallerSha256: $sha" "$winget/Photolib.Photolib.installer.yaml" &&
-  grep -qx "    InstallerUrl: https://github.com/Arxiflex/photolib/releases/download/v$version/Photolib.msix" \
+  grep -qx "    InstallerUrl: https://github.com/arxiflex-dev/photolib/releases/download/v$version/Photolib.msix" \
     "$winget/Photolib.Photolib.installer.yaml" && grep -qx "PackageVersion: $version" "$winget/Photolib.Photolib.yaml" &&
   grep -qx "License: AGPL-3.0-only" "$winget/Photolib.Photolib.locale.en-US.yaml" &&
   ok "with the winget manifests of the release's MSIX" || fail "the winget manifests: $(cat "$winget"/* 2>&1)"

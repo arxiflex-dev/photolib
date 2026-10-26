@@ -18,7 +18,7 @@ As the user who should own Photolib's files (or with `sudo`, which then uses you
 
 ```sh
 mkdir photolib
-curl -fsSL https://github.com/Arxiflex/photolib/archive/refs/heads/main.tar.gz |
+curl -fsSL https://github.com/arxiflex-dev/photolib/archive/refs/heads/main.tar.gz |
   tar -xz --strip-components=3 -C photolib photolib-main/deploy/compose
 sh photolib/setup.sh photos.example.com
 ```
@@ -44,7 +44,7 @@ beyond it, such as [object stores](storage.md#set-up-a-bucket), go in a `compose
 photolibd dumps the database before it migrates the schema ([upgrades](upgrades.md)):
 
 ```sh
-curl -fsSL https://github.com/Arxiflex/photolib/archive/refs/heads/main.tar.gz |
+curl -fsSL https://github.com/arxiflex-dev/photolib/archive/refs/heads/main.tar.gz |
   tar -xz --strip-components=3 -C photolib photolib-main/deploy/compose
 cd photolib && docker compose pull && docker compose up -d
 ```
@@ -84,10 +84,10 @@ Route an Ingress of your own to the Service on port 8080, with the limits of [re
 
 * Behind a proxy of your own: `deploy/proxy` has templates for Traefik, nginx, Apache, Nginx Proxy Manager and
   Cloudflare Tunnel ([reverse proxies](reverse-proxy.md)).
-* The image alone: `ghcr.io/arxiflex/photolib`, configured with `PHOTOLIB_*` variables
+* The image alone: `ghcr.io/arxiflex-dev/photolib`, configured with `PHOTOLIB_*` variables
   ([configuration](configuration.md)); give it `--read-only --tmpfs /tmp`, a writable `/data`, and
   `PHOTOLIB_OPAQUE_KEY_FILE` on a volume of its own or as a Docker secret.
-* From source, on Linux: build photolibd from `server/` ([server](https://github.com/Arxiflex/photolib/blob/main/server/README.md));
+* From source, on Linux: build photolibd from `server/` ([server](https://github.com/arxiflex-dev/photolib/blob/main/server/README.md));
   it needs libvips, FFmpeg, ExifTool and PostgreSQL's client programs. No static binary is published: photolibd links
   libvips, which may only be linked dynamically ([ADR-0096](../adr/0096-deployment-images-compose-and-proxies.md)).
 

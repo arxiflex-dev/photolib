@@ -10,7 +10,7 @@ services:
       PROXY_AUTH_ADD: "false"
 
   photolibd:
-    image: ghcr.io/arxiflex/photolib:0.1.0
+    image: ghcr.io/arxiflex-dev/photolib:0.1.0
     user: "1000:1000"
     read_only: true
     restart: on-failure

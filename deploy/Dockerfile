@@ -20,12 +20,12 @@ FROM alpine:3.24@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cab
 RUN apk add --no-cache ca-certificates exiftool ffmpeg postgresql18-client tzdata vips vips-heif vips-jxl
 COPY --from=build /photolibd /usr/bin/
 COPY <<EOF /usr/share/doc/photolib/SOURCES
-photolibd (AGPL-3.0-only): https://github.com/Arxiflex/photolib at this image's org.opencontainers.image.revision.
+photolibd (AGPL-3.0-only): https://github.com/arxiflex-dev/photolib at this image's org.opencontainers.image.revision.
 FFmpeg (GPL), libvips (LGPL), ExifTool and every other package: Alpine Linux 3.24 builds, whose sources and build
 recipes are at https://gitlab.alpinelinux.org/alpine/aports/-/tree/3.24-stable and
 https://distfiles.alpinelinux.org/distfiles/v3.24/.
 EOF
-LABEL org.opencontainers.image.source=https://github.com/Arxiflex/photolib \
+LABEL org.opencontainers.image.source=https://github.com/arxiflex-dev/photolib \
       org.opencontainers.image.licenses=AGPL-3.0-only
 ENV PHOTOLIB_CONFIG_VERSION=1 \
     PHOTOLIB_LISTEN=0.0.0.0:8080 \
