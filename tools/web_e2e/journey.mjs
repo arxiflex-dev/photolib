@@ -6,12 +6,12 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { openApp, seen, tap, texts, type } from './lib.mjs';
+import { dayLabel, openApp, seen, tap, texts, type } from './lib.mjs';
 
 const password = 'correct horse battery';
 // A 1 x 1 PNG, which a drop gives the page.
-// The dropped file is dated by the moment it is made: the timeline's day for it is today's.
-const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+// The dropped file is dated by the moment it is dropped, which can be a day after the run began (a run crosses midnight):
+// the scenario reads that day from the file, never from the clock at import.
 const dropped = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGP4z8DwHwAFAAH/q842iQAAAABJRU5ErkJggg==';
 
 /** Runs the journey in `page` (`light`: without downloads, video, reload and offline, for a slow phone); `context` and `files` (the photos on disk) and `video` (a clip, or null) are the user's. */
@@ -69,13 +69,18 @@ export async function journey({ page, context, engine, url, token, photos, video
     await shot('timeline');
   });
 
+  // The timeline's name for the day of the dropped photo, once it is dropped.
+  let today;
   await step('a photo dropped on the window uploads too', async () => {
-    await page.evaluate(async (encoded) => {
+    const modified = await page.evaluate(async (encoded) => {
       const bytes = Uint8Array.from(atob(encoded), (c) => c.charCodeAt(0));
       const data = new DataTransfer();
-      data.items.add(new File([bytes], `dropped-${Date.now()}.png`, { type: 'image/png' }));
+      const file = new File([bytes], `dropped-${Date.now()}.png`, { type: 'image/png' });
+      data.items.add(file);
       for (const type of ['dragover', 'drop']) document.dispatchEvent(new DragEvent(type, { dataTransfer: data, bubbles: true, cancelable: true }));
+      return file.lastModified;
     }, dropped);
+    today = dayLabel(modified);
     await seen(page, /Uploaded 3 of 3/);
     await seen(page, new RegExp(`${today}, 1 of 1`));
   });

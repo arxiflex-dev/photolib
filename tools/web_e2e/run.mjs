@@ -51,7 +51,7 @@ async function visit(name, type, built, { mobile = false } = {}) {
         await work();
         console.log(`ok: ${title}: ${what} (${((Date.now() - began) / 1000).toFixed(1)} s)`);
       } catch (error) {
-        console.log(`FAIL: ${title}: ${what}: ${String(error.message ?? error).split('\n')[0]}`);
+        console.log(`FAIL: ${title}: ${what}: ${String(error.message ?? error).slice(0, 3000)}`);
         failures.push(`${title}: ${what}`);
         await page.screenshot({ path: join(out, `failed-${failures.length}.png`) }).catch(() => {});
         for (const line of server.problems().slice(-5)) console.log(`  photolibd: ${line.slice(0, 300)}`);

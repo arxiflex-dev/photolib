@@ -155,13 +155,30 @@ export function texts(page) {
   );
 }
 
-/** Waits until some node of the accessibility tree matches `pattern`. */
-export function seen(page, pattern, timeout = 120_000) {
-  return page.waitForFunction(
-    (source) => [...document.querySelectorAll('flt-semantics')].some((node) => new RegExp(source).test(node.getAttribute('aria-label') || node.textContent || '')),
-    pattern.source,
-    { timeout },
-  );
+/** The timeline's name for the day of `ms`, in this process's time zone. */
+export function dayLabel(ms) {
+  return new Date(ms).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+/**
+ * Waits until some node of the accessibility tree matches `pattern`; a timeout says what it waited for and lists the
+ * page's nodes, which is all anyone has to go on when it happens on a runner.
+ */
+export async function seen(page, pattern, timeout = 120_000) {
+  try {
+    return await page.waitForFunction(
+      (source) => [...document.querySelectorAll('flt-semantics')].some((node) => new RegExp(source).test(node.getAttribute('aria-label') || node.textContent || '')),
+      pattern.source,
+      { timeout },
+    );
+  } catch (error) {
+    if (!/Timeout/.test(String(error.message))) throw error;
+    const nodes = await texts(page).then((all) => all.filter(Boolean), () => ['(the page could not be read)']);
+    throw new Error(
+      `${error.message.split('\n')[0]}\n  waiting for a node matching ${pattern}\n  the page shows ${nodes.length} nodes: ${JSON.stringify(nodes.slice(0, 60)).slice(0, 2000)}`,
+      { cause: error },
+    );
+  }
 }
 
 /** Types into a text field the way a user does: Flutter reads keystrokes, never a value set on the node. */
