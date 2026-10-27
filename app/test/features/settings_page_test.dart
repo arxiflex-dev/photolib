@@ -119,20 +119,13 @@ void main() {
       'keeps them', (tester) async {
     final settings = await open(tester);
     await tester.tapAndSettle(find.text("Buttons in the viewer's bar"));
-    const menu = [
-      'Share',
-      'Copy',
-      'Copy text',
-      'Rotate',
-      'Map',
-      'Set as',
-      'Slideshow',
-    ];
+    const menu = ['Copy', 'Copy text', 'Rotate', 'Map', 'Set as', 'Slideshow'];
     expect(lists(tester).$1, [
       'Favourite',
+      'Share',
       'Info',
-      'Edit',
       'Move to trash',
+      'Edit',
       'Filmstrip',
     ]);
     expect(lists(tester).$2, [
@@ -147,16 +140,18 @@ void main() {
     await tester.tapAndSettle(find.byTooltip('Remove Filmstrip from the bar'));
     await tester.tapAndSettle(find.byTooltip('Add Slideshow to the bar'));
     expect(lists(tester).$1, [
-      'Info',
       'Favourite',
+      'Info',
+      'Share',
       'Move to trash',
       'Edit',
       'Slideshow',
     ]);
-    expect(lists(tester).$2.take(3), ['Filmstrip', 'Share', 'Copy']);
+    expect(lists(tester).$2.take(3), ['Filmstrip', 'Copy', 'Copy text']);
     expect(settings().bar, [
-      ViewerAction.info,
       ViewerAction.favourite,
+      ViewerAction.info,
+      ViewerAction.share,
       ViewerAction.trash,
       ViewerAction.edit,
       ViewerAction.slideshow,
@@ -172,6 +167,29 @@ void main() {
     );
     await tester.tapAndSettle(find.text('Reset to default'));
     expect(settings().bar, defaultPins);
+    expect(defaultPins, [
+      ViewerAction.favourite,
+      ViewerAction.share,
+      ViewerAction.info,
+      ViewerAction.trash,
+      ViewerAction.edit,
+      ViewerAction.filmstrip,
+    ]);
+  });
+
+  test('a bar saved before the new default keeps its order', () {
+    final decode = SettingsNotifier().decode;
+    final saved = decode({
+      'bar': ['info', 'favourite', 'trash'],
+    });
+    expect(saved.bar, [
+      ViewerAction.info,
+      ViewerAction.favourite,
+      ViewerAction.trash,
+    ]);
+    expect(decode(<String, Object?>{}).bar, defaultPins);
+    expect(decode(saved.toJson()).bar, saved.bar);
+    expect(const Settings().toJson().containsKey('bar'), isFalse);
   });
 
   testWidgets('the toolbar is arranged with the keyboard alone', (
@@ -199,8 +217,9 @@ void main() {
     await press('Remove Edit from the bar');
     await press('Add Rotate to the bar');
     expect(settings().bar, [
-      ViewerAction.info,
+      ViewerAction.share,
       ViewerAction.favourite,
+      ViewerAction.info,
       ViewerAction.trash,
       ViewerAction.filmstrip,
       ViewerAction.rotate,
@@ -229,14 +248,15 @@ void main() {
     tester,
   ) async {
     await open(tester);
-    const pins = ['Favourite', 'Info', 'Edit', 'Move to trash', 'Filmstrip'];
+    const pins = ['Favourite', 'Info', 'Move to trash', 'Edit', 'Filmstrip'];
     const veils = ['Slideshow', 'Hide', 'Archive'];
     for (final (platform, actions) in [
       (
         TargetPlatform.android,
         [
-          ...pins,
+          'Favourite',
           'Share',
+          ...pins.skip(1),
           'Copy',
           'Copy text',
           'Rotate',
@@ -250,8 +270,9 @@ void main() {
       (
         TargetPlatform.iOS,
         [
-          ...pins.where((p) => p != 'Edit'),
+          'Favourite',
           'Share',
+          ...pins.skip(1).where((p) => p != 'Edit'),
           'Copy text',
           'Rotate',
           'Map',

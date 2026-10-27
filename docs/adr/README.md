@@ -118,7 +118,7 @@ here; the two share one numbering.
 | [0240](0240-server-policies.md) | Server policies: capability switches in the authorisation module, presets, pins in the configuration | Accepted (owner confirmed, 2026-10-23) |
 | [0242](0242-step-up.md) | Step-up: a fresh proof on the session before a way in is added, removed or replaced | Accepted (owner answered, 2026-10-23) |
 | [0243](0243-setup-links-open-the-app.md) | A password setup link opens the app: photolibd's page hands it over through `photolib:` | Accepted (owner confirmed, 2026-10-21) |
-| [0245](0245-deletion-trash-and-device-state.md) | One deletion path, the platforms' trashes, and Photolib's own state of device items | **Proposed — owner to confirm** |
+| [0245](0245-deletion-trash-and-device-state.md) | One deletion path, the platforms' trashes, and Photolib's own state of device items | Accepted (owner answered, 2026-10-23) |
 | [0245](0245-server-ml-role.md) | The server's ML role: ONNX Runtime loaded at run time, golden self-tests per backend, a memory limit | Accepted (owner confirmed, 2026-10-23) |
 | [0246](0246-adaptive-streaming.md) | Adaptive streaming: one grid of 2 s pieces, R1 sliced, the other rungs encoded on demand | Accepted (owner confirmed, 2026-10-23) |
 | [0246](0246-server-renditions-tier.md) | Server renditions in the thumbnail pipeline (T5): cached by ETag, pending tiles keep their ThumbHash | **Proposed — owner to confirm** |
