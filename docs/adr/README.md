@@ -152,6 +152,7 @@ here; the two share one numbering.
 | [0393](0393-storage-policies-and-offline-pins.md) | Storage policies and offline pins: four presets, a sealed budgeted store, pins of albums, searches and photos | **Proposed — owner to confirm** |
 | [0391](0391-edit-recipes-and-version-history.md) | Edit recipes and the version history: an `EditRecipe` per immutable version, derived data that follows | **Proposed — owner to confirm** |
 | [0394](0394-macos-desktop-build.md) | The macOS desktop app builds from a fresh checkout and runs with its network, libvips and orientation: the kernel built by the hook, `network.client`, libvips bundled by the Xcode build, upright HDR | **Proposed — owner to confirm** |
+| [0397](0397-m1-51-design-repository-amendments.md) | M1-51's amendments to the design repository, as text to apply | **Proposed — owner to confirm** |
 
 To record a decision, copy [template.md](template.md) to the next number free in both repositories, set its status
 to *Proposed* (the owner accepts it) and add a row above. `tools/tests/test_adr.sh` checks that every ADR is listed
