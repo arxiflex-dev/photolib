@@ -83,6 +83,15 @@ screenshots of that run, taken by a Playwright script, then scaled with FFmpeg):
 * `grid-chrome-mobile-emulation.jpg`, `viewer-chrome-mobile-emulation.jpg`: the same in a Pixel 7 emulation (touch,
   device pixel ratio 2.625, CPU slowed 4 times, the network at 1.5 MB/s).
 
+Run again on 2026-10-27 at `80a45ed7` on Linux arm64 (no GPU, no HEVC decoder): the app built with
+`flutter build web --wasm` in Chromium 156 (desktop and Pixel 7 emulation with the CPU slowed 4 times) shows the six
+twins upright and the HEVC file marked (`grid-chromium-156-aarch64.jpg`, `viewer-chromium-156-aarch64.jpg`,
+`grid-phone-emulation-aarch64.jpg`, `viewer-phone-emulation-aarch64.jpg`). The worker's own script, read from
+`browser_thumbnails.dart`, decodes the six twins in Chromium 156 (also on the phone emulation) and in Firefox 157 (which
+has `VideoDecoder` and AVC) to within 3/255 at full size, asks `isConfigSupported` once per configuration, and refuses
+the corpus' `iphone.heic` in all three with "this browser cannot decode HEVC; the desktop app and a connected server
+show it" (`isConfigSupported(hvc1…)` is false there).
+
 ## Options considered
 
 * **A WASM HEVC decoder** (libheif-js): 1.2 to 2.0 s per 12 MP photo and a codec in the bundle; refused by ADR-0214.
