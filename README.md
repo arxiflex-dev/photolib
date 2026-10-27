@@ -5,7 +5,7 @@ replaces your phone's gallery and browses local folders on the desktop. When you
 and web access, you connect it to a fast Rust server that you run yourself, with an optional zero-knowledge private
 mode.
 
-> **Status: pre-alpha.** This repository was just created and is not yet usable. The folders below are the agreed
+> **Status: pre-alpha.** This repository was newly created and is not yet usable. The folders below are the agreed
 > layout; the code arrives milestone by milestone. The design, research and roadmap live in the
 > design repository.
 
