@@ -1266,7 +1266,7 @@
   },
   "app/lib/l10n/formats.dart": {
    "always_use_package_imports": 1,
-   "public_member_api_docs": 8,
+   "public_member_api_docs": 7,
    "unnecessary_type_name_in_constructor": 1
   },
   "app/lib/main.dart": {
