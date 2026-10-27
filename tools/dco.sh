@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Requires a Developer Certificate of Origin sign-off (see DCO and AGENTS.md) on every commit in a range.
 #
-#   tools/dco.sh <git-range>     e.g. origin/main..HEAD
+#   tools/dco.sh <git-range>     e.g. <remote>/dev..HEAD
 #
 # A sign-off is a `Signed-off-by: Name <email>` trailer whose email is the commit's author or committer. Merge commits
 # and commits authored by a GitHub bot account (Renovate and the like, which cannot certify anything) are exempt.

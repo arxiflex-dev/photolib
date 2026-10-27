@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Fails when the protobuf module (default: proto) changes incompatibly (buf breaking) against the last release tag
-# reachable from HEAD or, until the first tag exists, against origin/dev. Run it from anywhere inside the checkout;
-# CI needs the tags and origin/dev fetched (a full-history checkout).
+# reachable from HEAD or, until the first tag exists, against <remote>/dev (tools/remote.sh). Run it from anywhere inside the checkout;
+# CI needs the tags and <remote>/dev fetched (a full-history checkout).
 set -euo pipefail
 
 TOOLS=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -11,11 +11,11 @@ cd "$(git rev-parse --show-toplevel)"
 
 if baseline=$(git describe --tags --abbrev=0 --match 'v[0-9]*' 2>/dev/null); then
   :
-elif git rev-parse --verify --quiet refs/remotes/origin/dev >/dev/null; then
-  baseline=origin/dev
+elif REMOTE=$(bash "$TOOLS/remote.sh") && git rev-parse --verify --quiet "refs/remotes/$REMOTE/dev" >/dev/null; then
+  baseline=$REMOTE/dev
 else
-  echo "proto_breaking.sh: no release tag and no origin/dev to compare against; fetch them" \
-    "(git fetch --tags origin main)" >&2
+  echo "proto_breaking.sh: no release tag and no ${REMOTE:-origin}/dev to compare against; fetch them" \
+    "(git fetch --tags ${REMOTE:-origin} dev)" >&2
   exit 1
 fi
 

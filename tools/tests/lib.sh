@@ -120,6 +120,8 @@ new_sandbox() {
   SANDBOXES+=("$SANDBOX")
   mkdir -p "$SANDBOX/$(dirname "$script")" "$SANDBOX/stubs"
   cp "$REPO_ROOT/$script" "$SANDBOX/$script"
+  # the tools name the remote they compare with through tools/remote.sh
+  [[ $script != tools/* ]] || cp "$REPO_ROOT/tools/remote.sh" "$SANDBOX/tools/remote.sh"
   for tool in "$@"; do
     stub_command "$SANDBOX/stubs/$tool" "$tool"
   done
