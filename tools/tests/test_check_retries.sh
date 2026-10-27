@@ -119,6 +119,8 @@ hls_sandbox() {
   gate_sandbox cargo node
   mkdir -p "$SANDBOX/server/crates/photolib-server/tests"
   : >"$SANDBOX/server/crates/photolib-server/tests/hls.rs"
+  mkdir -p "$SANDBOX/tools/perf"
+  printf '#!/bin/bash\nwhile [[ $1 != -- ]]; do shift; done\nshift\nexec "$@"\n' >"$SANDBOX/tools/perf/measure.sh"
 }
 download_sandbox() {
   gate_sandbox node
@@ -175,7 +177,7 @@ once_step "cargo deny's bans, licences and sources" rust_sandbox rust 'cargo den
   "cargo deny --locked --config SANDBOX/deny.toml check bans licenses sources"
 once_step "npm run typecheck" node_sandbox node 'typecheck' "npm run typecheck"
 CHECK_BUDGET_ATTEMPTS=2 once_step "the hls.js test, a budget step with its own attempts" hls_sandbox web 'hls' \
-  "cargo test --locked -p photolib-server --test hls -- --ignored" 2
+  "cargo test --locked -p photolib-server --test hls -- --ignored --nocapture" 2
 
 # The conformance script names the cases that failed, and its runner traces them (a release of the runner with --trace)
 conformance_script() {

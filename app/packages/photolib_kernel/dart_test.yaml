@@ -1,7 +1,2 @@
 # A test that fails runs again up to three times and passes if one of them does: flaky ones no longer fail the gate.
 retry: 3
-tags:
-  # Performance budgets (decrypt MiB/s, calls per second), natively (vectors_test) and in Chrome (web_vectors_test): a
-  # shared or small machine misses a budget the code meets, and the budgets are perf, not a test's own stability
-  # (docs/dev/flaky-tests.md). tools/check.sh runs them in a step of their own, which CI reports without failing on.
-  timing:

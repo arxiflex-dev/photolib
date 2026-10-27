@@ -1,7 +1,7 @@
 // Runs the kernel's conformance vectors through its WebAssembly build in a
-// browser and measures it against its web budgets, as vectors_test.dart does
-// through the C ABI: `dart test -p chrome -c dart2js -c dart2wasm` (the `web`
-// part of tools/check.sh).
+// browser, as vectors_test.dart does through the C ABI: `dart test -p chrome
+// -c dart2js -c dart2wasm` (the `web` part of tools/check.sh). Its speed is
+// benchmark/web_bench_test.dart's.
 @TestOn('browser')
 @Timeout(Duration(minutes: 10))
 library;
@@ -14,7 +14,6 @@ import 'package:photolib_harness/photolib_harness.dart';
 import 'package:photolib_kernel/photolib_kernel_web.dart';
 import 'package:test/test.dart';
 
-import 'bench.dart';
 import 'cases.dart';
 
 @JS()
@@ -60,21 +59,6 @@ void main() {
       }
     });
   });
-
-  test('the kernel meets its web budgets', () async {
-    final results = benchmark(
-      keys(await Kernel.load(module)),
-      vectors.cast<String, String>(),
-      web: true,
-      input: (bytes) => bytes.toJS.toDart,
-    );
-    const compiler = bool.fromEnvironment('dart.tool.dart2wasm')
-        ? 'dart2wasm'
-        : 'dart2js';
-    // The measurements are the run's report.
-    // ignore: avoid_print
-    print(jsonEncode({'target': '$userAgent $compiler', ...results}));
-  }, tags: 'timing');
 
   test('a panic traps only its call; '
       'then the module refuses calls until loaded again', () async {

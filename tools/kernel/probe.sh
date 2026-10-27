@@ -44,6 +44,10 @@ fi
 if [[ $TARGET =~ ^(linux|macos|windows)$ ]]; then
   mkdir -p test/vectors
   cp "$ROOT"/kernel/testvectors/*.json test/vectors/
-  cp "$ROOT"/app/packages/photolib_kernel/test/{vectors_test,bench,cases,machine}.dart test/
+  mkdir -p benchmark
+  cp "$ROOT"/app/packages/photolib_kernel/test/{vectors_test,bench,cases}.dart test/
+  cp "$ROOT"/app/packages/photolib_kernel/benchmark/kernel_bench_test.dart benchmark/
   flutter test --dart-define=vectors=test/vectors/ test/vectors_test.dart
+  # Its speed is printed, not asserted: the budgets are tools/perf/measure.sh's (a hosted runner cannot measure them)
+  flutter test --dart-define=vectors=test/vectors/ benchmark/kernel_bench_test.dart
 fi

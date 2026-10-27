@@ -1,6 +1,8 @@
-// The kernel's budgets measured through a binding: the overhead of a call that does nothing, EXIF + capture time on
+// The kernel's speed measured through a binding: the overhead of a call that does nothing, EXIF + capture time on
 // 64 KiB file heads (ADR-0004's go/no-go gate), PLB decrypt throughput on a 1 MiB envelope and Argon2id at the device
-// floor, which passcode setup times to calibrate t (M0-40, docs/dev/crypto-v1.md).
+// floor, which passcode setup times to calibrate t (M0-40, docs/dev/crypto-v1.md). No time is asserted here: the
+// budgets are the series `kernel-binding` of tools/perf/budgets.json, which tools/perf/measure.sh checks from the
+// `result:` lines [report] prints.
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
@@ -10,14 +12,14 @@ import 'package:test/test.dart';
 import 'cases.dart';
 
 /// Measures a binding on an empty [keyring], which it closes, with the vector files [vectors] (file name to JSON),
-/// expects the thresholds for the web or for native targets, and returns the results. The pieces a stream decrypts
+/// and returns the results; what it measures must work (a wrong answer fails), however long it takes. The pieces a
+/// stream decrypts
 /// are first passed through [input], which on the web puts them where file and network reads put bytes: in
 /// JavaScript buffers. [clock] gives microseconds of this thread's CPU time where the binding can read it, so that
 /// other work on a shared machine does not count; without it, the wall clock.
 Map<String, double> benchmark(
   Keys keyring,
   Map<String, String> vectors, {
-  required bool web,
   Uint8List Function(Uint8List bytes) input = _same,
   int Function()? clock,
 }) {
@@ -76,45 +78,19 @@ Map<String, double> benchmark(
   final results = <String, double>{};
   void measure(
     String name,
-    Matcher budget,
     double Function(double) result,
     void Function() run,
   ) {
     results[name] = result(
-      seconds(
-        run,
-        clock: clock ?? _wall,
-        until: (s) => budget.matches(result(s), {}),
-      ),
+      seconds(run, clock: clock ?? _wall, until: (_) => true),
     );
-    expect(results[name], budget, reason: name);
   }
 
-  measure(
-    'call_us',
-    lessThanOrEqualTo(web ? 200 : 50),
-    (s) => s * 1e6,
-    () => call(0, Uint8List(0)),
-  );
-  measure(
-    'decrypt_MiB_s',
-    greaterThanOrEqualTo(web ? 300 : 1024),
-    (s) => plaintext / s / (1 << 20),
-    decrypt,
-  );
-  measure(
-    'exif_files_s',
-    greaterThanOrEqualTo(1000),
-    (s) => 1 / s,
-    () => call(2, head),
-  );
+  measure('call_us', (s) => s * 1e6, () => call(0, Uint8List(0)));
+  measure('decrypt_MiB_s', (s) => plaintext / s / (1 << 20), decrypt);
+  measure('exif_files_s', (s) => 1 / s, () => call(2, head));
   // Within the 600 ms unlock budget (design doc 21 §8) even before calibration raises t.
-  measure(
-    'argon2id_floor_ms',
-    lessThan(600),
-    (s) => s * 1e3,
-    () => call(8, floor),
-  );
+  measure('argon2id_floor_ms', (s) => s * 1e3, () => call(8, floor));
   // The passcode's t from the calibration rule: at least 250 ms per unlock.
   results['passcode_t'] = min(
     64,
@@ -131,7 +107,7 @@ int _wall() => _watch.elapsedMicroseconds;
 
 /// The seconds that [run] takes by [clock] (microseconds) in its fastest sample, sampling for a second and then, while
 /// [until] is false, for up to ten. Other work on a shared machine only slows a sample, by descheduling it or by running
-/// it on a slower core, so the fastest one is the kernel's speed and a slower kernel still fails. A sample doubles its
+/// it on a slower core, so the fastest one is the kernel's speed and a slower kernel still measures slower. A sample doubles its
 /// runs until it lasts [sampleUs] and reads [clock] only at its ends, as a CPU-time clock is slow to read.
 double seconds(
   void Function() run, {
@@ -188,3 +164,16 @@ Uint8List encode(Map<int, Object> fields) => Uint8List.fromList([
 ]);
 
 List<int> varint(int n) => [for (; n >= 0x80; n >>= 7) n & 0x7f | 0x80, n];
+
+/// Prints each of [results] that is a budget of `kernel-binding` as the line tools/perf/perf.py watch records, for
+/// [target] `native`, `dart2js` or `dart2wasm`.
+void report(String target, Map<String, double> results) {
+  for (final MapEntry(:key, :value) in results.entries) {
+    if (key == 'passcode_t') continue;
+    // The measurements are the run's report.
+    // ignore: avoid_print
+    print(
+      'result: ${jsonEncode({'budget': 'kernel-binding', 'metric': key, 'target': target, 'value': double.parse(value.toStringAsPrecision(4))})}',
+    );
+  }
+}

@@ -749,12 +749,13 @@ async fn only_viewers_stream_and_each_resumes_where_they_stopped() {
 }
 
 /// Photolib-design#184's measure: hls.js, which the web clients play with, in Chrome and Firefox, each from a cold
-/// cache, over a link of 3 Mbit/s with 40 ms round trips, starts within 2 s; it then loads R1 once the link carries
-/// 8 Mbit/s, and the saver rung again when it falls to 1.5 Mbit/s, never stalling. Needs node, Chrome and Firefox;
-/// prints what each played.
+/// cache, over a link of 3 Mbit/s with 40 ms round trips, starts on the saver rung; it then loads R1 once the link
+/// carries 8 Mbit/s, and the saver rung again when it falls to 1.5 Mbit/s, never stalling. Its start within 2 s is
+/// the budget `hls-start` (tools/perf/measure.sh), not an assertion here: a loaded machine starts a browser late.
+/// Needs node, Chrome and Firefox; prints what each played.
 #[tokio::test(flavor = "multi_thread")]
 #[ignore = "needs node, Chrome and Firefox: the web part of tools/check.sh runs it"]
-async fn hls_js_starts_within_2_s_on_a_3_mbit_link_and_adapts_without_stalling() {
+async fn hls_js_starts_on_a_3_mbit_link_and_adapts_without_stalling() {
     // 720p, whose ladder is the saver rung and R1, as R2 needs more.
     let server = server(local().await, 110, 720, 2, 1 << 30, Duration::from_secs(30)).await;
     let mut wrong = vec![];
@@ -779,6 +780,11 @@ async fn hls_js_starts_within_2_s_on_a_3_mbit_link_and_adapts_without_stalling()
         assert!(done.status.success(), "{said}{}", String::from_utf8_lossy(&done.stderr));
         let played: Value = serde_json::from_str(said.trim()).unwrap();
         eprintln!("{browser}: {played}");
+        // The start is a time: tools/perf/measure.sh checks it against the series hls-start (budgets.json).
+        let start = serde_json::json!({
+            "budget": "hls-start", "metric": "start_ms", "target": browser, "value": played["start_ms"],
+        });
+        eprintln!("result: {start}");
         let heights: Vec<u64> = played["loaded"]
             .as_array()
             .unwrap()
@@ -786,7 +792,6 @@ async fn hls_js_starts_within_2_s_on_a_3_mbit_link_and_adapts_without_stalling()
             .map(|p| p[1].as_u64().unwrap())
             .collect();
         let checks = [
-            (played["start_ms"].as_f64().unwrap() <= 2000.0, "to start within 2 s"),
             (played["stalls"].as_array().unwrap().is_empty(), "never to stall"),
             (played["errors"].as_array().unwrap().is_empty(), "to have no error"),
             (heights.first() == Some(&480), "to start on the saver rung"),

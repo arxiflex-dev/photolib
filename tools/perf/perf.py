@@ -95,6 +95,8 @@ def series(result):
 # The budgets that are no test of perf_test.dart: the server's benchmarks, and what run.sh measures of the app alone
 SERVER = ("server-idle-rss", "ingest-throughput", "initial-sync-100k")
 ALONE = ("cold-start", "idle-cpu")
+# The budgets that measure.sh measures in a step of the gate of their own: the kernel through its bindings, hls.js's start
+MEASURED = ("kernel-binding", "hls-start")
 # The test of perf_test.dart that measures a budget over no fixture, as run.sh picks it for a rerun
 TESTS = {"video-swipe": "videos", "sphere-video": "sphere-video", "device-folders-scroll": "device-folders-5k",
          "server-tiles": "server-tiles"}
@@ -105,7 +107,7 @@ def unit(want):
     CPU."""
     if want["budget"] in SERVER:
         return "server"
-    if want["budget"] in ALONE:
+    if want["budget"] in ALONE + MEASURED:
         return want["budget"]
     return want["fixture"] or TESTS.get(want["budget"], "folder-10k")
 
@@ -366,7 +368,12 @@ def main():
     sharing = commands.add_parser("series")
     sharing.add_argument("--units")
     sharing.add_argument("--except", dest="skip")
-    args = parser.parse_args()
+    argv, command = sys.argv[1:], None
+    if argv[:1] == ["watch"] and "--" in argv:  # argparse would drop a `--` of the command's own too
+        argv, command = argv[: argv.index("--")] + ["command"], argv[argv.index("--") + 1:]
+    args = parser.parse_args(argv)
+    if command:
+        args.app = command
     if args.command == "check" and args.history and not args.commit:
         parser.error("--history needs the --commit the results belong to")
     commands = {"check": check, "dashboard": dashboard, "instructions": instructions, "watch": watch,

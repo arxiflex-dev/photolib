@@ -220,8 +220,9 @@ def check_gate(workflows):
     check(len(gated) == 1 and "bash tools/check.sh ${{ inputs.parts }}" in gated[0]["run"],
           "each job runs its parts of the gate once")
     advisory = (gated[0].get("env", {}) if gated else {}).get("CHECK_ADVISORY", "")
-    check(all(name in advisory for name in (r"perf/run\.sh", "--tags timing")),
-          "what only measures time and the tests tagged timing are advisory on a hosted runner")
+    check(all(name in advisory for name in (r"perf/run\.sh", r"perf/measure\.sh")),
+          "what only measures time (the budgets, the kernel's speed, hls.js's start) is advisory on a hosted runner")
+    check("timing" not in advisory, "no test is tagged for being flaky: nothing is advisory by a tag")
     check(r"advisories\.py" in advisory, "the RustSec check is advisory on a hosted runner: it never fails a build")
     check(r"timeline_bench\.py" in advisory,
           "the web timeline's frame budget (timeline_bench.py --check) only measures time: advisory on a hosted runner")
