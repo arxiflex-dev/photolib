@@ -160,6 +160,7 @@ void main() {
         },
         'indexWhileCharging': false,
         'searchColumns': 4,
+        'trashDays': 60,
         'slideshow': {'seconds': 5, 'shuffle': false, 'loop': false},
         'startScreen': 'timeline',
         'albumsFirst': false,
@@ -276,10 +277,12 @@ void main() {
           'badges': 'off',
         },
         'searchColumns': 'six',
+        'trashDays': 'forever',
         'startScreen': 'gallery',
         'albumsFirst': 'yes',
       });
       expect(read.searchColumns, 4);
+      expect(read.trashDays, 60);
       expect(
         (read.startScreen, read.albumsFirst),
         (StartScreen.timeline, false),
@@ -291,6 +294,17 @@ void main() {
       expect((read.library.backup, read.library.badges), (null, true));
       expect(read.diagnostics, isTrue);
       expect(read.library.added, isTrue);
+    });
+
+    test('keep how long the trash keeps its items, from 30, 60 or 90 days, '
+        'and read nothing else', () async {
+      final store = MemoryStore();
+      settings(store).read(settingsProvider.notifier).setTrashDays(90);
+      await pumpEventQueue();
+      expect(jsonDecode(store.value!), containsPair('trashDays', 90));
+      expect((await readBack({'trashDays': 90})).trashDays, 90);
+      expect((await readBack({'trashDays': 45})).trashDays, 60);
+      expect(const Settings().trashDays, 60);
     });
 
     test("keep the library's backup filter and badges", () async {

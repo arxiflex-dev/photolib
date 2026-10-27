@@ -2873,6 +2873,10 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String get settingsTrashKeep =>
+      'Photolib giữ các mục trong thùng rác trong bao lâu';
+
+  @override
   String get settingsViewerBar => 'Các nút trên thanh trình xem';
 
   @override
@@ -3266,6 +3270,16 @@ class AppLocalizationsVi extends AppLocalizations {
   String get trashEmptyAll => 'Dọn sạch thùng rác';
 
   @override
+  String trashKeepDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    return '$daysString ngày';
+  }
+
+  @override
   String trashMoved(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -3278,6 +3292,9 @@ class AppLocalizationsVi extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get trashRemoveGone => 'Xóa khỏi danh sách';
 
   @override
   String trashRetention(int days) {

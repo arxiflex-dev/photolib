@@ -908,6 +908,9 @@ folderContext(:folder AS INTEGER): SELECT * FROM timeline_item WHERE folder = :f
 deviceFolders: SELECT f.*, CAST(IFNULL(SUM(d.count), 0) AS INTEGER) AS items, MAX(d.day) AS newest,
   f.id IN (SELECT id FROM excluded_folder) AS out FROM device_folder f LEFT JOIN timeline_day d ON d.folder = f.id
   GROUP BY f.id ORDER BY f.volume, f.path;
+-- What each device folder shows of them: its timeline items without the hidden and archived (source_tree.dart).
+shownInFolders: SELECT folder, CAST(SUM(count) AS INTEGER) AS items, MAX(day) AS newest FROM timeline_day
+  WHERE NOT veiled GROUP BY folder;
 excludedFolders: SELECT id FROM excluded_folder;
 -- The first device folder new to the user that holds items, with how many.
 freshFolder: SELECT f.id, f.name, CAST(IFNULL(SUM(d.count), 0) AS INTEGER) AS items

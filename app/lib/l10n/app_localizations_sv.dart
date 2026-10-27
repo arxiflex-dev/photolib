@@ -2896,6 +2896,10 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String get settingsTrashKeep =>
+      'Hur länge Photolib behåller objekt i papperskorgen';
+
+  @override
   String get settingsViewerBar => 'Knappar i visningsfältet';
 
   @override
@@ -3292,6 +3296,16 @@ class AppLocalizationsSv extends AppLocalizations {
   String get trashEmptyAll => 'Töm papperskorgen';
 
   @override
+  String trashKeepDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    return '$daysString dagar';
+  }
+
+  @override
   String trashMoved(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -3305,6 +3319,9 @@ class AppLocalizationsSv extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get trashRemoveGone => 'Ta bort från listan';
 
   @override
   String trashRetention(int days) {

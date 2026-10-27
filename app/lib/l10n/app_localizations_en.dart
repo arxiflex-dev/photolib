@@ -2882,6 +2882,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settingsTrashKeep => 'How long Photolib keeps items in its trash';
+
+  @override
   String get settingsViewerBar => 'Buttons in the viewer\'s bar';
 
   @override
@@ -3275,6 +3278,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trashEmptyAll => 'Empty trash';
 
   @override
+  String trashKeepDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    return '$daysString days';
+  }
+
+  @override
   String trashMoved(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -3288,6 +3301,9 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get trashRemoveGone => 'Remove from list';
 
   @override
   String trashRetention(int days) {
@@ -6486,6 +6502,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   }
 
   @override
+  String get settingsTrashKeep =>
+      '[Ĥöŵ ļöñĝ Þĥöţöļîƀ ķééþš îţéɱš îñ îţš ţŕåšĥ one two three four]';
+
+  @override
   String get settingsViewerBar =>
       '[Ɓûţţöñš îñ ţĥé ṽîéŵéŕ\'š ƀåŕ one two three]';
 
@@ -6884,6 +6904,16 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get trashEmptyAll => '[Éɱþţý ţŕåšĥ one two]';
 
   @override
+  String trashKeepDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    return '[$daysString ðåýš one]';
+  }
+
+  @override
   String trashMoved(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -6897,6 +6927,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
     );
     return '[$_temp0 one two three]';
   }
+
+  @override
+  String get trashRemoveGone => '[Ŕéɱöṽé ƒŕöɱ ļîšţ one two]';
 
   @override
   String trashRetention(int days) {

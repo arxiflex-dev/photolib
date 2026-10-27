@@ -17272,6 +17272,20 @@ abstract class _$Replica extends GeneratedDatabase {
     );
   }
 
+  Selectable<ShownInFoldersResult> shownInFolders() {
+    return customSelect(
+      'SELECT folder, CAST(SUM(count) AS INTEGER) AS items, MAX(day) AS newest FROM timeline_day WHERE NOT veiled GROUP BY folder',
+      variables: [],
+      readsFrom: {this.timelineDay},
+    ).map(
+      (QueryRow row) => ShownInFoldersResult(
+        folder: row.read<int>('folder'),
+        items: row.readNullable<int>('items'),
+        newest: row.readNullable<int>('newest'),
+      ),
+    );
+  }
+
   Selectable<ExcludedFolderData> excludedFolders() {
     return customSelect(
       'SELECT id FROM excluded_folder',
@@ -17834,6 +17848,13 @@ class DeviceFoldersResult {
     this.newest,
     required this.out,
   });
+}
+
+class ShownInFoldersResult {
+  final int folder;
+  final int? items;
+  final int? newest;
+  ShownInFoldersResult({required this.folder, this.items, this.newest});
 }
 
 class FreshFolderResult {
