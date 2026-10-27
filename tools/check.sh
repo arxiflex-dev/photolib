@@ -65,9 +65,9 @@ SINCE=(
 # decryption and the benchmark. Seek timings on a loaded machine would make every gate flaky.
 PLAYBACK=(app/packages/photolib_api/lib/media_proxy.dart app/packages/photolib_api/tool/decrypting_proxy.dart
   kernel/src/blob.rs 'tools/playback/*')
-# The remote that holds dev (tools/remote.sh): $PHOTOLIB_REMOTE, else the only one, else origin.
-REMOTE=$(bash "$ROOT/tools/remote.sh") || exit 1
-BASE=$REMOTE/dev
+# The remote that holds dev (tools/remote.sh: $PHOTOLIB_REMOTE, else the only one, else origin), asked when needed.
+remote() { bash "$ROOT/tools/remote.sh"; }
+BASE=
 
 STATE=$(mktemp -d) || exit 1
 trap 'rm -rf "$STATE"' EXIT
@@ -701,6 +701,7 @@ check_web() {
 # playback_changed: whether the diff BASE...HEAD touches PLAYBACK; true when there is no diff to tell.
 playback_changed() {
   local paths path glob
+  BASE=${BASE:-$(remote)/dev}
   paths=$(git diff --name-only --no-renames "$BASE...HEAD" 2>/dev/null) || return 0
   while IFS= read -r path; do
     for glob in "${PLAYBACK[@]}"; do
@@ -729,6 +730,8 @@ check_proto() {
 check_commits() {
   [[ -e .git ]] || return 0
   need git "the checks of this branch's commits" || return 0
+  local REMOTE
+  REMOTE=$(remote) || { note_failure "the remote that holds dev is unknown: set PHOTOLIB_REMOTE"; return 0; }
   if ! git rev-parse -q --verify "$REMOTE/dev" >/dev/null; then
     note_failure "$REMOTE/dev is missing, so this branch's commits cannot be checked: git fetch $REMOTE dev"
     return 0

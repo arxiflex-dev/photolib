@@ -19,7 +19,7 @@ queue pushes (`dev` plus the queued pull requests), never on a pull request or a
 * `dev/`: `compose.yaml`, Garage/Caddy configs, `bootstrap.sh` and the stdlib `seed.py` uploader, wrapped by `justfile`.
 * `buf.sh`, `squawk.sh`, `garage.sh`, `postgres.sh`: pinned releases cached per user (`PHOTOLIB_TOOLS_CACHE`) outside
   the checkout, the first two via `npm_tool.sh` unless on `PATH`, again if broken. `migrations.sh`: squawk, rules for
-  released migrations/fixtures on `origin/dev`, `--renumber` after a rebase; `proto_breaking.sh` needs history/tags.
+  released migrations/fixtures on `<remote>/dev` (`remote.sh`), `--renumber` after a rebase; `proto_breaking.sh` needs tags.
 * `connect_conformance.sh <dir>`: official Connect suite for the crate's `connect-conformance.yaml`, in the rust gate.
   It, `codegen.sh`, `promtool.sh`, `proxies.sh`, `video/ffmpeg.sh` (LGPL FFmpeg; `--libs` for Firefox in `video/play.mjs`)
   and `ml/fetch.py` (ONNX Runtime, models of `ml/artefacts.json`) cache pinned tools via `fetch_release.sh` (SHA-256).
