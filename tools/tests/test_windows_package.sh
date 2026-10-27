@@ -2,6 +2,7 @@
 # The Windows app's standalone package (ADR-0404): tools/windows/standalone.sh packs a flutter build windows output with
 # the Visual C++ runtime and the licence notices into one zip, and tools/windows/deps_scan.py proves it needs nothing
 # outside it. The Windows binaries here are synthetic PE files (tools/tests/windows_tests.py, which tests the scan).
+# shellcheck disable=SC2016 # the stubs and the python are literal scripts, not expansions
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 cd "$REPO_ROOT" || exit 1

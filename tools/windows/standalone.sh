@@ -37,7 +37,7 @@ if [[ -z $redist ]] && command -v vswhere >/dev/null 2>&1; then
   redist=$(vswhere -latest -find 'VC/Redist/MSVC/*/x64/Microsoft.VC*.CRT' | tr -d '\r' | sort | tail -n 1)
   ! command -v cygpath >/dev/null 2>&1 || redist=$(cygpath -u "$redist")
 fi
-for round in 1 2; do
+for _ in 1 2; do
   for name in $(scan --missing "$package" | tr -d '\r'); do
     if [[ ${name,,} =~ $runtime && -n $redist ]]; then
       found=$(find "$redist" -maxdepth 1 -iname "$name" | head -n 1)
@@ -54,7 +54,7 @@ cp "$root/LICENSE" "$package/LICENSE"
 pins=$root/app/windows/libmpv.json
 revision=${GITHUB_SHA:-$(git -C "$root" rev-parse HEAD)}
 cat >"$package/SOURCE.txt" <<EOF
-Photolib for Windows, built from https://github.com/arxiflex-dev/photolib at commit $revision.
+Photolib for Windows, built from github.com/arxiflex-dev/photolib at commit $revision.
 
 The FFmpeg DLLs (avcodec, avformat, avutil, avfilter, swresample, swscale) and libmpv-2.dll beside photolib.exe are
 LGPL-2.1-or-later libraries (libmpv-notices.txt lists them all, with their licences and the source each was built

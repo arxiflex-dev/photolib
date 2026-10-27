@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Fails unless a Windows package runs on a machine with nothing installed (ADR-0404): every DLL that one of its
 executables or DLLs imports must be in the package or be Windows' own. It reads the PE import tables itself, so it
 runs on the Linux machines that test it as well as on the Windows runner that packs the app.
@@ -16,15 +15,17 @@ from pathlib import Path
 
 # What every Windows 10 and 11 has, which a clean machine can be relied on for (the API sets are virtual DLLs).
 SYSTEM_PREFIXES = ("api-ms-win-", "ext-ms-win-", "ext-ms-onecore-")
-SYSTEM = frozenset(
-    """advapi32 audioses avrt bcrypt bcryptprimitives cabinet cfgmgr32 combase comctl32 comdlg32 crypt32 d2d1 d3d11
-    d3d12 d3d9 d3dcompiler_47 dbgcore dbghelp dcomp dhcpcsvc dnsapi dwmapi dwrite dxgi dxva2 gdi32 gdi32full glu32
-    hid imm32 iphlpapi kernel32 kernelbase ksuser mf mfplat mfreadwrite mmdevapi mpr msimg32 mswsock msvcrt ncrypt
-    netapi32 normaliz ntdll ntmarta oleacc oleaut32 ole32 opengl32 powrprof profapi propsys psapi rpcrt4 rstrtmgr
-    schannel secur32 setupapi shcore shell32 shlwapi sspicli ucrtbase uiautomationcore urlmon user32 userenv usp10
-    uxtheme version wevtapi win32u windowscodecs winhttp wininet winmm winspool.drv wintrust wldap32 ws2_32 wsock32
-    wtsapi32""".split()
-)
+SYSTEM = frozenset([
+    "advapi32", "audioses", "avrt", "bcrypt", "bcryptprimitives", "cabinet", "cfgmgr32", "combase", "comctl32",
+    "comdlg32", "crypt32", "d2d1", "d3d11", "d3d12", "d3d9", "d3dcompiler_47", "dbgcore", "dbghelp", "dcomp",
+    "dhcpcsvc", "dnsapi", "dwmapi", "dwrite", "dxgi", "dxva2", "gdi32", "gdi32full", "glu32", "hid", "imm32",
+    "iphlpapi", "kernel32", "kernelbase", "ksuser", "mf", "mfplat", "mfreadwrite", "mmdevapi", "mpr", "msimg32",
+    "mswsock", "msvcrt", "ncrypt", "netapi32", "normaliz", "ntdll", "ntmarta", "oleacc", "oleaut32", "ole32",
+    "opengl32", "powrprof", "profapi", "propsys", "psapi", "rpcrt4", "rstrtmgr", "schannel", "secur32",
+    "setupapi", "shcore", "shell32", "shlwapi", "sspicli", "ucrtbase", "uiautomationcore", "urlmon", "user32",
+    "userenv", "usp10", "uxtheme", "version", "wevtapi", "win32u", "windowscodecs", "winhttp", "wininet", "winmm",
+    "winspool.drv", "wintrust", "wldap32", "ws2_32", "wsock32", "wtsapi32",
+])
 # The ANGLE libraries media_kit_video delay-loads for a hardware path the app turns off and never calls (ADR-0229).
 DELAY_OK = ("libEGL.dll", "libGLESv2.dll")
 

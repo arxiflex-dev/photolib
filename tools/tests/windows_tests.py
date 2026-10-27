@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """tools/windows/deps_scan.py reads the import tables of a Windows package's executables and DLLs, on synthetic PE
 files built here (a Linux machine has no Windows binaries): every import must be in the package or the system's."""
 import contextlib
@@ -11,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools" / "windows"))
-import deps_scan  # noqa: E402
+import deps_scan
 
 SECTION_RVA, SECTION_RAW = 0x1000, 0x200
 
