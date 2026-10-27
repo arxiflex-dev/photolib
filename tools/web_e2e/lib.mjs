@@ -160,32 +160,110 @@ export function dayLabel(ms) {
   return new Date(ms).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-/**
- * Waits until some node of the accessibility tree matches `pattern`; a timeout says what it waited for and lists the
- * page's nodes, which is all anyone has to go on when it happens on a runner.
- */
-export async function seen(page, pattern, timeout = 120_000) {
+/** How long a wait for the page lasts unless the step says it needs longer: a condition missed costs this, per browser. */
+export const WAIT = 30_000;
+
+/** Waits for `check` (run in the page with `arg`); a timeout says what it waited for and lists the page's nodes, which is all anyone has to go on when it happens on a runner. */
+async function waitForTree(page, what, check, arg, timeout, polling = undefined) {
   try {
-    return await page.waitForFunction(
-      (source) => [...document.querySelectorAll('flt-semantics')].some((node) => new RegExp(source).test(node.getAttribute('aria-label') || node.textContent || '')),
-      pattern.source,
-      { timeout },
-    );
+    return await page.waitForFunction(check, arg, { timeout, polling });
   } catch (error) {
     if (!/Timeout/.test(String(error.message))) throw error;
     const nodes = await texts(page).then((all) => all.filter(Boolean), () => ['(the page could not be read)']);
     throw new Error(
-      `${error.message.split('\n')[0]}\n  waiting for a node matching ${pattern}\n  the page shows ${nodes.length} nodes: ${JSON.stringify(nodes.slice(0, 60)).slice(0, 2000)}`,
+      `${error.message.split('\n')[0]}\n  waiting for ${what}\n  the page shows ${nodes.length} nodes: ${JSON.stringify(nodes.slice(0, 60)).slice(0, 2000)}`,
       { cause: error },
     );
   }
 }
 
-/** Types into a text field the way a user does: Flutter reads keystrokes, never a value set on the node. */
+/** Waits until some node of the accessibility tree matches `pattern`. */
+export function seen(page, pattern, timeout = WAIT) {
+  return waitForTree(
+    page,
+    `a node matching ${pattern}`,
+    (source) => [...document.querySelectorAll('flt-semantics')].some((node) => new RegExp(source).test(node.getAttribute('aria-label') || node.textContent || '')),
+    pattern.source,
+    timeout,
+  );
+}
+
+/** Waits until no node of the accessibility tree matches `pattern`: a dialog, a viewer or a selection bar has closed. */
+export function gone(page, pattern, timeout = WAIT) {
+  return waitForTree(
+    page,
+    `no node matching ${pattern}`,
+    (source) => ![...document.querySelectorAll('flt-semantics')].some((node) => new RegExp(source).test(node.getAttribute('aria-label') || node.textContent || '')),
+    pattern.source,
+    timeout,
+  );
+}
+
+/** Waits until the accessibility tree has not changed for `frames` frames: a page transition has ended. */
+export function settled(page, frames = 20, timeout = WAIT) {
+  return waitForTree(
+    page,
+    `the page to settle (unchanged for ${frames} frames)`,
+    (count) => {
+      const now = JSON.stringify([...document.querySelectorAll('flt-semantics')].map((node) => node.getAttribute('aria-label') || node.textContent || ''));
+      window.__e2eStill = window.__e2eSnapshot === now ? (window.__e2eStill ?? 0) + 1 : 0;
+      window.__e2eSnapshot = now;
+      return window.__e2eStill >= count;
+    },
+    frames,
+    timeout,
+    'raf',
+  );
+}
+
+/** Presses `key` until no node matches `pattern`: the first press is lost while what it should dismiss has not taken the focus yet. */
+export async function dismiss(page, pattern, key = 'Escape') {
+  for (let attempt = 1; attempt < 5; attempt++) {
+    await page.keyboard.press(key);
+    if (await gone(page, pattern, 3000).then(() => true, () => false)) return;
+  }
+  await page.keyboard.press(key);
+  await gone(page, pattern);
+}
+
+/** Waits until the accessibility tree differs from `before` (what `texts()` returned): the page has answered a gesture. */
+export function changed(page, before, timeout = WAIT) {
+  return waitForTree(
+    page,
+    'the page to change',
+    (was) => JSON.stringify([...document.querySelectorAll('flt-semantics')].map((node) => node.getAttribute('aria-label') || node.textContent || '')) !== was,
+    JSON.stringify(before),
+    timeout,
+  );
+}
+
+/** Waits for the page to paint `frames` times (twice by default), so that a screenshot shows what the last gesture made. */
+export function painted(page, frames = 2) {
+  return page.evaluate(
+    (count) => new Promise((done) => (function next(left) { return left ? requestAnimationFrame(() => next(left - 1)) : done(); })(count)),
+    frames,
+  );
+}
+
+/**
+ * Types into a text field the way a user does: Flutter reads keystrokes, never a value set on the node. The keystrokes go
+ * to the native input Flutter puts inside the field's node when it takes the focus, so this waits for that input. The
+ * framework takes the input over a few frames later and sets its value to what it holds, which loses what was typed
+ * before: the text is checked in the input some frames after, and typed again if it is not there.
+ */
 export async function type(page, field, text) {
-  await field.click();
-  await page.waitForTimeout(250);
-  await page.keyboard.type(text);
+  for (let attempt = 1; ; attempt++) {
+    await field.click();
+    const node = await field.elementHandle({ timeout: WAIT });
+    await page.waitForFunction((it) => it.contains(document.activeElement) && /^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName), node, { timeout: WAIT });
+    await painted(page, 5);
+    await page.keyboard.press('ControlOrMeta+a');
+    await page.keyboard.type(text);
+    await painted(page, 5);
+    const typed = await page.evaluate(() => document.activeElement?.value);
+    if (typed === text) return;
+    if (attempt === 4) throw new Error(`typing ${JSON.stringify(text)} into a field left ${JSON.stringify(typed)} in it, four times`);
+  }
 }
 
 /** Turns the accessibility tree on, as a screen reader's user does. */
@@ -194,7 +272,8 @@ export async function openApp(page, url) {
   await page.waitForSelector('flt-semantics-placeholder', { state: 'attached', timeout: 120_000 });
   await page.evaluate(() => document.querySelector('flt-semantics-placeholder').click());
   await page.waitForSelector('flt-semantics', { state: 'attached', timeout: 120_000 });
-  await page.waitForTimeout(1500);
+  // The first frame has named something.
+  await seen(page, /\S/, 120_000);
 }
 
 /** Taps the tile whose label matches `pattern`, wherever the layout puts it. */
