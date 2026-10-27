@@ -163,10 +163,10 @@ A benchmark appends one JSON object per line to `$PERF_RESULTS`, or an app print
 
 ## The map
 
-The map is not a budget of `budgets.json` (docs/19 §3 pins those); its numbers are measured by hand. `cargo nextest run
---test cluster` in `kernel/` builds and pans a million points (fastest viewport query under 16 ms, asserted).
-`app/benchmark/map_perf.dart` runs the real page over a synthlib library of a million assets
-(`MAP_FIXTURE=<dir> flutter drive --profile -d linux --driver test_driver/integration_test.dart --target
-benchmark/map_perf.dart`, under `xvfb-run`, `taskset -c 0,1` for two cores) and prints each scenario's frames and
-queries as `result:` lines; `app/benchmark/map_web.dart` is the page alone in a browser over `?n=` synthetic photos, for
-Chrome's phone emulation. The numbers of the first runs are in [ADR-0384](../adr/0384-map-view.md)'s pull request.
+The map is the `map-pan` budget of `budgets.json` ([ADR-0403](../adr/0403-map-pan-budget.md)): `run.sh` drives
+`app/benchmark/map_perf.dart` over the 1m fixture's located assets and records `janky`, `query_p95` and `open`. Run it
+alone with `MAP_FIXTURE=<dir> flutter drive --profile -d linux --driver test_driver/integration_test.dart --target
+benchmark/map_perf.dart --dart-define=PERF_TARGET=headless` under `xvfb-run` (`taskset -c 0,1` for two cores); each
+sweep prints its frames and queries. `kernel/tests/cluster.rs` builds and pans a million points and asserts counts
+only. `app/benchmark/map_web.dart` is the page alone in a browser over `?n=` synthetic photos, for Chrome's phone
+emulation. The first numbers are in [ADR-0384](../adr/0384-map-view.md)'s and ADR-0403's pull requests.

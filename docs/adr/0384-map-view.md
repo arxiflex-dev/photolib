@@ -39,7 +39,7 @@ the world as clusters, a zoom to single photos, the heatmap, and a lasso around 
 
 Panning needs no network and no server. A new filter is a field of `MapFilter`. The lasso filters the map and its
 grid exactly, but a search by the lasso is its bounding box. The tile host and policy are one constant and one
-manifest row to change.
+manifest row to change. Its speed is held by the `map-pan` budget ([ADR-0403](0403-map-pan-budget.md)).
 
 ## Options considered
 

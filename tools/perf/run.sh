@@ -135,6 +135,11 @@ drive() {
     --dart-define=PERF_FFMPEG="$ffmpeg" --dart-define=PERF_BUDGETS="$(cd .. && pwd)/tools/perf/budgets.json" \
     ${tests:+--dart-define=PERF_TESTS=$tests}
 }
+map() {
+  # The map over the 1m fixture's located assets (map-pan); its results are the lines it prints.
+  MAP_FIXTURE=$PERF_FIXTURES/1m watch map-pan 'result: ' flutter drive --profile -d "$device" \
+    --driver test_driver/integration_test.dart --target benchmark/map_perf.dart --dart-define=PERF_TARGET="$target"
+}
 cold() {
   FLUTTER_TEST_OUTPUTS_DIR=$tmp/startup watch cold-start '' flutter run --profile --trace-startup -d "$device"
   [[ ! -f $tmp/startup/start_up_info.json ]] || python3 -c 'import json, sys; print(json.dumps({"budget": "cold-start",
@@ -151,6 +156,7 @@ cat "$tmp/server.log"
 [[ ! -f $tmp/server.jsonl ]] || cat "$tmp/server.jsonl" >>"$results"
 ((status == 0)) || exit "$status"
 if [[ $tests != none ]]; then timed perf_test.dart drive; fi
+if [[ -z $tests || ,$tests, == *,1m,* ]] && measures map-pan 1m; then timed map-pan map; fi
 if measures cold-start; then timed cold-start cold; fi
 cd ..
 
