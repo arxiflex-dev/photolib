@@ -32,7 +32,7 @@ const _references = {
   // The indexers, extraction and sync write and match device items.
   'packages/photolib_data/lib/src/media_store.dart': 16,
   'packages/photolib_data/lib/src/photo_kit.dart': 5,
-  'packages/photolib_data/lib/src/folder_indexer.dart': 8,
+  'packages/photolib_data/lib/src/folder_indexer.dart': 9,
   'packages/photolib_data/lib/src/folders.dart': 6,
   'packages/photolib_data/lib/src/ml.dart': 1,
   'packages/photolib_data/lib/src/sync.dart': 4,

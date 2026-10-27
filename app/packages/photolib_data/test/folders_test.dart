@@ -44,9 +44,11 @@ void main() {
     )..orderBy([(a) => OrderingTerm(expression: a.path)])).get();
   }
 
-  /// path → state of every folder item of [of], by default the test's replica.
+  /// path → state of every folder item of [of], by default the test's replica,
+  /// but for those the ignore rules exclude (`hidden` 2), which `excluded` shows.
   Future<Map<String, String>> items([Replica? of]) async => {
-    for (final a in await byPath(of)) a.path!: a.state,
+    for (final a in await byPath(of))
+      if (a.hidden != 2) a.path!: a.state,
   };
 
   /// Waits until the items are [expected], which a watcher's scan makes them
@@ -496,12 +498,46 @@ void main() {
     write('2024/.photolibignore', '');
     write('.photolibignore', 'drafts/\nkeep.jpg\n');
     await indexer.scan(root, dir: '2024');
-    expect(await items(), {
-      '2024/c.jpg': 'present',
-      '2024/keep.jpg': 'missing',
-      'a.jpg': 'present',
-    });
+    expect(await items(), {'2024/c.jpg': 'present', 'a.jpg': 'present'});
   });
+
+  test(
+    'what the rules ignore is indexed apart: out of every view until the '
+    'excluded show, and in again when the rules let go; junk is not',
+    () async {
+      write('a.jpg');
+      write('drafts/b.jpg');
+      write('c.tmp.jpg');
+      write('@eaDir/t.jpg');
+      write('.photolibignore', 'drafts/\n*.tmp.jpg\n');
+      await addFolder(db, root);
+      await indexer.scan(root);
+      Future<Map<String, int>> hidden() async => {
+        for (final a in await byPath()) a.path!: a.hidden,
+      };
+      Future<List<String?>> shown({required bool veiled}) async => [
+        for (final i
+            in await db.timelinePage(1 << 30, veiled, null, 9, 0).get())
+          i.path,
+      ]..sort();
+      expect(await hidden(), {'a.jpg': 0, 'c.tmp.jpg': 2, 'drafts/b.jpg': 2});
+      expect(await shown(veiled: false), ['a.jpg']);
+      expect(await shown(veiled: true), ['a.jpg', 'c.tmp.jpg', 'drafts/b.jpg']);
+
+      // A hidden item the rules also ignore stays the user's.
+      await setHidden(db, [
+        (await byPath()).firstWhere((a) => a.path == 'a.jpg').id,
+      ], value: true);
+      write('.photolibignore', '*.jpg\n');
+      await indexer.scan(root);
+      expect(await hidden(), {'a.jpg': 1, 'c.tmp.jpg': 2, 'drafts/b.jpg': 2});
+
+      write('.photolibignore', '');
+      await indexer.scan(root);
+      expect(await hidden(), {'a.jpg': 1, 'c.tmp.jpg': 0, 'drafts/b.jpg': 0});
+      expect(await shown(veiled: false), ['c.tmp.jpg', 'drafts/b.jpg']);
+    },
+  );
 
   /// Indexes `a.jpg` and `2024/drafts/b.jpg` under a rule `DRAFTS/`.
   Future<void> scanDrafts() async {
@@ -530,10 +566,10 @@ void main() {
     ];
     expect(first.logger, 'photolib.index');
     expect(first.fields, containsPair('root', root));
-    expect(first.fields, containsPair('directories', 1));
-    expect(first.fields, containsPair('seen', 5));
-    expect(first.fields, containsPair('indexed', 2));
-    expect(first.fields['skipped'], {'ignored': 1, 'not media': 2});
+    expect(first.fields, containsPair('directories', 2));
+    expect(first.fields, containsPair('seen', 6));
+    expect(first.fields, containsPair('indexed', 3));
+    expect(first.fields['skipped'], {'excluded': 1, 'not media': 2});
     expect(second.fields, containsPair('indexed', 0));
     expect(second.fields, containsPair('missing', 1));
   });
@@ -546,11 +582,7 @@ void main() {
     // link is, shows a case-insensitive volume.
     Process.runSync('ln', ['$root/a.jpg', '$root/A.JPG']);
     await indexer.scan(root);
-    expect(await items(), {
-      '2024/drafts/b.jpg': 'missing',
-      'A.JPG': 'present',
-      'a.jpg': 'present',
-    });
+    expect(await items(), {'A.JPG': 'present', 'a.jpg': 'present'});
   }, testOn: 'linux');
   test(
     'on a case-insensitive volume, ignore rules match names in any case',

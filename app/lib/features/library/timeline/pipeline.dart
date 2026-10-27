@@ -97,7 +97,7 @@ class ThumbnailItem {
       sphere: Sphere.projections.contains(item.projection),
       marks: {
         if (item.favorite == 1) Mark.favourite,
-        if (item.hidden == 1) Mark.hidden,
+        if (item.hidden > 0) Mark.hidden,
         if (item.archived == 1) Mark.archived,
       },
       renditions: server

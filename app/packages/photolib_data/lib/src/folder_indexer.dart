@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:math';
 
 import 'package:drift/drift.dart';
@@ -92,9 +93,13 @@ class FolderIndexer {
     final (from, deep) = folder.state == 'offline'
         ? ('', true)
         : (dir, recursive);
-    final rules = await _rulesAbove(root, from);
-    // Its parent's scan has marked what an ignored directory held missing.
-    if (rules == null) return true;
+    final junk = IgnoreRules.defaults(
+      caseSensitive: await _files.caseSensitive(root),
+    );
+    final above = await _rulesAbove(root, from, junk);
+    // Its parent's scan has marked what a junk directory held missing.
+    if (above == null) return true;
+    final (rules, ignoredAbove) = above;
     final full = from.isEmpty && deep;
     if (full && folder.state != 'scanning') {
       await _update(root, const MediaSourceCompanion(state: Value('scanning')));
@@ -102,9 +107,9 @@ class FolderIndexer {
     final resume = full ? folder.checkpoint : null;
     final counts = {'directories': 0, 'seen': 0, 'indexed': 0, 'missing': 0};
     final skipped = <String, int>{};
-    final pending = [(from, rules)];
+    final pending = [(from, rules, ignoredAbove)];
     while (pending.isNotEmpty) {
-      final (d, above) = pending.removeLast();
+      final (d, above, ignoredHere) = pending.removeLast();
       // Directories are scanned in order: those up to the checkpoint are only
       // listed.
       final done = resume != null && _before(d, resume);
@@ -119,20 +124,31 @@ class FolderIndexer {
       }
       _count(counts, 'directories');
       _count(counts, 'seen', entries.length);
-      final (files, dirs) = await _sort(root, d, entries, rules, done, skipped);
+      final (files, dirs, ignored) = await _sort(
+        root,
+        d,
+        entries,
+        (rules, junk, ignoredHere),
+        done,
+        skipped,
+      );
       if (!done) {
         final (indexed, missing) = await _reconcile(
           root,
           d,
           files,
-          dirs.toSet(),
+          dirs.keys.toSet(),
           full,
+          ignored,
         );
         _count(counts, 'indexed', indexed);
         _count(counts, 'missing', missing);
       }
       if (deep) {
-        pending.addAll([for (final s in dirs.reversed) (_join(d, s), rules)]);
+        pending.addAll([
+          for (final s in dirs.keys.toList().reversed)
+            (_join(d, s), rules, dirs[s]!),
+        ]);
       }
     }
     if (full) {
@@ -159,37 +175,52 @@ class FolderIndexer {
     return true;
   }
 
-  /// The ignore rules of the directories above [dir], or null when they
-  /// ignore it.
-  Future<IgnoreRules?> _rulesAbove(String root, String dir) async {
-    var rules = IgnoreRules.defaults(
-      caseSensitive: await _files.caseSensitive(root),
-    );
+  /// The ignore rules of the directories above [dir], and whether one the user
+  /// chose ignores it; null when the [junk] defaults do, which is never indexed.
+  Future<(IgnoreRules, bool)?> _rulesAbove(
+    String root,
+    String dir,
+    IgnoreRules junk,
+  ) async {
+    var rules = junk;
+    var ignored = false;
     final parts = dir.isEmpty ? const <String>[] : dir.split('/');
     for (var i = 0; i < parts.length; i++) {
       rules = rules.add(_up(parts, i), await _ignoreFile(root, _up(parts, i)));
-      if (rules.ignores(_up(parts, i + 1), dir: true)) return null;
+      final path = _up(parts, i + 1);
+      if (rules.ignores(path, dir: true)) {
+        if (junk.ignores(path, dir: true)) return null;
+        ignored = true;
+      }
     }
-    return rules;
+    return (rules, ignored);
   }
 
-  /// The media files of the [entries] of [dir] to index, none when [done], and
-  /// its subdirectories to scan, sorted; [skipped] counts the rest.
-  Future<(Map<String, FileInfo>, List<String>)> _sort(
+  /// The media files of the [entries] of [dir] to index, none when [done], its
+  /// subdirectories to scan, sorted, each with whether the user's rules ignore
+  /// it, and the names of the files they do: these are indexed all the same,
+  /// out of every view but the one that shows the excluded. [skipped] counts
+  /// the rest, the junk the defaults name among it.
+  Future<(Map<String, FileInfo>, Map<String, bool>, Set<String>)> _sort(
     String root,
     String dir,
     List<FileEntry> entries,
-    IgnoreRules rules,
+    (IgnoreRules, IgnoreRules, bool) rules,
     bool done,
     Map<String, int> skipped,
   ) async {
+    final (all, junk, ignoredHere) = rules;
     final files = <String, FileInfo>{};
-    final dirs = <String>[];
+    final dirs = <String, bool>{};
+    final ignored = <String>{};
     for (final (:name, dir: isDir, :info) in entries) {
-      if (rules.ignores(_join(dir, name), dir: isDir)) {
+      final path = _join(dir, name);
+      final byRules = all.ignores(path, dir: isDir);
+      final out = ignoredHere || byRules;
+      if (byRules && junk.ignores(path, dir: isDir)) {
         _count(skipped, 'ignored');
       } else if (isDir) {
-        dirs.add(name);
+        dirs[name] = out;
       } else if (!mediaExtensions.contains(
         name.split('.').last.toLowerCase(),
       )) {
@@ -197,6 +228,10 @@ class FolderIndexer {
       } else if (!done) {
         if (await info() case final info?) {
           files[name] = info;
+          if (out) {
+            ignored.add(name);
+            _count(skipped, 'excluded');
+          }
         } else {
           _count(skipped, 'unreadable');
         }
@@ -212,7 +247,7 @@ class FolderIndexer {
         if (done) 'resumed past it': true,
       },
     );
-    return (files, dirs..sort());
+    return (files, SplayTreeMap.of(dirs), ignored);
   }
 
   Future<String> _ignoreFile(String root, String dir) =>
@@ -270,14 +305,16 @@ class FolderIndexer {
   });
 
   /// Brings the rows of the directory [dir] in line with its [files] and
-  /// [dirs] in one transaction (see [_match]). Returns the rows it indexed and
-  /// those it marked missing.
+  /// [dirs] in one transaction (see [_match]); the files named in [ignored]
+  /// are marked excluded (`hidden` 2) and the others no longer are. Returns the
+  /// rows it indexed and those it marked missing.
   Future<(int, int)> _reconcile(
     String root,
     String dir,
     Map<String, FileInfo> files,
     Set<String> dirs,
     bool full,
+    Set<String> ignored,
   ) => db.transaction(() async {
     if (full) await _update(root, MediaSourceCompanion(checkpoint: Value(dir)));
     final a = db.localAsset;
@@ -327,16 +364,62 @@ class FolderIndexer {
     for (final chunk in _chunks(news, 100)) {
       await db.batch((b) {
         for (final (name, info) in chunk) {
-          b.insert(a, _insert(root, '$prefix$name', info, folder));
+          b.insert(
+            a,
+            _insert(
+              root,
+              '$prefix$name',
+              info,
+              folder,
+              ignored: ignored.contains(name),
+            ),
+          );
         }
       });
     }
+    await _exclude(root, dir, {for (final n in ignored) '$prefix$n'});
     final gone = [
       for (final (_, c) in changes)
         if (c.state == const Value('missing')) c,
     ].length;
     return (news.length + changes.length - gone, missing + gone);
   });
+
+  /// Marks the files of the directory [dir] at [paths] excluded by the rules
+  /// (`hidden` 2) unless the user hid them, and lets go of those it marked that
+  /// no rule ignores any more. The excluded show only while the library shows
+  /// hidden items.
+  Future<void> _exclude(String root, String dir, Set<String> paths) async {
+    final a = db.localAsset;
+    final slash = FunctionCallExpression<int>('instr', [
+      a.path.substrExpr(
+        Variable(dir.isEmpty ? '' : '$dir/').length + const Constant(1),
+      ),
+      const Constant('/'),
+    ]);
+    final rows =
+        await (db.select(a)..where(
+              (r) =>
+                  _under(root, dir) &
+                  slash.equals(0) &
+                  r.state.isNotValue('missing'),
+            ))
+            .get();
+    final set = <Uint8List>[];
+    final unset = <Uint8List>[];
+    for (final row in rows) {
+      final out = paths.contains(row.path);
+      if (out && row.hidden == 0) set.add(row.id);
+      if (!out && row.hidden == 2) unset.add(row.id);
+    }
+    for (final (ids, to) in [(set, 2), (unset, 0)]) {
+      for (final chunk in _chunks(ids, 100)) {
+        await (db.update(a)..where((r) => r.id.isIn(chunk))).write(
+          LocalAssetCompanion(hidden: Value(to)),
+        );
+      }
+    }
+  }
 
   /// The row each of the [files] of the directory at [prefix] keeps, by
   /// source id with its path and info, and those that need a new row. A file
@@ -432,8 +515,9 @@ class FolderIndexer {
     String root,
     String path,
     FileInfo info,
-    int folder,
-  ) {
+    int folder, {
+    bool ignored = false,
+  }) {
     final id = uuidv7();
     return LocalAssetCompanion.insert(
       id: id,
@@ -448,6 +532,7 @@ class FolderIndexer {
       fileId: Value(info.id),
       added: Value(uuidTime(id)),
       folder: Value(folder),
+      hidden: Value(ignored ? 2 : 0),
     );
   }
 
