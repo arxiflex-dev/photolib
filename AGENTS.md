@@ -227,7 +227,7 @@ pass the corpus and fuzz checks there.
   import (`kernel_web.dart`), and `app/test/web_imports_test.dart` follows `lib/main.dart`'s web imports in seconds.
 * The map (`app/lib/features/map/`, ADR-0384) asks the kernel's index (`kernel/src/cluster.rs`, `map.proto`, kept in a
   keyring on an isolate of its own, `openMapKernel`) for the clusters of the viewport at the camera's integer zoom;
-  never cluster in Dart. `kernel/tests/cluster.rs` holds its 1M-asset budget.
+  never cluster in Dart. The `map-pan` budget (ADR-0403, `tools/perf`) holds its 1M-asset speed.
 * Faces in the kernel (ADR-0389): `PrepareFaceDetection`, `DecodeFaces`, `AlignFace`, `NormalizeFaceEmbedding` and
   `MapFaces` (`kernel/src/faces*`), vectors in `testvectors/faces.json`; `MapFaces` is held to `Develop`'s geometry by
   `kernel/tests/face_edits.rs`, which renders marked faces through every turn, mirror and crop.
