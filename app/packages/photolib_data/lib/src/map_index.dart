@@ -99,6 +99,10 @@ final class MapIndex {
   }
 }
 
+/// The response bytes of a kernel call's `CallResponse`, or a [StateError]
+/// naming [method] and the error the kernel gave.
+Uint8List unwrapCall(Method method, Uint8List bytes) => _unwrap(method, bytes);
+
 Uint8List _unwrap(Method method, Uint8List bytes) {
   final response = CallResponse.fromBuffer(bytes);
   if (response.hasError()) {

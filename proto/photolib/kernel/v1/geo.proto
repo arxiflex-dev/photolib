@@ -1,0 +1,117 @@
+syntax = "proto3";
+
+package photolib.kernel.v1;
+
+// Offline reverse geocoding (ADR-0405, MAP-08): the packs of app/assets/geo/ are loaded into the keyring and answer for
+// positions without any network. Coordinates never leave the kernel call.
+
+// Loads the places packs into the keyring; its handle is used by the other geo calls until it is dropped.
+message GeoLoadRequest {
+  // The bytes of places.bin.
+  bytes core = 1;
+  // The bytes of a names-<locale>.bin that localises the names, or none for English.
+  bytes names = 2;
+}
+
+// The pack the keyring now holds.
+message GeoLoadResponse {
+  // The handle of the pack in the keyring.
+  uint32 pack = 1;
+  uint32 countries = 2;
+  uint32 regions = 3;
+  uint32 cities = 4;
+}
+
+// A place the user named: the first one whose circle holds a position takes it (a nearer centre wins among several).
+message GeoUserPlace {
+  // The caller's id for it, returned as the node's code.
+  string id = 1;
+  string name = 2;
+  double latitude = 3;
+  double longitude = 4;
+  // Radius in metres; 0 means 200.
+  uint32 radius_m = 5;
+  // A sensitive place (a home, say) is never named, counted or listed unless the request includes sensitive places:
+  // its positions resolve to no place at all, so nothing derived from them shows where they are.
+  bool sensitive = 6;
+}
+
+// The places of a list of positions, as a tree of countries, regions and cities, and the user's places beside it.
+message GeoResolveRequest {
+  uint32 pack = 1;
+  // Latitude in degrees, one per position (as MapIndexBuildRequest's).
+  repeated double latitudes = 2 [packed = true];
+  // Longitude in degrees, as many as latitudes, else the request is invalid.
+  repeated double longitudes = 3 [packed = true];
+  repeated GeoUserPlace user_places = 4;
+  // Whether sensitive user places are named and counted.
+  bool include_sensitive = 5;
+  GeoSort sort = 6;
+}
+
+// How siblings are ordered.
+enum GeoSort {
+  // Most items first, then by name.
+  GEO_SORT_COUNT = 0;
+  // By name, as the locale's lower-cased text compares.
+  GEO_SORT_NAME = 1;
+}
+
+// The level of a node.
+enum GeoLevel {
+  GEO_LEVEL_UNSPECIFIED = 0;
+  GEO_LEVEL_COUNTRY = 1;
+  GEO_LEVEL_REGION = 2;
+  GEO_LEVEL_CITY = 3;
+  // A place of the user's, which has no parent.
+  GEO_LEVEL_USER = 4;
+}
+
+// One place of the tree.
+message GeoNode {
+  GeoLevel level = 1;
+  // In the pack's language, else English.
+  string name = 2;
+  // A country's ISO 3166 alpha-2 code, a region's GeoNames admin1 code (US.CA), a city's GeoNames id, a user place's id.
+  string code = 3;
+  // The index of its parent in the nodes, or -1.
+  sint32 parent = 4;
+  // The positions at it or beneath it.
+  uint32 count = 5;
+  // A city's or a user place's centre.
+  double latitude = 6;
+  double longitude = 7;
+  // A city's IANA time zone.
+  string timezone = 8;
+  bool sensitive = 9;
+}
+
+// The places found.
+message GeoResolveResponse {
+  // Siblings are in the requested order; a parent comes before its children.
+  repeated GeoNode nodes = 1;
+  // One per position: the index of its deepest node, or -1 for none (at sea, off the map, or in a hidden sensitive place).
+  repeated sint32 assignment = 2 [packed = true];
+}
+
+// The IANA time zone at a position, for resolving a capture time that has none.
+message GeoTimezoneRequest {
+  uint32 pack = 1;
+  double latitude = 2;
+  double longitude = 3;
+}
+
+// The zone: a city's of the same country, else the nearest city's within 500 km, else the nautical zone (Etc/GMT+n).
+message GeoTimezoneResponse {
+  string timezone = 1;
+  // The country's alpha-2 code when the position lies in one, else empty.
+  string country = 2;
+}
+
+// Forgets a pack.
+message GeoDropRequest {
+  uint32 pack = 1;
+}
+
+// Nothing: the pack is gone.
+message GeoDropResponse {}

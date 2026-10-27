@@ -120,6 +120,14 @@ pub enum Method {
     METHOD_RENDER_RECIPE = 56i32,
     /// RecipeFromDevelopRequest to RecipeFromDevelopResponse.
     METHOD_RECIPE_FROM_DEVELOP = 57i32,
+    /// GeoLoadRequest to GeoLoadResponse; the places pack lives in the keyring until dropped.
+    METHOD_GEO_LOAD = 58i32,
+    /// GeoResolveRequest to GeoResolveResponse.
+    METHOD_GEO_RESOLVE = 59i32,
+    /// GeoTimezoneRequest to GeoTimezoneResponse.
+    METHOD_GEO_TIMEZONE = 60i32,
+    /// GeoDropRequest to GeoDropResponse.
+    METHOD_GEO_DROP = 61i32,
 }
 impl Method {
     ///Idiomatic alias for [`Self::METHOD_UNSPECIFIED`]; `Debug` prints the variant name.
@@ -293,6 +301,18 @@ impl Method {
     ///Idiomatic alias for [`Self::METHOD_RECIPE_FROM_DEVELOP`]; `Debug` prints the variant name.
     #[allow(non_upper_case_globals)]
     pub const RecipeFromDevelop: Self = Self::METHOD_RECIPE_FROM_DEVELOP;
+    ///Idiomatic alias for [`Self::METHOD_GEO_LOAD`]; `Debug` prints the variant name.
+    #[allow(non_upper_case_globals)]
+    pub const GeoLoad: Self = Self::METHOD_GEO_LOAD;
+    ///Idiomatic alias for [`Self::METHOD_GEO_RESOLVE`]; `Debug` prints the variant name.
+    #[allow(non_upper_case_globals)]
+    pub const GeoResolve: Self = Self::METHOD_GEO_RESOLVE;
+    ///Idiomatic alias for [`Self::METHOD_GEO_TIMEZONE`]; `Debug` prints the variant name.
+    #[allow(non_upper_case_globals)]
+    pub const GeoTimezone: Self = Self::METHOD_GEO_TIMEZONE;
+    ///Idiomatic alias for [`Self::METHOD_GEO_DROP`]; `Debug` prints the variant name.
+    #[allow(non_upper_case_globals)]
+    pub const GeoDrop: Self = Self::METHOD_GEO_DROP;
 }
 impl ::core::default::Default for Method {
     fn default() -> Self {
@@ -445,6 +465,10 @@ impl ::buffa::Enumeration for Method {
             55i32 => ::core::option::Option::Some(Self::METHOD_MAP_REGIONS),
             56i32 => ::core::option::Option::Some(Self::METHOD_RENDER_RECIPE),
             57i32 => ::core::option::Option::Some(Self::METHOD_RECIPE_FROM_DEVELOP),
+            58i32 => ::core::option::Option::Some(Self::METHOD_GEO_LOAD),
+            59i32 => ::core::option::Option::Some(Self::METHOD_GEO_RESOLVE),
+            60i32 => ::core::option::Option::Some(Self::METHOD_GEO_TIMEZONE),
+            61i32 => ::core::option::Option::Some(Self::METHOD_GEO_DROP),
             _ => ::core::option::Option::None,
         }
     }
@@ -510,6 +534,10 @@ impl ::buffa::Enumeration for Method {
             Self::METHOD_MAP_REGIONS => "METHOD_MAP_REGIONS",
             Self::METHOD_RENDER_RECIPE => "METHOD_RENDER_RECIPE",
             Self::METHOD_RECIPE_FROM_DEVELOP => "METHOD_RECIPE_FROM_DEVELOP",
+            Self::METHOD_GEO_LOAD => "METHOD_GEO_LOAD",
+            Self::METHOD_GEO_RESOLVE => "METHOD_GEO_RESOLVE",
+            Self::METHOD_GEO_TIMEZONE => "METHOD_GEO_TIMEZONE",
+            Self::METHOD_GEO_DROP => "METHOD_GEO_DROP",
         }
     }
     fn from_proto_name(name: &str) -> ::core::option::Option<Self> {
@@ -649,6 +677,14 @@ impl ::buffa::Enumeration for Method {
             "METHOD_RECIPE_FROM_DEVELOP" => {
                 ::core::option::Option::Some(Self::METHOD_RECIPE_FROM_DEVELOP)
             }
+            "METHOD_GEO_LOAD" => ::core::option::Option::Some(Self::METHOD_GEO_LOAD),
+            "METHOD_GEO_RESOLVE" => {
+                ::core::option::Option::Some(Self::METHOD_GEO_RESOLVE)
+            }
+            "METHOD_GEO_TIMEZONE" => {
+                ::core::option::Option::Some(Self::METHOD_GEO_TIMEZONE)
+            }
+            "METHOD_GEO_DROP" => ::core::option::Option::Some(Self::METHOD_GEO_DROP),
             _ => ::core::option::Option::None,
         }
     }
@@ -711,6 +747,10 @@ impl ::buffa::Enumeration for Method {
             Self::METHOD_MAP_REGIONS,
             Self::METHOD_RENDER_RECIPE,
             Self::METHOD_RECIPE_FROM_DEVELOP,
+            Self::METHOD_GEO_LOAD,
+            Self::METHOD_GEO_RESOLVE,
+            Self::METHOD_GEO_TIMEZONE,
+            Self::METHOD_GEO_DROP,
         ]
     }
 }

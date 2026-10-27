@@ -6,6 +6,7 @@ include!("photolib.kernel.v1.metadata.rs");
 include!("photolib.kernel.v1.capture_time.rs");
 include!("photolib.kernel.v1.develop.rs");
 include!("photolib.kernel.v1.faces.rs");
+include!("photolib.kernel.v1.geo.rs");
 include!("photolib.kernel.v1.heif.rs");
 include!("photolib.kernel.v1.keys.rs");
 include!("photolib.kernel.v1.live_photo.rs");
@@ -41,6 +42,7 @@ pub mod __buffa {
         include!("photolib.kernel.v1.capture_time.__view.rs");
         include!("photolib.kernel.v1.develop.__view.rs");
         include!("photolib.kernel.v1.faces.__view.rs");
+        include!("photolib.kernel.v1.geo.__view.rs");
         include!("photolib.kernel.v1.heif.__view.rs");
         include!("photolib.kernel.v1.keys.__view.rs");
         include!("photolib.kernel.v1.live_photo.__view.rs");
@@ -111,6 +113,16 @@ pub mod __buffa {
         reg.register_json_any(super::__NORMALIZE_FACE_EMBEDDING_RESPONSE_JSON_ANY);
         reg.register_json_any(super::__MAP_FACES_REQUEST_JSON_ANY);
         reg.register_json_any(super::__MAP_FACES_RESPONSE_JSON_ANY);
+        reg.register_json_any(super::__GEO_LOAD_REQUEST_JSON_ANY);
+        reg.register_json_any(super::__GEO_LOAD_RESPONSE_JSON_ANY);
+        reg.register_json_any(super::__GEO_USER_PLACE_JSON_ANY);
+        reg.register_json_any(super::__GEO_RESOLVE_REQUEST_JSON_ANY);
+        reg.register_json_any(super::__GEO_NODE_JSON_ANY);
+        reg.register_json_any(super::__GEO_RESOLVE_RESPONSE_JSON_ANY);
+        reg.register_json_any(super::__GEO_TIMEZONE_REQUEST_JSON_ANY);
+        reg.register_json_any(super::__GEO_TIMEZONE_RESPONSE_JSON_ANY);
+        reg.register_json_any(super::__GEO_DROP_REQUEST_JSON_ANY);
+        reg.register_json_any(super::__GEO_DROP_RESPONSE_JSON_ANY);
         reg.register_json_any(super::__READ_HEIF_REQUEST_JSON_ANY);
         reg.register_json_any(super::__READ_HEIF_RESPONSE_JSON_ANY);
         reg.register_json_any(super::__HEIF_PICTURE_JSON_ANY);
@@ -388,6 +400,46 @@ pub use self::__buffa::view::MapFacesRequestOwnedView;
 pub use self::__buffa::view::MapFacesResponseView;
 #[doc(inline)]
 pub use self::__buffa::view::MapFacesResponseOwnedView;
+#[doc(inline)]
+pub use self::__buffa::view::GeoLoadRequestView;
+#[doc(inline)]
+pub use self::__buffa::view::GeoLoadRequestOwnedView;
+#[doc(inline)]
+pub use self::__buffa::view::GeoLoadResponseView;
+#[doc(inline)]
+pub use self::__buffa::view::GeoLoadResponseOwnedView;
+#[doc(inline)]
+pub use self::__buffa::view::GeoUserPlaceView;
+#[doc(inline)]
+pub use self::__buffa::view::GeoUserPlaceOwnedView;
+#[doc(inline)]
+pub use self::__buffa::view::GeoResolveRequestView;
+#[doc(inline)]
+pub use self::__buffa::view::GeoResolveRequestOwnedView;
+#[doc(inline)]
+pub use self::__buffa::view::GeoNodeView;
+#[doc(inline)]
+pub use self::__buffa::view::GeoNodeOwnedView;
+#[doc(inline)]
+pub use self::__buffa::view::GeoResolveResponseView;
+#[doc(inline)]
+pub use self::__buffa::view::GeoResolveResponseOwnedView;
+#[doc(inline)]
+pub use self::__buffa::view::GeoTimezoneRequestView;
+#[doc(inline)]
+pub use self::__buffa::view::GeoTimezoneRequestOwnedView;
+#[doc(inline)]
+pub use self::__buffa::view::GeoTimezoneResponseView;
+#[doc(inline)]
+pub use self::__buffa::view::GeoTimezoneResponseOwnedView;
+#[doc(inline)]
+pub use self::__buffa::view::GeoDropRequestView;
+#[doc(inline)]
+pub use self::__buffa::view::GeoDropRequestOwnedView;
+#[doc(inline)]
+pub use self::__buffa::view::GeoDropResponseView;
+#[doc(inline)]
+pub use self::__buffa::view::GeoDropResponseOwnedView;
 #[doc(inline)]
 pub use self::__buffa::view::ReadHeifRequestView;
 #[doc(inline)]

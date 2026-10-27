@@ -1,0 +1,121 @@
+{
+  "counts": {
+    "cities": 31806,
+    "countries": 252,
+    "countries_with_borders": 237,
+    "regions": 2764
+  },
+  "format": 1,
+  "licences": {
+    "GeoNames": "CC BY 4.0, https://creativecommons.org/licenses/by/4.0/, https://www.geonames.org/",
+    "Natural Earth": "public domain, https://www.naturalearthdata.com/about/terms-of-use/"
+  },
+  "packs": {
+    "names-ar.bin": {
+      "bytes": 206041,
+      "sha256": "ceaae1a22aac3937eee0b753a029d08137d59fd655d11997edfb577daf89841d"
+    },
+    "names-de.bin": {
+      "bytes": 50561,
+      "sha256": "88aad00a4ef5b6994830bf2eea30d7545f335070295ec6bd0ead9adb0c75864c"
+    },
+    "names-es.bin": {
+      "bytes": 56331,
+      "sha256": "2d33c7a811d7db0fe50825ef83e4ae5cd1e3e3b894d615cd06b53d1b16c2db81"
+    },
+    "names-fr.bin": {
+      "bytes": 44523,
+      "sha256": "bfb59eca8dad58e29f5bb053b42e630874460b597fa58751779f2a281b2b38da"
+    },
+    "names-he.bin": {
+      "bytes": 79665,
+      "sha256": "47d3905aa6a9b2e07546065932b31cc959e259e607467250fb8543c516e77145"
+    },
+    "names-hi.bin": {
+      "bytes": 161074,
+      "sha256": "90398efd30098b31658c78096a306f8170ee732caab16c4c4d73bea699abba9b"
+    },
+    "names-id.bin": {
+      "bytes": 38343,
+      "sha256": "fa13f0785a9e8c43ef2aab684d12d9b2f7de77f42e16df8faa4ef0a1121f1ff2"
+    },
+    "names-it.bin": {
+      "bytes": 46764,
+      "sha256": "e6267fc1485e7fbc83528f82bd98c08acc0f037e5ddbcddcfb321cebf1a56ed8"
+    },
+    "names-ja.bin": {
+      "bytes": 223837,
+      "sha256": "71df7cedc977cc33d5d5467f9aa1fde051b2e214ac4c3ebfbae4d525be4deee0"
+    },
+    "names-ko.bin": {
+      "bytes": 121845,
+      "sha256": "58dd3ea35878d0e76fc7bc34ac5f7f1b96c0cd8043ccb70c6cd0f1a45bc12f9a"
+    },
+    "names-nl.bin": {
+      "bytes": 26324,
+      "sha256": "79dfce1ba1fa76422e689b5425c06917f79744cf4e5108ebc84885c3bda7d3e7"
+    },
+    "names-pl.bin": {
+      "bytes": 44189,
+      "sha256": "30bfffb3d8b1bc9c9275f414a3171ecbb161a315a34e6e1bc2427770135b0ffa"
+    },
+    "names-pt.bin": {
+      "bytes": 36697,
+      "sha256": "ab2a7705698e5600c44f4d2ec5d3204f27fd8e582f861322523fa0ae870d9ec0"
+    },
+    "names-ru.bin": {
+      "bytes": 377295,
+      "sha256": "4c173f2bd77d6774a3468ed9e4194199757f16cf208b04d0f95e0e8a345227d6"
+    },
+    "names-sv.bin": {
+      "bytes": 24091,
+      "sha256": "11df1eb56e87280c85b75f2999f6f5c06b5a3e0fa8a2e0fdecdbd4e55c1cba89"
+    },
+    "names-tr.bin": {
+      "bytes": 33849,
+      "sha256": "8dd20129cedca6c8d80f2482d198616144ce7f0aa0fe778ec9001cd891e71281"
+    },
+    "names-uk.bin": {
+      "bytes": 178889,
+      "sha256": "de3482c1fc19c04346bb6af116a5390fd216b1dd93e54e7a44bea64d1935eb5f"
+    },
+    "names-vi.bin": {
+      "bytes": 26020,
+      "sha256": "91c11c7ca944240aee90acbe03699f001618e5b11129ca0f229e7b8d6526da7c"
+    },
+    "names-zh.bin": {
+      "bytes": 180713,
+      "sha256": "a064dde749f25575fb334b806635e892e93c1844a07affc6e00926ed8c9f41c1"
+    },
+    "names-zh_Hant.bin": {
+      "bytes": 178850,
+      "sha256": "b308dbf3d5c08c41de0886c8bc7d3f98eb7f4e50d3b0d90db6bd73e5b4ec8f46"
+    },
+    "places.bin": {
+      "bytes": 1603347,
+      "sha256": "6b2574d81e0f9cf8a6b11a702b0e29c1c14c6d055ce7be945b529d64a9ea3930"
+    }
+  },
+  "sources": {
+    "admin1CodesASCII.txt": {
+      "sha256": "2e4867f5397acb056ea26377601b57af37cb4c81399770225018e9e439e91ad3",
+      "url": "https://download.geonames.org/export/dump/admin1CodesASCII.txt"
+    },
+    "alternateNamesV2.zip": {
+      "sha256": "1741ffd3dfe705c7000ef9233319bc07fe83b58fdb1e0a6c5a10a41c97894e28",
+      "url": "https://download.geonames.org/export/dump/alternateNamesV2.zip"
+    },
+    "cities15000.zip": {
+      "sha256": "767af45ad4d11a21475d0cf8be377d7821030caa771b35c0a294de91ada68bca",
+      "url": "https://download.geonames.org/export/dump/cities15000.zip"
+    },
+    "countryInfo.txt": {
+      "sha256": "c55f638cfaafb4fe45a9aa15120a0f1f78e8a34a8e1847d7b9320cf740fbc9ab",
+      "url": "https://download.geonames.org/export/dump/countryInfo.txt"
+    },
+    "ne_50m_admin_0_countries.zip": {
+      "sha256": "5fed433373581fa648920435f937d95f2d3c0200e067409c6478dcdf1b853139",
+      "url": "https://naciscdn.org/naturalearth/50m/cultural/ne_50m_admin_0_countries.zip"
+    }
+  }
+}

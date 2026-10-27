@@ -206,6 +206,14 @@ pub enum Method {
     RenderRecipe = 56,
     /// RecipeFromDevelopRequest to RecipeFromDevelopResponse.
     RecipeFromDevelop = 57,
+    /// GeoLoadRequest to GeoLoadResponse; the places pack lives in the keyring until dropped.
+    GeoLoad = 58,
+    /// GeoResolveRequest to GeoResolveResponse.
+    GeoResolve = 59,
+    /// GeoTimezoneRequest to GeoTimezoneResponse.
+    GeoTimezone = 60,
+    /// GeoDropRequest to GeoDropResponse.
+    GeoDrop = 61,
 }
 impl Method {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -271,6 +279,10 @@ impl Method {
             Self::MapRegions => "METHOD_MAP_REGIONS",
             Self::RenderRecipe => "METHOD_RENDER_RECIPE",
             Self::RecipeFromDevelop => "METHOD_RECIPE_FROM_DEVELOP",
+            Self::GeoLoad => "METHOD_GEO_LOAD",
+            Self::GeoResolve => "METHOD_GEO_RESOLVE",
+            Self::GeoTimezone => "METHOD_GEO_TIMEZONE",
+            Self::GeoDrop => "METHOD_GEO_DROP",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -333,6 +345,10 @@ impl Method {
             "METHOD_MAP_REGIONS" => Some(Self::MapRegions),
             "METHOD_RENDER_RECIPE" => Some(Self::RenderRecipe),
             "METHOD_RECIPE_FROM_DEVELOP" => Some(Self::RecipeFromDevelop),
+            "METHOD_GEO_LOAD" => Some(Self::GeoLoad),
+            "METHOD_GEO_RESOLVE" => Some(Self::GeoResolve),
+            "METHOD_GEO_TIMEZONE" => Some(Self::GeoTimezone),
+            "METHOD_GEO_DROP" => Some(Self::GeoDrop),
             _ => None,
         }
     }
@@ -1457,6 +1473,204 @@ pub struct MapFacesResponse {
     /// away. Its box is then clipped to the copy.
     #[prost(bool, repeated, tag="2")]
     pub visible: ::prost::alloc::vec::Vec<bool>,
+}
+// Offline reverse geocoding (ADR-0405, MAP-08): the packs of app/assets/geo/ are loaded into the keyring and answer for
+// positions without any network. Coordinates never leave the kernel call.
+
+/// Loads the places packs into the keyring; its handle is used by the other geo calls until it is dropped.
+#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
+pub struct GeoLoadRequest {
+    /// The bytes of places.bin.
+    #[prost(bytes="vec", tag="1")]
+    pub core: ::prost::alloc::vec::Vec<u8>,
+    /// The bytes of a names-<locale>.bin that localises the names, or none for English.
+    #[prost(bytes="vec", tag="2")]
+    pub names: ::prost::alloc::vec::Vec<u8>,
+}
+/// The pack the keyring now holds.
+#[derive(Clone, Copy, PartialEq, Eq, Hash, ::prost::Message)]
+pub struct GeoLoadResponse {
+    /// The handle of the pack in the keyring.
+    #[prost(uint32, tag="1")]
+    pub pack: u32,
+    #[prost(uint32, tag="2")]
+    pub countries: u32,
+    #[prost(uint32, tag="3")]
+    pub regions: u32,
+    #[prost(uint32, tag="4")]
+    pub cities: u32,
+}
+/// A place the user named: the first one whose circle holds a position takes it (a nearer centre wins among several).
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GeoUserPlace {
+    /// The caller's id for it, returned as the node's code.
+    #[prost(string, tag="1")]
+    pub id: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub name: ::prost::alloc::string::String,
+    #[prost(double, tag="3")]
+    pub latitude: f64,
+    #[prost(double, tag="4")]
+    pub longitude: f64,
+    /// Radius in metres; 0 means 200.
+    #[prost(uint32, tag="5")]
+    pub radius_m: u32,
+    /// A sensitive place (a home, say) is never named, counted or listed unless the request includes sensitive places:
+    /// its positions resolve to no place at all, so nothing derived from them shows where they are.
+    #[prost(bool, tag="6")]
+    pub sensitive: bool,
+}
+/// The places of a list of positions, as a tree of countries, regions and cities, and the user's places beside it.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GeoResolveRequest {
+    #[prost(uint32, tag="1")]
+    pub pack: u32,
+    /// Latitude in degrees, one per position (as MapIndexBuildRequest's).
+    #[prost(double, repeated, tag="2")]
+    pub latitudes: ::prost::alloc::vec::Vec<f64>,
+    /// Longitude in degrees, as many as latitudes, else the request is invalid.
+    #[prost(double, repeated, tag="3")]
+    pub longitudes: ::prost::alloc::vec::Vec<f64>,
+    #[prost(message, repeated, tag="4")]
+    pub user_places: ::prost::alloc::vec::Vec<GeoUserPlace>,
+    /// Whether sensitive user places are named and counted.
+    #[prost(bool, tag="5")]
+    pub include_sensitive: bool,
+    #[prost(enumeration="GeoSort", tag="6")]
+    pub sort: i32,
+}
+/// One place of the tree.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GeoNode {
+    #[prost(enumeration="GeoLevel", tag="1")]
+    pub level: i32,
+    /// In the pack's language, else English.
+    #[prost(string, tag="2")]
+    pub name: ::prost::alloc::string::String,
+    /// A country's ISO 3166 alpha-2 code, a region's GeoNames admin1 code (US.CA), a city's GeoNames id, a user place's id.
+    #[prost(string, tag="3")]
+    pub code: ::prost::alloc::string::String,
+    /// The index of its parent in the nodes, or -1.
+    #[prost(sint32, tag="4")]
+    pub parent: i32,
+    /// The positions at it or beneath it.
+    #[prost(uint32, tag="5")]
+    pub count: u32,
+    /// A city's or a user place's centre.
+    #[prost(double, tag="6")]
+    pub latitude: f64,
+    #[prost(double, tag="7")]
+    pub longitude: f64,
+    /// A city's IANA time zone.
+    #[prost(string, tag="8")]
+    pub timezone: ::prost::alloc::string::String,
+    #[prost(bool, tag="9")]
+    pub sensitive: bool,
+}
+/// The places found.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GeoResolveResponse {
+    /// Siblings are in the requested order; a parent comes before its children.
+    #[prost(message, repeated, tag="1")]
+    pub nodes: ::prost::alloc::vec::Vec<GeoNode>,
+    /// One per position: the index of its deepest node, or -1 for none (at sea, off the map, or in a hidden sensitive place).
+    #[prost(sint32, repeated, tag="2")]
+    pub assignment: ::prost::alloc::vec::Vec<i32>,
+}
+/// The IANA time zone at a position, for resolving a capture time that has none.
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct GeoTimezoneRequest {
+    #[prost(uint32, tag="1")]
+    pub pack: u32,
+    #[prost(double, tag="2")]
+    pub latitude: f64,
+    #[prost(double, tag="3")]
+    pub longitude: f64,
+}
+/// The zone: a city's of the same country, else the nearest city's within 500 km, else the nautical zone (Etc/GMT+n).
+#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
+pub struct GeoTimezoneResponse {
+    #[prost(string, tag="1")]
+    pub timezone: ::prost::alloc::string::String,
+    /// The country's alpha-2 code when the position lies in one, else empty.
+    #[prost(string, tag="2")]
+    pub country: ::prost::alloc::string::String,
+}
+/// Forgets a pack.
+#[derive(Clone, Copy, PartialEq, Eq, Hash, ::prost::Message)]
+pub struct GeoDropRequest {
+    #[prost(uint32, tag="1")]
+    pub pack: u32,
+}
+/// Nothing: the pack is gone.
+#[derive(Clone, Copy, PartialEq, Eq, Hash, ::prost::Message)]
+pub struct GeoDropResponse {
+}
+/// How siblings are ordered.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum GeoSort {
+    /// Most items first, then by name.
+    Count = 0,
+    /// By name, as the locale's lower-cased text compares.
+    Name = 1,
+}
+impl GeoSort {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            Self::Count => "GEO_SORT_COUNT",
+            Self::Name => "GEO_SORT_NAME",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "GEO_SORT_COUNT" => Some(Self::Count),
+            "GEO_SORT_NAME" => Some(Self::Name),
+            _ => None,
+        }
+    }
+}
+/// The level of a node.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum GeoLevel {
+    Unspecified = 0,
+    Country = 1,
+    Region = 2,
+    City = 3,
+    /// A place of the user's, which has no parent.
+    User = 4,
+}
+impl GeoLevel {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            Self::Unspecified => "GEO_LEVEL_UNSPECIFIED",
+            Self::Country => "GEO_LEVEL_COUNTRY",
+            Self::Region => "GEO_LEVEL_REGION",
+            Self::City => "GEO_LEVEL_CITY",
+            Self::User => "GEO_LEVEL_USER",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "GEO_LEVEL_UNSPECIFIED" => Some(Self::Unspecified),
+            "GEO_LEVEL_COUNTRY" => Some(Self::Country),
+            "GEO_LEVEL_REGION" => Some(Self::Region),
+            "GEO_LEVEL_CITY" => Some(Self::City),
+            "GEO_LEVEL_USER" => Some(Self::User),
+            _ => None,
+        }
+    }
 }
 /// Where a HEIF still keeps the coded images a platform decoder shows (ISO/IEC 23008-12), so that a host with a video
 /// decoder, such as the browser's WebCodecs, can decode them without a HEIF library. Pure parsing: no pixel is decoded.

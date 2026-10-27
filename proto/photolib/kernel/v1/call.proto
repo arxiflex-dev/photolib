@@ -121,6 +121,14 @@ enum Method {
   METHOD_RENDER_RECIPE = 56;
   // RecipeFromDevelopRequest to RecipeFromDevelopResponse.
   METHOD_RECIPE_FROM_DEVELOP = 57;
+  // GeoLoadRequest to GeoLoadResponse; the places pack lives in the keyring until dropped.
+  METHOD_GEO_LOAD = 58;
+  // GeoResolveRequest to GeoResolveResponse.
+  METHOD_GEO_RESOLVE = 59;
+  // GeoTimezoneRequest to GeoTimezoneResponse.
+  METHOD_GEO_TIMEZONE = 60;
+  // GeoDropRequest to GeoDropResponse.
+  METHOD_GEO_DROP = 61;
 }
 
 // One call into the kernel, whose whole ABI is call(method_id, request) -> response over protobuf bytes.
