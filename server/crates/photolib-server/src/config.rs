@@ -506,7 +506,7 @@ pub const CONFIG_VERSION: u32 = 1;
 const NOT_SETTINGS: &str = "config token server library state domain upstream version subnet data flags tools_cache \
     toolchains cache upload_bytes cli_files scan_files rescan_files sync_assets upgrade_assets record_fixtures \
     playable ml_models ml_golden ml_soak_secs crash chaos_worker proxies_child spawn_stopped browser_slots \
-    hdr_review hdr_seconds heif_samples";
+    hdr_review hdr_seconds heif_samples remote";
 
 impl Config {
     /// Where workers stage files: `work_dir`, else `tmp/` in the data directory (same filesystem as the libraries).

@@ -586,6 +586,7 @@ expect_result "no benchmarks on the branch fail" 1 "no instruction counts"
 # says, the base is the merge base with origin/dev, and a commit or $PR_BODY may accept a regression.
 repo=$TMP/repo
 mkdir -p "$repo/tools/perf" "$repo/kernel/benches" "$TMP/bin"
+cp tools/remote.sh "$repo/tools/"
 cp tools/perf/instructions.sh tools/perf/perf.py tools/perf/budgets.json "$repo/tools/perf/"
 : >"$repo/kernel/benches/instructions.rs"
 # Like cargo, which names a workspace's crates by their path within it, the stub takes the build in its target
