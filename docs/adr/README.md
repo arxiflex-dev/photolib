@@ -136,7 +136,7 @@ here; the two share one numbering.
 | [0266](0266-backups-restore-drills-manifests-postgresql-upgrades.md) | Backups with a daily restore drill, restores from the console, manifests for recovery from storage, PostgreSQL major upgrades by copy | **Proposed — owner to confirm** |
 | [0267](0267-unified-timeline.md) | The unified timeline: one tile per photo from two flags that triggers keep | **Proposed — owner to confirm** |
 | [0278](0278-on-device-ml-in-production.md) | On-device ML in production: models from the user's server, gated indexing, results handed off | Accepted (owner confirmed, 2026-10-23) |
-| [0290](0290-one-source-tree.md) | One source tree on every client: local folders as a nested tree with an eye per node | **Proposed — owner to confirm** |
+| [0290](0290-one-source-tree.md) | One source tree on every client: local folders as a nested tree with an eye per node | Accepted (owner confirmed, 2026-10-23) |
 | [0311](0311-reaching-the-server.md) | Reaching the server without a network degree: discovery, pairing, guided tunnels and a relay later | Accepted (owner confirmed, 2026-10-23) |
 | [0312](0312-app-icon.md) | The app icon on every platform, written from the design's export set | **Proposed — owner to confirm** |
 | [0314](0314-language-setting.md) | Language setting: the device's language unless Settings chooses one | **Proposed — owner to confirm** |
