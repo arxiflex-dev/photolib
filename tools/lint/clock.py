@@ -28,7 +28,8 @@ SUFFIXES = {".py", ".mjs", ".js", ".ts", ".dart"}
 # What reads the clock, with the text of a line stripped of strings and comments.
 READS = {
     ".dart": re.compile(r"\bDateTime\s*\.\s*now\s*\("),
-    "js": re.compile(r"\bDate\s*\.\s*now\s*\(|\bnew\s+Date\s*\(\s*\)|(?<![\w.])Date\s*\(\s*\)|\bperformance\s*\.\s*now\s*\("),
+    "js": re.compile(r"\bDate\s*\.\s*now\s*\(|\bnew\s+Date\s*\(\s*\)|(?<![\w.])Date\s*\(\s*\)"
+                     r"|\bperformance\s*\.\s*now\s*\("),
 }
 GROUPS = {".dart": r"\bgroup\s*\(", "js": r"\b(?:describe|suite)\s*\("}
 MAIN = {".dart": r"\bmain\s*\([^)]*\)\s*(?:async\s*)?$", "js": r"$^"}
@@ -49,9 +50,8 @@ def python_reads(source):
     class Visit(ast.NodeVisitor):
         def visit_Call(self, node):
             func = node.func
-            if isinstance(func, ast.Attribute) and (name := _tail(func.value)):
-                if (name, func.attr) in PY_CLOCK:
-                    hits.append(node.lineno)
+            if isinstance(func, ast.Attribute) and (_tail(func.value), func.attr) in PY_CLOCK:
+                hits.append(node.lineno)
             self.generic_visit(node)
 
         def visit_Lambda(self, node):
