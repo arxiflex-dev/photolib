@@ -11,6 +11,12 @@ This is the checklist for the release commit. Items join it as the release work 
    fixture upgrades with a million synthetic assets.
 4. **Signed files.** Each set of release files goes out through `tools/release.sh`, which adds an SBOM and
    `SHA256SUMS` signed by cosign; check a published set as [Supply chain](supply-chain.md#verifying-a-release) shows.
+   The Windows client is a zip, not a store build: the post-merge run of the release commit builds
+   `photolib-client-windows-x64-<short sha>` (the app, our LGPL libmpv and FFmpeg, the Visual C++ runtime, the licences
+   and `SOURCE.txt`), and its `smoke-windows` job must be green (it unpacks the zip on a fresh runner, scans it for DLLs
+   outside it and plays a corpus video, [ADR-0404](../adr/0404-standalone-windows-client.md)). Download it with
+   `gh run download <run> -n photolib-client-windows-x64-<short sha> -D <release directory>` and add it to the release
+   files before `tools/release.sh` signs them: it is published with the release.
 5. **Version.** `app/pubspec.yaml`'s version (`x.y.z+code`) is every channel's ([ADR-0249](../adr/0249-packaging-and-distribution.md)):
    bump it with `deploy/helm/photolib/Chart.yaml`, the image tag of each `deploy/nas` entry, a `<release>` of
    `app/linux/packaging/org.photolib.photolib.metainfo.xml` and the builds of `app/android/fdroid/`; `test_helm.sh`,

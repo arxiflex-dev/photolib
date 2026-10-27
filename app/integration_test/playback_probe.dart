@@ -121,6 +121,38 @@ void main() {
     'one that ends before its first picture fails its player',
     _errors,
   );
+
+  // The Windows release pipeline runs the same on its package (ADR-0404).
+  testWidgets(
+    'the self-test plays a clip headless with the bundled libmpv and says so, '
+    'and fails for a file libmpv cannot decode',
+    _selfTest,
+  );
+}
+
+Future<void> _selfTest(WidgetTester tester) async {
+  final dir = await Directory.systemTemp.createTemp('self-test-');
+  addTearDown(() => dir.delete(recursive: true));
+  final clip = '${dir.path}/clip.mp4';
+  await _run([
+    ...['-f', 'lavfi', '-i', 'testsrc2=s=320x240:r=30:d=3'],
+    ...['-c:v', 'libopenh264', '-movflags', '+faststart'],
+    clip,
+  ]);
+  final broken = File('${dir.path}/broken.mp4')
+    ..writeAsBytesSync(List.filled(4096, 7));
+  for (final (video, code, report) in [
+    (clip, 0, startsWith('played ')),
+    ('$_corpus/files/video/mjpeg.mov', 0, startsWith('played ')),
+    (broken.path, 1, startsWith('failed: ')),
+  ]) {
+    final result = '${dir.path}/${video.split('/').last}.txt';
+    final got = await runSelfTest((video: video, result: result));
+    expect(got, code, reason: File(result).readAsStringSync());
+    final lines = File(result).readAsLinesSync();
+    expect(lines.first, report, reason: '$lines');
+    expect(lines.last, startsWith('mpv '), reason: 'the versions it ran with');
+  }
 }
 
 /// Plays 40 players of an H.264 clip, each disposed as the next is made.

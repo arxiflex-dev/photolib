@@ -38,6 +38,86 @@ Stream<LicenseEntry> bundledNotices(File file) async* {
   }
 }
 
+/// What `--self-test-play <video> <result>` asks of the app: play the video
+/// with the libmpv it bundles, write what happened to the result file, and
+/// exit.
+typedef SelfTest = ({String video, String result});
+
+/// The self-test [args] ask for, or null when they are files to open.
+SelfTest? selfTestOf(List<String> args) {
+  if (args.isEmpty || args.first != '--self-test-play') return null;
+  if (args.length != 3) {
+    throw ArgumentError('usage: --self-test-play <video> <result file>');
+  }
+  return (video: args[1], result: args[2]);
+}
+
+/// Plays [test]'s video, headless (no picture out, no audio), until its first
+/// second or its end, and writes `played ...` or `failed: ...` and the
+/// libmpv and FFmpeg versions it ran with to its result file. Returns the
+/// exit code: 0 when a picture decoded and nothing failed. The release
+/// pipeline runs it on a clean Windows machine (tools/windows/smoke.sh).
+Future<int> runSelfTest(SelfTest test) async {
+  var report = '';
+  var code = 1;
+  try {
+    // Asynchronous already; the lint prefers the synchronous call.
+    // ignore: avoid_slow_async_io
+    if (!await File(test.video).exists()) {
+      report = 'failed: ${test.video} does not exist';
+    } else {
+      MediaKit.ensureInitialized();
+      final player = Player();
+      try {
+        final native = player.native;
+        // media_kit leaves video off until a controller turns it on.
+        await native.setProperty('vid', 'auto');
+        await native.setProperty('ao', 'null');
+        final errors = <String>[];
+        final logs = <String>[];
+        final listening = [
+          player.stream.error.listen(errors.add),
+          player.stream.log.listen((l) => logs.add('${l.prefix}: ${l.text}')),
+        ];
+        await player.open(Media(test.video));
+        await Future.any([
+          player.stream.position.firstWhere((p) => p.inSeconds >= 1),
+          player.stream.completed.firstWhere((done) => done),
+          player.stream.error.first,
+          Future<void>.delayed(const Duration(seconds: 60)),
+        ]);
+        for (final l in listening) {
+          await l.cancel();
+        }
+        final state = player.state;
+        final (w, h) = (state.width ?? 0, state.height ?? 0);
+        final versions =
+            '${await native.getProperty('mpv-version')}, '
+            'ffmpeg ${await native.getProperty('ffmpeg-version')}';
+        if (errors.isNotEmpty) {
+          report = 'failed: ${errors.join('; ')}';
+        } else if (w == 0 || h == 0 || state.position == Duration.zero) {
+          report =
+              'failed: no picture decoded (${w}x$h at ${state.position}, '
+              'completed ${state.completed})\n${logs.join('\n')}';
+        } else {
+          code = 0;
+          report =
+              'played ${state.position.inMilliseconds} ms of '
+              '${state.duration.inMilliseconds} ms, ${w}x$h';
+        }
+        report = '$report\n$versions';
+      } finally {
+        await player.dispose();
+      }
+    }
+  } on Object catch (e) {
+    report = 'failed: $e';
+  }
+  await File(test.result).writeAsString('$report\n');
+  return code;
+}
+
 /// Never called: only the web has `folder:` items.
 Future<VideoPlayerController> folderVideo(ThumbnailItem item) =>
     throw UnsupportedError('no folder: items natively');
