@@ -1788,6 +1788,37 @@ assert_prose AGENTS.md 'writes nothing for 20 min[^.]*killed with its process gr
 silent_frozen() { thawed silent_gate 8; silent_checks; }
 frozen silent_frozen
 
+# wait_gate <pid> <seconds>: waits for a gate started in the background, at most that long: a gate that hangs is a failure
+# of this test, killed with its group, never a hang of the suite (CHECK_SILENCE is 20 min and CI retries a failed test).
+wait_gate() {
+  local i
+  for ((i = 0; i < $2 * 5; i++)); do kill -0 "$1" 2>/dev/null && sleep 0.2 || break; done
+  if kill -0 "$1" 2>/dev/null; then
+    fail "the gate (pid $1) was still running after $2 s: killed"
+    kill -KILL -- -"$1" 2>/dev/null
+  fi
+  { wait "$1"; } 2>/dev/null
+}
+
+# A gate that hangs is reported and killed within the bound, and one that ends is waited for without a report.
+fail_saved=$(declare -f fail)
+fail() { HANG_REPORT=$*; }
+HANG_REPORT=
+set -m
+(exec sleep 60) &
+hung=$!
+set +m
+wait_gate "$hung" 1
+[[ $HANG_REPORT == *"still running after 1 s: killed"* ]] && ! kill -0 "$hung" 2>/dev/null &&
+  RESULT=reported || RESULT="not reported ($HANG_REPORT)"
+HANG_REPORT=
+(exec sleep 0.2) &
+wait_gate $! 5
+[[ -z $HANG_REPORT ]] && ENDED=quiet || ENDED="reported: $HANG_REPORT"
+eval "$fail_saved"
+[[ $RESULT == reported ]] && ok "wait_gate kills a gate that hangs and says so" || fail "wait_gate: $RESULT"
+[[ $ENDED == quiet ]] && ok "and says nothing of one that ends" || fail "wait_gate on a gate that ended: $ENDED"
+
 # A freeze (quiet.sh, worker-throttle.sh) stops the gate and its steps, here for 8 s past a CHECK_SILENCE of 6, once the
 # gate has read what the step wrote: none of it is the step's silence, or the thaw kills a step that writes within its
 # limit of the time it ran (photolib-design#659: a gate killed test_check_sh.sh the moment a 24-min freeze ended).
@@ -1801,11 +1832,15 @@ frozen_gate() {
   (cd "$SANDBOX" && CHECK_SILENCE=6 PATH="$SANDBOX/stubs:$BASE_BIN" exec bash tools/check.sh repo &>"$SANDBOX/out") &
   gate=$!
   set +m
-  for _ in {1..100}; do [[ -s $SANDBOX/step && $(<"$SANDBOX/out") == *started* ]] && break || sleep 0.1; done
-  kill -STOP -- -"$gate" -"$(cat "$SANDBOX/step")"
+  # The gate holds a step's output until it ends, so the step's own file says that it started.
+  for _ in {1..100}; do [[ -s $SANDBOX/step ]] && break || sleep 0.1; done
+  [[ -s $SANDBOX/step ]] || fail "the step did not start within 10 s"
+  stepgroup=$(ps -o pgid= -p "$(cat "$SANDBOX/step")" | tr -d ' ')
+  kill -0 -- -"$gate" -"${stepgroup:-0}" 2>/dev/null || fail "the gate or its step was gone before the freeze, which tests nothing"
+  kill -STOP -- -"$gate" -"${stepgroup:-0}"
   sleep 8
-  kill -CONT -- -"$(cat "$SANDBOX/step")" -"$gate"
-  wait "$gate"
+  kill -CONT -- -"${stepgroup:-0}" -"$gate"
+  wait_gate "$gate" 60
   STATUS=$? OUT=$(<"$SANDBOX/out")
 }
 thawed frozen_gate 'sleep 1; sleep 1; sleep 1; echo done'
@@ -1862,7 +1897,7 @@ stop_gate() {
   kill -"$1" -- -"$gate"
   for _ in {1..50}; do kill -0 "$(cat "$SANDBOX/child")" 2>/dev/null && sleep 0.1 || break; done
   kill -0 "$(cat "$SANDBOX/child")" 2>/dev/null && SURVIVED=1 || SURVIVED=0
-  wait "$gate"
+  wait_gate "$gate" 60
 }
 for sig in TERM INT; do
   for jobs in 1 3; do
@@ -1907,7 +1942,7 @@ stopped_gate() {
   set +m
   for _ in {1..100}; do [[ -e $SANDBOX/step ]] && break || sleep 0.1; done
   kill -STOP -- -"$gate" && sleep 8 && kill -CONT -- -"$gate"
-  wait "$gate"
+  wait_gate "$gate" 120
   STATUS=$? OUT=$(<"$SANDBOX/out")
 }
 stopped_gate 'echo run >>calls.log; [[ -e step ]] && exit 0; : >step; sleep 1; exit 1'
