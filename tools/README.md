@@ -10,7 +10,7 @@ queue pushes (`dev` plus the queued pull requests), never on a pull request or a
 
 ## Contents
 
-* `check.sh`: the [quality gate](../AGENTS.md#the-quality-gate), with `*_licenses.py`, `cargo deny`, [`lint/`](../docs/dev/lint.md).
+* `check.sh`: the [quality gate](../AGENTS.md#the-quality-gate), with `*_licenses.py`, `cargo deny`, `lint/clock.py`, [`lint/`](../docs/dev/lint.md).
 * `tests/`: per-concern `test_*.sh`; `lib.sh` assertions, pattern/description tables (`assert_patterns`) and isolated stubs;
   `checklib.py` reporting, `miniyaml.py` YAML, `mdlint.py` Markdown; corpus schema/capture-time cases use `unittest.subTest`.
 * `commitlint.sh`: the [commit rules](../AGENTS.md#commits); `dco.sh`: sign-offs; `repeat.sh`: [flaky-test guard](../docs/dev/flaky-tests.md);[`prequeue.sh`](../AGENTS.md#the-quality-gate).
