@@ -217,6 +217,7 @@ at stake. New threats or changed controls update the tables above in the same pu
 * 2026-10-20: the desktops' thumbnail disk cache is sealed (photolib-design#410, ADR-0070), in T4.
 * 2026-10-20: the local recovery code at L1 and the rebuild of a store whose keystore lost its key (photolib-design#409,
   ADR-0057), in T4.
+* 2026-10-27: the text for design 21 §6 on both (ADR-0395; the owner applies it to the design repository).
 * 2026-10-21: the on-device ML runner (M5-03, ADR-0254) extended T7: models read only the kernel's tensors.
 * 2026-10-21: step-up before a second factor is removed or replaced (M2-43, ADR-0242) added T89 for the stolen
   unlocked device.
