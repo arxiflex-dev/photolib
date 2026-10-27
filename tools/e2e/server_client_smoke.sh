@@ -16,6 +16,9 @@
 #   WEB_DIR, SMOKE_BROWSERS  the web build and the browsers to drive (chromium,firefox,phone); none without WEB_DIR
 #   SMOKE_OUT            where screenshots and logs go (default: inside the temporary directory, printed)
 #   SMOKE_KEEP=1         keep the temporary directory (server log, storage tree) after the run
+# wait_for evaluates the quoted expression in this shell, each poll: SC2016 (no expansion in single quotes) is the point,
+# and SC2034 cannot see a variable that only such an expression reads.
+# shellcheck disable=SC2016,SC2034
 set -uo pipefail
 
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
@@ -28,7 +31,6 @@ OUT=${SMOKE_OUT:-$WORK/out}
 mkdir -p "$OUT"
 PIDS=()
 PG=""
-LAST_FAIL=0
 
 say() { echo "ok: $*"; }
 die() {
@@ -70,7 +72,7 @@ PATH=${FFMPEG_DIR:+$FFMPEG_DIR:}$PATH
 if [[ -z ${FFMPEG_DIR:-} ]]; then FFMPEG_DIR=$(bash "$ROOT/tools/video/ffmpeg.sh") || die "no ffmpeg"; PATH=$FFMPEG_DIR:$PATH; fi
 if [[ -z ${PG_BIN:-} ]]; then
   if command -v pg_ctl >/dev/null; then PG_BIN=$(dirname "$(command -v pg_ctl)"); else
-    PG_BIN=$(ls -d /usr/lib/postgresql/*/bin 2>/dev/null | sort -V | tail -n 1)
+    PG_BIN=$(find /usr/lib/postgresql -maxdepth 2 -name bin -type d 2>/dev/null | sort -V | tail -n 1)
   fi
 fi
 PG=$PG_BIN
@@ -168,7 +170,7 @@ CORPUS=$ROOT/testdata/corpus/files
 # stubs no decoder reads, so a HEIC and an AVIF are made with pillow-heif when it is installed.
 for f in baseline progressive cmyk exif-big-endian exif-thumbnail gps-sydney mpf-secondary rgb.png palette.png lossy.webp \
   lossless.webp 24bit.bmp rgb.tif static.gif; do
-  src=$(ls "$CORPUS"/stills/"$f"* 2>/dev/null | head -n 1)
+  src=$(find "$CORPUS/stills" -maxdepth 1 -name "$f*" | sort | head -n 1)
   [[ -n $src ]] && cp "$src" "$FX/cli/"
 done
 cp "$ROOT"/testdata/seed/*/*.jpg "$FX/cli/"
@@ -184,8 +186,8 @@ picture.save(sys.argv[3], quality=60)' "$FX/curl/gen_01.jpg" "$FX/cli/iphone_lik
 else
   echo "note: pillow-heif is not installed: no HEIC is uploaded (pip install pillow-heif)"
 fi
-CURL_N=$(ls "$FX/curl" | wc -l)
-CLI_N=$(ls "$FX/cli" | wc -l)
+CURL_N=$(find "$FX/curl" -type f | wc -l)
+CLI_N=$(find "$FX/cli" -type f | wc -l)
 
 # --- upload with curl: the resumable-upload protocol, a complete creation per file (ADR-0061)
 # The hash curl must send is BLAKE3 (b3sum): the one on PATH, else b3sum 1.8.7, the blake3 release the server locks,

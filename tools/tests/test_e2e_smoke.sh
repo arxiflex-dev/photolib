@@ -18,7 +18,12 @@ check "every curl has a time limit" bash -c "! grep -E 'curl -' '$REPO_ROOT/$SMO
 check "no clock is read at the top of a file for a name" bash -c "! grep -E 'date \+' '$REPO_ROOT/$SMOKE'"
 
 WORK=$(mktemp -d)
-trap 'for p in "$WORK"/*/pid; do [[ -e $p ]] && kill "$(cat "$p")" 2>/dev/null; done; rm -rf "$WORK"' EXIT
+stop_stubs() {
+  local pidfile
+  for pidfile in "$WORK"/*/pid; do [[ -e $pidfile ]] && kill "$(cat "$pidfile")" 2>/dev/null; done
+  rm -rf "$WORK"
+}
+trap stop_stubs EXIT
 mkdir -p "$WORK/pgbin" "$WORK/ffmpeg" "$WORK/tmp" "$WORK/server"
 
 # Stubs: a PostgreSQL that starts and stops, an FFmpeg, and a photolibd that runs and never listens.

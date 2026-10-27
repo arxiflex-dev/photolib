@@ -130,7 +130,8 @@ find $W/data -maxdepth 3 -type d | head      # libraries/<id>/originals/<year>/<
 curl -s -o thumb.webp -H "Authorization: Bearer $KEY" http://127.0.0.1:8080/media/<asset id>/thumb_s   # 200
 ```
 
-The server log has one `render` and one `transcode` job per file; `GetStatus` lists the library's `assetCount`.
+The server log has one `render` and one `transcode` job per file; `GetStatus` lists the library's `assetCount`. No
+unary API lists the assets themselves yet ([PHO-250](https://linear.app/photolib/issue/PHO-250)), hence the SQL.
 
 ## 7. Index a folder in place (external library)
 
@@ -210,6 +211,12 @@ byte-exact downloads of originals, the unified timeline in Chrome, Firefox and a
 playback on the web, and the desktop app's sign-in, timeline, viewer and video playback from a managed library;
 external folders are indexed in place and followed.
 
+External folders: **partly works**. Scanned in place and in the unified timeline (a), a moved file keeps its asset and a
+deleted one is handled as the docs say, behind the guard (b), originals stay byte for byte and no copy is made (c), an
+unmounted or empty root is shown offline, changes nothing and comes back by itself (d). Not yet: a new file is seen
+within seconds only after the first ten minutes (PHO-244), and the original of an external file cannot be downloaded,
+so the desktop app cannot play an external video (e; PHO-248); the web client plays one through HLS.
+
 Does not work or is rough (each has a sub-task of [PHO-240](https://linear.app/photolib/issue/PHO-240)):
 
 * `photolibd` does not compile on aarch64 without a patch (PHO-241).
@@ -220,6 +227,7 @@ Does not work or is rough (each has a sub-task of [PHO-240](https://linear.app/p
 * `photolib upload` sends no file name or folder (PHO-246).
 * The originals of external files answer 503: no download, and the desktop app cannot play an external video; the web
   client plays it through the HLS ladder (PHO-248).
-* The corpus' HEIC, AVIF, JPEG XL and video files are stubs that no decoder reads: photolibd keeps them with no
-  thumbnail after five failed render attempts. Real HEIC from a phone is not covered here (the smoke makes one with
-  pillow-heif when it is installed).
+* A photo or video that cannot be rendered (the corpus' HEIC, AVIF, JPEG XL and video files are header-only stubs no
+  decoder reads) ends with no thumbnail after five failed attempts, and the apps show a grey tile for ever
+  (PHO-249). A real HEIC and AVIF render; the smoke makes them with pillow-heif when it is installed.
+* No unary API lists a library's assets for a script (PHO-250).

@@ -656,7 +656,7 @@
    "clippy::cast_possible_truncation": 1,
    "clippy::cast_possible_wrap": 1,
    "clippy::cast_sign_loss": 1,
-   "clippy::expect_used": 3,
+   "clippy::expect_used": 2,
    "clippy::indexing_slicing": 2,
    "clippy::let_underscore_must_use": 2,
    "clippy::significant_drop_in_scrutinee": 1,

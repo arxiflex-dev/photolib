@@ -161,16 +161,17 @@ impl std::ops::Deref for Lease<'_> {
     type Target = Path;
 
     fn deref(&self) -> &Path {
-        &self.renderer.as_ref().expect("held until dropped").1
+        self.renderer.as_ref().map_or_else(|| Path::new(""), |(_, dir)| dir)
     }
 }
 
 impl Drop for Lease<'_> {
     fn drop(&mut self) {
         if let Some(renderer) = self.renderer.take() {
+            // A poisoned pool is still a pool of renderers.
             self.idle
                 .lock()
-                .expect("no panics holding the renderers")
+                .unwrap_or_else(std::sync::PoisonError::into_inner)
                 .push(renderer);
         }
     }

@@ -179,24 +179,7 @@ fn main() -> ExitCode {
         Some(Command::Recover { from_storage }) => runtime
             .block_on(manifest::from_storage(&config, &from_storage))
             .map(|recovery| println!("{recovery}start photolibd: it renders every rendition again")),
-        Some(Command::Admin {
-            action: Admin::PasswordSetup { handle },
-        }) => runtime
-            .block_on(auth::host_password_setup(&config, &handle))
-            .map(|setup| println!("{setup}")),
-        Some(Command::Admin {
-            action:
-                Admin::ApiKey {
-                    handle,
-                    name,
-                    scopes,
-                    days,
-                },
-        }) => runtime
-            .block_on(photolib_server::keys::host_api_key(
-                &config, &handle, &name, &scopes, days,
-            ))
-            .map(|key| println!("{key}")),
+        Some(Command::Admin { action }) => admin(&config, action, &runtime),
         Some(Command::Models { action }) => models(&config, action, &runtime),
         Some(Command::MediaChild { .. }) => unreachable!("handled before the runtime starts"),
     };
@@ -220,6 +203,23 @@ fn restart() -> std::io::Error {
                 .exec()
         },
     )
+}
+
+/// The host's own commands: what an operator does with the configuration and the database, signed in as no one.
+fn admin(config: &Config, action: Admin, runtime: &tokio::runtime::Runtime) -> Result<(), String> {
+    let printed = match action {
+        Admin::PasswordSetup { handle } => runtime.block_on(auth::host_password_setup(config, &handle)),
+        Admin::ApiKey {
+            handle,
+            name,
+            scopes,
+            days,
+        } => runtime.block_on(photolib_server::keys::host_api_key(
+            config, &handle, &name, &scopes, days,
+        )),
+    }?;
+    println!("{printed}");
+    Ok(())
 }
 
 fn models(config: &Config, action: Models, runtime: &tokio::runtime::Runtime) -> Result<(), String> {

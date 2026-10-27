@@ -225,7 +225,8 @@ pub async fn host_api_key(
             .map_err(|error| format!("cannot read the accounts: {error}"))?;
     let user = account.ok_or_else(|| format!("no active account is {handle}"))?;
     let user = user.parse().map_err(|_| "an account id is not a uuid")?;
-    let expires = SystemTime::now() + std::time::Duration::from_secs(u64::from(days) * 86_400);
+    let day = std::time::Duration::from_hours(24);
+    let expires = (SystemTime::now().checked_add(day.saturating_mul(days))).ok_or("days: too far away")?;
     let key = ApiKey {
         name: name.into(),
         scopes,
