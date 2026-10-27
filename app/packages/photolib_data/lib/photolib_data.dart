@@ -22,6 +22,7 @@ export 'src/journal.dart';
 export 'src/keys.dart' show KernelError, openMlSection, sealMlSection;
 export 'src/local_only.dart' show deviceTables, localOnlyCount;
 export 'src/map_index.dart';
+export 'src/places.dart';
 export 'src/media_store.dart';
 export 'src/metadata.dart';
 export 'src/ml.dart';

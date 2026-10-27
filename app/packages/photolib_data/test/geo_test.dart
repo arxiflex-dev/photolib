@@ -69,6 +69,27 @@ void main() {
     expect((await geoPoints(db, veiled: true)).length, 3);
   });
 
+  test('geoPoints: videos are located items like photos, on the device and '
+      'on the server', () async {
+    await photo(lat: 48.85, lon: 2.35);
+    await db.customStatement(
+      "UPDATE local_asset SET mime = 'video/mp4' WHERE source_id = 'asset-1'",
+    );
+    await photo(lat: 48.86, lon: 2.36);
+    await db.customStatement(
+      'INSERT INTO library (id, owner_id, kind, privacy, access, state) '
+      "VALUES (x'01', x'01', 'managed', 'standard', 'rw', 'online')",
+    );
+    await db.customStatement(
+      'INSERT INTO asset (id, library_id, owner_id, original_filename, '
+      "source, media_kind, lat, lon, taken_utc, created_at) VALUES (x'05', "
+      "x'01', x'01', 'v.mp4', 'upload', 'video', 10, 5, 1000, 0)",
+    );
+    final points = await geoPoints(db);
+    expect(points.length, 3);
+    expect(points.cloud.where((c) => c == 1).length, 1);
+  });
+
   test('geoPoints: an asset only the server holds is on the map, a trashed '
       'one is not', () async {
     await db.customStatement(

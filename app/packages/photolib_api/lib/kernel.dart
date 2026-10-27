@@ -4,6 +4,7 @@ library;
 export 'src/gen/photolib/kernel/v1/call.pb.dart';
 export 'src/gen/photolib/kernel/v1/capture_time.pb.dart';
 export 'src/gen/photolib/kernel/v1/faces.pb.dart';
+export 'src/gen/photolib/kernel/v1/geo.pb.dart';
 export 'src/gen/photolib/kernel/v1/keys.pb.dart';
 export 'src/gen/photolib/kernel/v1/logs.pb.dart';
 export 'src/gen/photolib/kernel/v1/map.pb.dart';
