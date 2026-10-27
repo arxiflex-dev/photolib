@@ -3171,6 +3171,14 @@ class AppLocalizationsTr extends AppLocalizations {
   String get timelineExcluded => 'Hariç tutulan bir klasörde';
 
   @override
+  String get timelineNoHeicLinux =>
+      'Photolib, bu bilgisayarda HEIC fotoğraflarını gösteremiyor. Kopyasını görmek için bir Photolib sunucusuna bağlanın veya fotoğrafları bir Mac\'te açın.';
+
+  @override
+  String get timelineNoHeicWindows =>
+      'Photolib, bu PC\'de HEIC fotoğraflarını gösteremiyor. Kopyasını görmek için bir Photolib sunucusuna bağlanın veya fotoğrafları bir Mac\'te açın.';
+
+  @override
   String get timelineScrubber => 'Tarihe göre kaydır';
 
   @override

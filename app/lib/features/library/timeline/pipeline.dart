@@ -628,6 +628,20 @@ class ThumbnailPipeline {
     }
   }
 
+  /// A HEIC on Windows or Linux outside the browser: no codec ships there and
+  /// none is to be installed (ADR-0214), so the cell names connected mode or
+  /// a Mac. The web says its own reason.
+  static bool _noHevc(ThumbnailItem item) =>
+      !kIsWeb &&
+      !item.video &&
+      const {
+        'heic',
+        'heif',
+        'hif',
+      }.contains(item.uri.path.split('.').last.toLowerCase()) &&
+      (defaultTargetPlatform == TargetPlatform.windows ||
+          defaultTargetPlatform == TargetPlatform.linux);
+
   NoThumbnail _missed(
     ThumbnailItem item,
     List<(String, Object?)> misses, {
@@ -639,6 +653,7 @@ class ThumbnailPipeline {
         .whereType<NoThumbnail>()
         .any((e) => e.unplayable),
     duration: _durations[item.key],
+    noHevc: _noHevc(item),
     cause: [
       for (final (name, answer) in misses)
         '$name: ${switch (answer) {

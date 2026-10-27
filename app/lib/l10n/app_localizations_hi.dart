@@ -3169,6 +3169,14 @@ class AppLocalizationsHi extends AppLocalizations {
   String get timelineExcluded => 'बाहर रखे गए फ़ोल्डर में';
 
   @override
+  String get timelineNoHeicLinux =>
+      'Photolib इस कंप्यूटर पर HEIC फ़ोटो नहीं दिखा सकता। उनकी कॉपी देखने के लिए Photolib सर्वर से कनेक्ट करें, या उन्हें Mac पर खोलें।';
+
+  @override
+  String get timelineNoHeicWindows =>
+      'Photolib इस पीसी पर HEIC फ़ोटो नहीं दिखा सकता। उनकी कॉपी देखने के लिए Photolib सर्वर से कनेक्ट करें, या उन्हें Mac पर खोलें।';
+
+  @override
   String get timelineScrubber => 'तारीख के हिसाब से स्क्रोल करें';
 
   @override

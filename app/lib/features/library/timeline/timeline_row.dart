@@ -30,6 +30,7 @@ class TimelineRow extends StatefulWidget {
     required this.view,
     required this.clock,
     required this.cannotPlay,
+    required this.noHeic,
     required this.excluded,
     required this.sphere,
     required this.markLabel,
@@ -59,6 +60,9 @@ class TimelineRow extends StatefulWidget {
 
   /// What a video the platform cannot play says.
   final String cannotPlay;
+
+  /// What a HEIC no decoder takes says.
+  final String noHeic;
 
   /// What an excluded folder's item says.
   final String excluded;
@@ -697,6 +701,7 @@ class _RowPainter extends CustomPainter {
               ].join(', '),
               hint: switch (cells.elementAtOrNull(i)?.$1) {
                 NoThumbnail(unplayable: true) => row.cannotPlay,
+                NoThumbnail(noHevc: true) => row.noHeic,
                 _ when _excluded(i) => row.excluded,
                 _ => null,
               },

@@ -750,6 +750,8 @@
   "timelineCell": "{date}, {position} av {count}",
   "timelineCellNoPreview": "{date}, {position} av {count}, ingen förhandsvisning",
   "timelineExcluded": "I en utesluten mapp",
+  "timelineNoHeicLinux": "Photolib kan inte visa HEIC-foton på den här datorn. Anslut en Photolib-server för att se kopian, eller öppna dem på en Mac.",
+  "timelineNoHeicWindows": "Photolib kan inte visa HEIC-foton på den här datorn. Anslut en Photolib-server för att se kopian, eller öppna dem på en Mac.",
   "timelineScrubber": "Bläddra efter datum",
   "timelineSphere": "360°",
   "timelineUndated": "Okänt datum",

@@ -3047,6 +3047,14 @@ class AppLocalizationsKo extends AppLocalizations {
   String get timelineExcluded => '제외한 폴더에 있음';
 
   @override
+  String get timelineNoHeicLinux =>
+      'Photolib은 이 컴퓨터에서 HEIC 사진을 표시할 수 없습니다. Photolib 서버에 연결해 사본을 보거나 Mac에서 여세요.';
+
+  @override
+  String get timelineNoHeicWindows =>
+      'Photolib은 이 PC에서 HEIC 사진을 표시할 수 없습니다. Photolib 서버에 연결해 사본을 보거나 Mac에서 여세요.';
+
+  @override
   String get timelineScrubber => '날짜별로 스크롤';
 
   @override

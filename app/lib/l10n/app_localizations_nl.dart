@@ -3189,6 +3189,14 @@ class AppLocalizationsNl extends AppLocalizations {
   String get timelineExcluded => 'In een uitgesloten map';
 
   @override
+  String get timelineNoHeicLinux =>
+      'Photolib kan HEIC-foto\'s op deze computer niet tonen. Verbind een Photolib-server om de kopie te zien, of open ze op een Mac.';
+
+  @override
+  String get timelineNoHeicWindows =>
+      'Photolib kan HEIC-foto\'s op deze pc niet tonen. Verbind een Photolib-server om de kopie te zien, of open ze op een Mac.';
+
+  @override
   String get timelineScrubber => 'Scrollen op datum';
 
   @override

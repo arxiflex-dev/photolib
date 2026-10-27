@@ -56,6 +56,7 @@ class NoThumbnail implements Exception {
     required this.cause,
     this.unplayable = false,
     this.duration,
+    this.noHevc = false,
   });
 
   final bool video;
@@ -64,6 +65,10 @@ class NoThumbnail implements Exception {
   /// A video the platform cannot play, and its duration when known.
   final bool unplayable;
   final Duration? duration;
+
+  /// A HEIC no decoder took on a desktop with no HEVC decoder to install
+  /// (ADR-0214): its mark says to connect a server or open it on a Mac.
+  final bool noHevc;
 
   @override
   String toString() => 'NoThumbnail(video: $video, cause: $cause)';

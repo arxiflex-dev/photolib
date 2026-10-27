@@ -750,6 +750,8 @@
   "timelineCell": "{date}, {position} מתוך {count}",
   "timelineCellNoPreview": "{date}, {position} מתוך {count}, ללא תצוגה מקדימה",
   "timelineExcluded": "בתיקייה מוחרגת",
+  "timelineNoHeicLinux": "Photolib אינו יכול להציג תמונות HEIC במחשב זה. חברו שרת Photolib כדי לראות את העותק שלהן, או פתחו אותן ב-Mac.",
+  "timelineNoHeicWindows": "Photolib אינו יכול להציג תמונות HEIC במחשב זה. חברו שרת Photolib כדי לראות את העותק שלהן, או פתחו אותן ב-Mac.",
   "timelineScrubber": "גלילה לפי תאריך",
   "timelineSphere": "360°",
   "timelineUndated": "תאריך לא ידוע",

@@ -3017,6 +3017,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get timelineExcluded => '位于已排除的文件夹中';
 
   @override
+  String get timelineNoHeicLinux =>
+      'Photolib 无法在此计算机上显示 HEIC 照片。请连接 Photolib 服务器查看其副本，或在 Mac 上打开。';
+
+  @override
+  String get timelineNoHeicWindows =>
+      'Photolib 无法在此电脑上显示 HEIC 照片。请连接 Photolib 服务器查看其副本，或在 Mac 上打开。';
+
+  @override
   String get timelineScrubber => '按日期滚动';
 
   @override
@@ -6375,6 +6383,14 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get timelineExcluded => '位於已排除的資料夾中';
+
+  @override
+  String get timelineNoHeicLinux =>
+      'Photolib 無法在此電腦上顯示 HEIC 相片。請連線至 Photolib 伺服器查看其副本，或在 Mac 上開啟。';
+
+  @override
+  String get timelineNoHeicWindows =>
+      'Photolib 無法在此電腦上顯示 HEIC 相片。請連線至 Photolib 伺服器查看其副本，或在 Mac 上開啟。';
 
   @override
   String get timelineScrubber => '依日期捲動';

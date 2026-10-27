@@ -750,6 +750,8 @@
   "timelineCell": "{date}、{count} 件中 {position} 件目",
   "timelineCellNoPreview": "{date}、{count} 件中 {position} 件目、プレビューなし",
   "timelineExcluded": "除外したフォルダ内",
+  "timelineNoHeicLinux": "Photolib はこのコンピューターで HEIC 写真を表示できません。Photolib サーバーに接続してそのコピーを表示するか、Mac で開いてください。",
+  "timelineNoHeicWindows": "Photolib はこの PCで HEIC 写真を表示できません。Photolib サーバーに接続してそのコピーを表示するか、Mac で開いてください。",
   "timelineScrubber": "日付でスクロール",
   "timelineSphere": "360°",
   "timelineUndated": "日付不明",

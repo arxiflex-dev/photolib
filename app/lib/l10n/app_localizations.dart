@@ -4637,6 +4637,18 @@ abstract class AppLocalizations {
   /// **'In an excluded folder'**
   String get timelineExcluded;
 
+  /// Said of, and shown on, a HEIC photo's cell in the Linux app when no decoder takes it: names connected mode or a Mac, never a codec (ADR-0214)
+  ///
+  /// In en, this message translates to:
+  /// **'Photolib can\'t show HEIC photos on this computer. Connect a Photolib server to see its copy, or open them on a Mac.'**
+  String get timelineNoHeicLinux;
+
+  /// Said of, and shown on, a HEIC photo's cell in the Windows app when no decoder takes it: names connected mode or a Mac, never a codec (ADR-0214)
+  ///
+  /// In en, this message translates to:
+  /// **'Photolib can\'t show HEIC photos on this PC. Connect a Photolib server to see its copy, or open them on a Mac.'**
+  String get timelineNoHeicWindows;
+
   /// The handle on the timeline's edge that jumps through the years
   ///
   /// In en, this message translates to:

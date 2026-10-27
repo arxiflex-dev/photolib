@@ -750,6 +750,8 @@
   "timelineCell": "{date}，第 {position} 项，共 {count} 项",
   "timelineCellNoPreview": "{date}，第 {position} 项，共 {count} 项，无预览",
   "timelineExcluded": "位于已排除的文件夹中",
+  "timelineNoHeicLinux": "Photolib 无法在此计算机上显示 HEIC 照片。请连接 Photolib 服务器查看其副本，或在 Mac 上打开。",
+  "timelineNoHeicWindows": "Photolib 无法在此电脑上显示 HEIC 照片。请连接 Photolib 服务器查看其副本，或在 Mac 上打开。",
   "timelineScrubber": "按日期滚动",
   "timelineSphere": "360°",
   "timelineUndated": "日期未知",

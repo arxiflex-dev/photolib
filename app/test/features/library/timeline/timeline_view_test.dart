@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +16,7 @@ import 'package:photolib/features/library/timeline/pages.dart';
 import 'package:photolib/features/library/timeline/scrubber.dart';
 import 'package:photolib/features/library/timeline/selection.dart';
 import 'package:photolib/features/library/timeline/thumb_hash.dart';
+import 'package:photolib/features/library/timeline/thumbnail_at.dart';
 import 'package:photolib/features/library/timeline/thumbnails.dart';
 import 'package:photolib/features/library/timeline/timeline_row.dart';
 import 'package:photolib/features/library/timeline/timeline_view.dart';
@@ -223,6 +225,67 @@ void main() {
       );
     }
     expect(find.semantics.byLabel('Mar 4, 2025, 1 of 1, no preview'), findsOne);
+    semantics.dispose();
+  });
+
+  for (final (platform, device) in [
+    (TargetPlatform.linux, 'computer'),
+    (TargetPlatform.windows, 'PC'),
+  ]) {
+    testWidgets('a HEIC no decoder takes says on ${platform.name} to connect '
+        'a server or open it on a Mac, never a codec, said too', (
+      tester,
+    ) async {
+      debugDefaultTargetPlatformOverride = platform;
+      final semantics = tester.ensureSemantics();
+      await pump(
+        tester,
+        source: (asset, tile, _) async => asset == 0
+            ? throw const NoThumbnail(cause: 'vips: refused', noHevc: true)
+            : tile.clone(),
+      );
+      final text =
+          "Photolib can't show HEIC photos on this $device. Connect a "
+          'Photolib server to see its copy, or open them on a Mac.';
+      expect(
+        find.semantics
+            .byLabel('Mar 4, 2025, 1 of 1, no preview')
+            .evaluate()
+            .single,
+        isSemantics(hint: text),
+      );
+      expect(text, isNot(contains('HEVC')));
+      semantics.dispose();
+      debugDefaultTargetPlatformOverride = null;
+    });
+  }
+
+  testWidgets("the mark of a HEIC no decoder takes says the way out, not the "
+      'cause, which stays for every other failure', (tester) async {
+    final semantics = tester.ensureSemantics();
+    for (final (error, said) in [
+      (
+        const NoThumbnail(cause: 'vips: refused', noHevc: true),
+        "Photolib can't show HEIC photos on this computer. Connect a "
+            'Photolib server to see its copy, or open them on a Mac.',
+      ),
+      (const NoThumbnail(cause: 'vips: refused'), 'vips: refused'),
+    ]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: FailureMark(error),
+        ),
+      );
+      expect(find.byTooltip(said), findsOne);
+      expect(
+        find.semantics.byPredicate(
+          (node) => node.getSemanticsData().tooltip == said,
+        ),
+        findsOne,
+      );
+    }
     semantics.dispose();
   });
 
