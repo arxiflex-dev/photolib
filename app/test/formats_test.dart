@@ -42,6 +42,42 @@ void main() {
     expect(formats.number(1234567.5), '1,234,567.5');
   });
 
+  test('a date order lays dates out its own way, in the language of the app '
+      'and no other', () async {
+    final german = await AppLocalizations.delegate.load(const Locale('de'));
+    await GlobalMaterialLocalizations.delegate.load(const Locale('de'));
+    final dec24 = DateTime(2025, 12, 24, 16, 3);
+    String of(AppLocalizations s, DateOrder order) =>
+        Formats(s, order: order).date(dec24);
+    expect(of(english, DateOrder.languageDefault), 'Dec 24, 2025');
+    expect(of(english, DateOrder.dmy), '24 Dec 2025');
+    expect(of(english, DateOrder.mdy), 'Dec 24, 2025');
+    expect(of(english, DateOrder.ymd), '2025 Dec 24');
+    expect(of(german, DateOrder.languageDefault), '24. Dez. 2025');
+    for (final order in [DateOrder.dmy, DateOrder.mdy, DateOrder.ymd]) {
+      expect(of(german, order), contains('Dez'), reason: '$order');
+      expect(of(german, order), isNot(contains('Dec')), reason: '$order');
+    }
+    final dmy = Formats(english, order: DateOrder.dmy);
+    expect(dmy.month(dec24), 'Dec 2025');
+    expect(Formats(english, order: DateOrder.ymd).month(dec24), '2025 Dec');
+    expect(dmy.year(dec24), '2025');
+    expect(dmy.taken(dec24), '24 Dec 2025 4:03\u202fPM', reason: 'time stays');
+    expect(dmy.taken(dec24, 'day'), '24 Dec 2025');
+    expect(dmy.firstDayOfWeek, DateTime.sunday, reason: 'week stays');
+    expect(dmy.number(1234567.5), '1,234,567.5');
+  });
+
+  test('a date order is stored by name, and one this build lacks reads as the '
+      'language default', () {
+    for (final order in DateOrder.values) {
+      expect(DateOrder.named(order.name), order);
+    }
+    expect(DateOrder.named('iso'), DateOrder.languageDefault);
+    expect(DateOrder.named(null), DateOrder.languageDefault);
+    expect(DateOrder.named(3), DateOrder.languageDefault);
+  });
+
   test("a video's length is m:ss, or h:mm:ss, to the nearest second", () {
     final length = Formats(english).duration;
     expect(length(const Duration(milliseconds: 2008)), '0:02');

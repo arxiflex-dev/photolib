@@ -186,11 +186,11 @@ String _when(BuildContext context, Timestamp at) {
   final time = at.toDateTime().toLocal();
   final clock = MaterialLocalizations.of(context)
       .formatTimeOfDay(TimeOfDay.fromDateTime(time));
-  return '${Formats(AppLocalizations.of(context)).date(time)} $clock';
+  return '${Formats.of(context).date(time)} $clock';
 }
 
 String _size(BuildContext context, Int64 bytes) =>
-    Formats(AppLocalizations.of(context)).fileSize(bytes.toInt());
+    Formats.of(context).fileSize(bytes.toInt());
 
 /// A page titled [title]: [header], then the items of what [load] returns, a
 /// retry when it fails; it loads again after every change. Without a title it

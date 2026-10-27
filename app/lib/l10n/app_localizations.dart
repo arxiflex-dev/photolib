@@ -1379,6 +1379,30 @@ abstract class AppLocalizations {
   /// **'Type a command'**
   String get commandPaletteHint;
 
+  /// The first choice of Settings' date format list: dates are laid out the way the app's language does
+  ///
+  /// In en, this message translates to:
+  /// **'Language default'**
+  String get dateFormatDefault;
+
+  /// A choice of Settings' date format list: dates as day, month, year, in the app's language
+  ///
+  /// In en, this message translates to:
+  /// **'Day-month-year'**
+  String get dateFormatDmy;
+
+  /// A choice of Settings' date format list: dates as month, day, year, in the app's language
+  ///
+  /// In en, this message translates to:
+  /// **'Month-day-year'**
+  String get dateFormatMdy;
+
+  /// A choice of Settings' date format list: dates as year, month, day, in the app's language
+  ///
+  /// In en, this message translates to:
+  /// **'Year-month-day'**
+  String get dateFormatYmd;
+
   /// A line of the delete dialog: how many selected items are on this device and backed up on the server, followed by their size
   ///
   /// In en, this message translates to:
@@ -4186,6 +4210,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Behind transparent images'**
   String get settingsBackground;
+
+  /// A tile of Settings that opens the list of ways to order a date, whatever the language
+  ///
+  /// In en, this message translates to:
+  /// **'Date format'**
+  String get settingsDateFormat;
 
   /// The tab the folders and albums page shows first
   ///
