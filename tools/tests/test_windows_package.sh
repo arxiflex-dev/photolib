@@ -87,4 +87,50 @@ pack "$TMP/bare" "$redist" "$TMP/bare.zip"
 [[ $STATUS -ne 0 && $OUT == *"libmpv-notices.txt"* && ! -e $TMP/bare.zip ]] &&
   ok "a build without the libmpv licence notices is refused" || fail "no notices: exit $STATUS: $OUT"
 
+# --- tools/windows/smoke.sh unpacks the zip into a fresh directory, scans it, runs photolib.exe in a bare environment
+# with --self-test-play and judges its result file. SMOKE_RUNNER stands for Windows (or wine): a stub plays the app.
+SMOKE=tools/windows/smoke.sh
+stub() { # <body>, @TMP@ the test's directory: a runner that gets the exe, then the app's arguments
+  printf '#!/usr/bin/env bash\nexe=$1; shift; [[ $1 == --self-test-play ]] || exit 9\nvideo=$2 result=$3\n%s\n' \
+    "${1//@TMP@/$TMP}" >"$TMP/runner.sh"
+}
+smoke() { # <zip>: SMOKE_TIMEOUT 3 s
+  CANARY=leaked SMOKE_PATH=/usr/bin:/bin SMOKE_RUNNER="bash $TMP/runner.sh" SMOKE_TIMEOUT=3 \
+    capture bash "$SMOKE" "$1" "$TMP/video.mov"
+}
+echo video >"$TMP/video.mov"
+stub 'echo "$exe" >@TMP@/exe-ran; [[ -f $video ]] || exit 8
+[[ -z ${CANARY:-} ]] || { echo "failed: environment leaked" >"$result"; exit 1; }
+echo "played 1000 ms of 1000 ms, 640x480" >"$result"; echo "mpv 0.41.0, ffmpeg n8.1.3" >>"$result"'
+smoke "$TMP/one.zip"
+expect_result "a package that plays the video passes, and says what played" 0 "played 1000 ms" "ffmpeg n8.1.3"
+[[ $(cat "$TMP/exe-ran") == */photolib/photolib.exe && $(cat "$TMP/exe-ran") != "$TMP/release"* ]] &&
+  ok "it ran the exe of the unpacked copy, not of the build" || fail "the exe ran from $(cat "$TMP/exe-ran")"
+stub 'echo "failed: no picture decoded" >"$result"; echo "mpv 0.41.0, ffmpeg n8.1.3" >>"$result"; exit 1'
+smoke "$TMP/one.zip"
+expect_result "a result that says failed fails the smoke, with libmpv's words" failure "failed: no picture decoded"
+stub 'exec sleep 30'
+START=$SECONDS
+smoke "$TMP/one.zip"
+expect_result "an app that writes no result is given up on after the timeout" failure "no result in 3 s"
+((SECONDS - START < 20)) && ok "and killed, not waited for" || fail "the smoke waited $((SECONDS - START)) s"
+stub 'echo "played 1 ms of 1 ms, 1x1" >"$result"; exec sleep 30'
+smoke "$TMP/one.zip"
+expect_result "an app that plays but does not exit is a failure" failure "did not exit"
+rm -f "$TMP/exe-ran"
+stub 'echo ran >@TMP@/exe-ran'
+smoke "$TMP/none.zip"
+expect_result "a zip that is not there fails" failure "none.zip"
+python3 -I - "$TMP/unscanned.zip" <<'PY'
+import sys, zipfile
+sys.path.insert(0, "tools/tests")
+import windows_tests
+with zipfile.ZipFile(sys.argv[1], "w") as z:
+    z.writestr("photolib/photolib.exe", windows_tests.pe(["KERNEL32.dll", "VCRUNTIME140.dll"]))
+    z.writestr("photolib/libmpv-notices.txt", "x")
+PY
+smoke "$TMP/unscanned.zip"
+expect_result "a package that needs a DLL outside itself fails before the app starts" failure "VCRUNTIME140.dll"
+[[ ! -e $TMP/exe-ran ]] && ok "the app was not started" || fail "the app ran from a package that failed the scan"
+
 finish
