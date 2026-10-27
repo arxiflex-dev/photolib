@@ -18,7 +18,7 @@ trap 'rm -rf "$tmp"' EXIT
 results=$tmp/results.jsonl
 failed=${PERF_FAILED:-$tmp/failed.jsonl}
 check=(check "$results" --failed "$failed")
-server=(server-idle-rss ingest-throughput initial-sync-100k cold-start idle-cpu)
+server=(server-idle-rss ingest-throughput initial-sync-100k ocr-read cold-start idle-cpu)
 # The tests of app/benchmark/perf_test.dart to run, comma-separated (all when empty): a fixture's, folder-10k's,
 # videos', sphere-video's, device-folders-5k's or server-tiles'.
 tests=
@@ -102,6 +102,10 @@ server_benchmarks() {
   if ((${#benches[@]})); then
     PERF_RESULTS=$tmp/server.jsonl timed "${benches[*]}" cargo test --locked -q --release \
       --manifest-path server/Cargo.toml -p photolib-server --test renditions --test sync -- --ignored "${benches[@]}"
+  fi
+  if measures ocr-read; then
+    PERF_RESULTS=$tmp/server.jsonl timed ocr-read cargo test --locked -q --release --manifest-path server/Cargo.toml \
+      -p photolib-ml --test ocr -- --ignored ocr_read
   fi
   if [[ $target == headless && ( -z $tests || ,$tests, == *,sphere-video,* ) ]]; then
     # A twin of the corpus' 4K 360° sample: 3,840 × 1,920 H.264 at 30 fps, its frame number modulo 8 burnt in as
