@@ -225,6 +225,8 @@ def check_gate(workflows):
     check(r"advisories\.py" in advisory, "the RustSec check is advisory on a hosted runner: it never fails a build")
     check(r"timeline_bench\.py" in advisory,
           "the web timeline's frame budget (timeline_bench.py --check) only measures time: advisory on a hosted runner")
+    check(r"server_client_smoke\.sh" in advisory,
+          "the server and client smoke is advisory on a hosted runner until it has run on the queue without a flake")
     commands = runs_of(lane)
     check("libgtk-3-dev" in commands and "xvfb" in commands and "libmpv-dev" in commands,
           "the lane installs the Linux build tools, libmpv and Xvfb, for the dart and perf parts' headless app")

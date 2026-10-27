@@ -672,6 +672,13 @@ check_web() {
     # The web's cold start budget (tools/perf/budgets.json): the engine's first frame within 2.5 s of opening the page.
     step . node tools/web_e2e/cold_start.mjs
   fi
+  # The server and its clients together (PHO-240, docs/dev/server-client.md): a throw-away photolibd with uploads by curl
+  # and by the CLI, renditions, downloads, an external folder indexed in place and its change detection; the browsers
+  # are the journey's above (`WEB_DIR` adds them here). Needs PostgreSQL programs, FFmpeg and cargo (b3sum).
+  if [[ -f tools/e2e/server_client_smoke.sh ]] && need cargo "the server and client smoke (photolibd)" &&
+    need python3 "the server and client smoke"; then
+    retried . bash tools/e2e/server_client_smoke.sh
+  fi
   # The web timeline's frame budget over the 1M library (NFR-PERF-1): drag and fling in Chrome on the WASM build, which
   # times, so it runs alone.
   if [[ -f tools/timeline_bench.py ]] && need python3 "the web timeline's frame budget" &&

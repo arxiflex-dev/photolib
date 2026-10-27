@@ -150,6 +150,33 @@ impl Render {
     }
 }
 
+/// A renderer on loan to a job, which derefs to its directory (`out` holds what it rendered). It rejoins the pool of
+/// idle renderers when dropped.
+pub(crate) struct Lease<'a> {
+    idle: &'a Mutex<Vec<(Worker, PathBuf)>>,
+    renderer: Option<(Worker, PathBuf)>,
+}
+
+impl std::ops::Deref for Lease<'_> {
+    type Target = Path;
+
+    fn deref(&self) -> &Path {
+        self.renderer.as_ref().map_or_else(|| Path::new(""), |(_, dir)| dir)
+    }
+}
+
+impl Drop for Lease<'_> {
+    fn drop(&mut self) {
+        if let Some(renderer) = self.renderer.take() {
+            // A poisoned pool is still a pool of renderers.
+            self.idle
+                .lock()
+                .unwrap_or_else(std::sync::PoisonError::into_inner)
+                .push(renderer);
+        }
+    }
+}
+
 #[async_trait]
 impl Handler for Render {
     async fn run(&self, job: &Job, tx: &mut PgConnection) -> Result<(), String> {
@@ -194,7 +221,7 @@ impl Render {
         tx: &mut PgConnection,
         row: &sqlx::postgres::PgRow,
         outputs: impl FnOnce(bool) -> Vec<Output>,
-    ) -> Fallible<(photolib_media::render::Rendered, PathBuf)> {
+    ) -> Fallible<(photolib_media::render::Rendered, Lease<'_>)> {
         self.sandboxed_as(tx, row, true, outputs).await
     }
 
@@ -205,7 +232,7 @@ impl Render {
         row: &sqlx::postgres::PgRow,
         edited: bool,
         outputs: impl FnOnce(bool) -> Vec<Output>,
-    ) -> Fallible<(photolib_media::render::Rendered, PathBuf)> {
+    ) -> Fallible<(photolib_media::render::Rendered, Lease<'_>)> {
         let original = self.staged(tx, row).await?;
         let sphere = row.get::<Vec<String>, _>("facets").iter().any(|f| f == "sphere_360");
         let mime: String = row.get("mime");
@@ -237,11 +264,13 @@ impl Render {
         if let Some(edit) = &request.edit {
             drop(std::fs::remove_file(edit));
         }
-        self.idle
-            .lock()
-            .expect("no panics holding the renderers")
-            .push((worker, dir.clone()));
-        Ok((rendered.map_err(|failure| format!("{failure:?}"))?, dir))
+        // The renderer's `out` directory holds this job's files until the caller has read them: it goes back to the
+        // pool when the lease is dropped, never before, or another job's output would replace them.
+        let lease = Lease {
+            idle: &self.idle,
+            renderer: Some((worker, dir)),
+        };
+        Ok((rendered.map_err(|failure| format!("{failure:?}"))?, lease))
     }
 
     async fn render(&self, job: &Job, tx: &mut PgConnection) -> Fallible<()> {

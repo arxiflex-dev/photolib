@@ -198,6 +198,50 @@ impl ApiKeys {
     }
 }
 
+/// `photolibd admin api-key <handle>`: an API key for an active account, made on the host by no OPAQUE sign-in, so that
+/// a script (`curl`, `photolib upload`) can start; the secret is shown once.
+pub async fn host_api_key(
+    config: &crate::config::Config,
+    handle: &str,
+    name: &str,
+    scopes: &[String],
+    days: u32,
+) -> Result<String, String> {
+    use photolib_proto::proto::photolib::api::v1::ApiKeyScope;
+    let url = config.database.url.as_ref().ok_or("database.url is not set")?;
+    let scopes = scopes
+        .iter()
+        .map(|scope| from_db::<ApiKeyScope>(scope, "API_KEY_SCOPE_").map_err(|_| format!("{scope} is not a scope")))
+        .collect::<Result<Vec<_>, _>>()?;
+    let pool = PgPool::connect(url.expose())
+        .await
+        .map_err(|error| format!("cannot connect to the database: {error}"))?;
+    let handle = handle.trim().to_lowercase();
+    let account: Option<String> =
+        sqlx::query_scalar("SELECT id::text FROM users WHERE (handle = $1 OR email = $1) AND status = 'active'")
+            .bind(&handle)
+            .fetch_optional(&pool)
+            .await
+            .map_err(|error| format!("cannot read the accounts: {error}"))?;
+    let user = account.ok_or_else(|| format!("no active account is {handle}"))?;
+    let user = user.parse().map_err(|_| "an account id is not a uuid")?;
+    let day = std::time::Duration::from_hours(24);
+    let expires = (SystemTime::now().checked_add(day.saturating_mul(days))).ok_or("days: too far away")?;
+    let key = ApiKey {
+        name: name.into(),
+        scopes,
+        expires_at: Some(expires.into()).into(),
+        ..Default::default()
+    };
+    let (_, secret) = ApiKeys::new(pool)
+        .create(user, key)
+        .await
+        .map_err(|error| format!("cannot make the key: {error:?}"))?;
+    Ok(format!(
+        "An API key for {handle}, valid for {days} days; it is shown once:\n{secret}"
+    ))
+}
+
 /// The role `users.role` names; an unknown one gets the fewest rights.
 pub(crate) fn role_named(name: &str) -> Role {
     match name {
