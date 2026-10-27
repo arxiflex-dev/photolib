@@ -2860,6 +2860,10 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
+  String get settingsTrashKeep =>
+      'Berapa lama Photolib menyimpan item di tempat sampahnya';
+
+  @override
   String get settingsViewerBar => 'Tombol di bilah penampil';
 
   @override
@@ -3256,6 +3260,16 @@ class AppLocalizationsId extends AppLocalizations {
   String get trashEmptyAll => 'Kosongkan sampah';
 
   @override
+  String trashKeepDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    return '$daysString hari';
+  }
+
+  @override
   String trashMoved(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -3268,6 +3282,9 @@ class AppLocalizationsId extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get trashRemoveGone => 'Hapus dari daftar';
 
   @override
   String trashRetention(int days) {

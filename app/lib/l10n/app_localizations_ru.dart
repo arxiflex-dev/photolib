@@ -2928,6 +2928,10 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get settingsTrashKeep =>
+      'Как долго Photolib хранит элементы в корзине';
+
+  @override
   String get settingsViewerBar => 'Кнопки на панели просмотра';
 
   @override
@@ -3333,6 +3337,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get trashEmptyAll => 'Очистить корзину';
 
   @override
+  String trashKeepDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    return '$daysString дней';
+  }
+
+  @override
   String trashMoved(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -3348,6 +3362,9 @@ class AppLocalizationsRu extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get trashRemoveGone => 'Убрать из списка';
 
   @override
   String trashRetention(int days) {

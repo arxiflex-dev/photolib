@@ -2939,6 +2939,10 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get settingsTrashKeep =>
+      'Durée de conservation des éléments dans la corbeille de Photolib';
+
+  @override
   String get settingsViewerBar => 'Boutons de la barre de la visionneuse';
 
   @override
@@ -3343,6 +3347,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trashEmptyAll => 'Vider la corbeille';
 
   @override
+  String trashKeepDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    return '$daysString jours';
+  }
+
+  @override
   String trashMoved(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -3357,6 +3371,9 @@ class AppLocalizationsFr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get trashRemoveGone => 'Retirer de la liste';
 
   @override
   String trashRetention(int days) {

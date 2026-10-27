@@ -92,6 +92,22 @@ void main() {
     expect(settings().filmstrip, isFalse);
   });
 
+  testWidgets("Photolib's trash keeps its items 60 days until 30 or 90 is "
+      'chosen in Settings', (tester) async {
+    await pumpApp(tester, size: const Size(800, 1800));
+    await tester.tapAndSettle(find.byTooltip('Settings'));
+    final container = ProviderScope.containerOf(
+      tester.element(find.text('Settings')),
+    );
+    Settings settings() => container.read(settingsProvider);
+    expect(settings().trashDays, 60);
+    expect(find.text('How long Photolib keeps items in its trash'), findsOne);
+    await tester.tapAndSettle(find.text('30 days'));
+    expect(settings().trashDays, 30);
+    await tester.tapAndSettle(find.text('90 days'));
+    expect(settings().trashDays, 90);
+  });
+
   testWidgets('the background behind transparent images is chosen', (
     tester,
   ) async {

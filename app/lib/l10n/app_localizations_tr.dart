@@ -2881,6 +2881,10 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get settingsTrashKeep =>
+      'Photolib çöp kutusundaki öğeleri ne kadar saklasın';
+
+  @override
   String get settingsViewerBar => 'Görüntüleyici çubuğundaki düğmeler';
 
   @override
@@ -3277,6 +3281,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get trashEmptyAll => 'Çöp kutusunu boşalt';
 
   @override
+  String trashKeepDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    return '$daysString gün';
+  }
+
+  @override
   String trashMoved(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -3290,6 +3304,9 @@ class AppLocalizationsTr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get trashRemoveGone => 'Listeden kaldır';
 
   @override
   String trashRetention(int days) {
