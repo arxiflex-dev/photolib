@@ -855,6 +855,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get commandPaletteHint => '输入命令';
 
   @override
+  String get dateFormatDefault => '跟随语言';
+
+  @override
+  String get dateFormatDmy => '日-月-年';
+
+  @override
+  String get dateFormatMdy => '月-日-年';
+
+  @override
+  String get dateFormatYmd => '年-月-日';
+
+  @override
   String deleteBoth(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -2693,6 +2705,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsBackground => '透明图片的背景';
 
   @override
+  String get settingsDateFormat => '日期格式';
+
+  @override
   String get settingsDefaultTab => '文件夹和相册默认打开';
 
   @override
@@ -4212,6 +4227,18 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get commandPaletteHint => '輸入命令';
+
+  @override
+  String get dateFormatDefault => '跟隨語言';
+
+  @override
+  String get dateFormatDmy => '日-月-年';
+
+  @override
+  String get dateFormatMdy => '月-日-年';
+
+  @override
+  String get dateFormatYmd => '年-月-日';
 
   @override
   String deleteBoth(int count) {
@@ -6051,6 +6078,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get settingsBackground => '透明圖片的背景';
+
+  @override
+  String get settingsDateFormat => '日期格式';
 
   @override
   String get settingsDefaultTab => '資料夾和相簿預設開啟';

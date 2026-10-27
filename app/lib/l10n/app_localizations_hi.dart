@@ -895,6 +895,18 @@ class AppLocalizationsHi extends AppLocalizations {
   String get commandPaletteHint => 'कोई कमांड टाइप करें';
 
   @override
+  String get dateFormatDefault => 'भाषा का डिफ़ॉल्ट';
+
+  @override
+  String get dateFormatDmy => 'दिन-माह-वर्ष';
+
+  @override
+  String get dateFormatMdy => 'माह-दिन-वर्ष';
+
+  @override
+  String get dateFormatYmd => 'वर्ष-माह-दिन';
+
+  @override
   String deleteBoth(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -2829,6 +2841,9 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get settingsBackground => 'पारदर्शी इमेज के पीछे';
+
+  @override
+  String get settingsDateFormat => 'दिनांक प्रारूप';
 
   @override
   String get settingsDefaultTab => 'फ़ोल्डर और एल्बम इस टैब पर खुलते हैं';

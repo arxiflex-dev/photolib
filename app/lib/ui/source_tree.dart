@@ -30,7 +30,7 @@ String _label(AppLocalizations strings, SourceNode node) => switch (node.kind) {
 };
 
 /// What [node] holds, how new, and its state: `count · newest · state`.
-String _details(AppLocalizations strings, SourceNode node) {
+String _details(AppLocalizations strings, Formats formats, SourceNode node) {
   final newest = node.newest;
   return [
     switch (node.state) {
@@ -41,7 +41,7 @@ String _details(AppLocalizations strings, SourceNode node) {
       SourceState.present => strings.folderItems(node.itemsBelow),
     },
     if (newest != null)
-      Formats(strings)
+      formats
           .date(DateTime(newest ~/ 10000, newest ~/ 100 % 100, newest % 100)),
     if (node.kind == SourceKind.device)
       if (node.shown) strings.deviceFoldersAll else strings.deviceFoldersChosen,
@@ -435,7 +435,7 @@ class _Row extends StatelessWidget {
           ],
         ),
         title: Text(label, style: TextStyle(color: dim)),
-        subtitle: Text(_details(strings, node)),
+        subtitle: Text(_details(strings, Formats.of(context), node)),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -479,7 +479,7 @@ class _Details extends StatelessWidget {
           ),
           subtitle: Text(
             [
-              _details(strings, node),
+              _details(strings, Formats.of(context), node),
               if (node.key.isNotEmpty)
                 isolated(node.key.substring(0, node.key.length - 1)),
             ].join('\n'),

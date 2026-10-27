@@ -588,7 +588,7 @@ class _MapPageState extends ConsumerState<MapPage> {
   );
 
   Widget _slider(({int from, int to}) span, AppLocalizations strings) {
-    final formats = Formats(strings);
+    final formats = Formats.of(context);
     DateTime at(double t) => DateTime.fromMillisecondsSinceEpoch(
       (span.from + (span.to - span.from) * t).round() * 1000,
     );

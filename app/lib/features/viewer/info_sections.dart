@@ -90,7 +90,7 @@ class _DateRowState extends State<DateRow> {
   @override
   Widget build(BuildContext context) {
     final strings = AppLocalizations.of(context);
-    final formats = Formats(strings);
+    final formats = Formats.of(context);
     final a = widget.asset;
     final source = a.timeSource;
     final named = source?.startsWith('filename:') ?? false;
@@ -340,7 +340,7 @@ class HistoryRow extends StatelessWidget {
         subtitle: Text(
           strings.infoVersions(
             all.length,
-            Formats(strings).taken(all.map((v) => v.time).reduce(_later)),
+            Formats.of(context).taken(all.map((v) => v.time).reduce(_later)),
           ),
         ),
         onTap: onOpen,
@@ -396,7 +396,7 @@ class _HistoryListState extends State<HistoryList> {
   @override
   Widget build(BuildContext context) {
     final strings = AppLocalizations.of(context);
-    final formats = Formats(strings);
+    final formats = Formats.of(context);
     return StreamBuilder(
       stream: widget.facts.versions(widget.id),
       builder: (context, versions) {

@@ -154,7 +154,7 @@ class _What extends ConsumerWidget {
           subtitle: Text(
             since == null
                 ? s.backupAnyDate
-                : Formats(s).date(DateTime.fromMillisecondsSinceEpoch(since)),
+                : Formats.of(context).date(DateTime.fromMillisecondsSinceEpoch(since)),
           ),
           trailing: since == null
               ? null
@@ -189,7 +189,7 @@ class _When extends ConsumerWidget {
     final s = AppLocalizations.of(context);
     final settings = ref.watch(backupSettingsProvider);
     final edit = ref.read(backupSettingsProvider.notifier).edit;
-    final formats = Formats(s);
+    final formats = Formats.of(context);
     return Column(
       children: [
         SwitchListTile(
@@ -268,7 +268,7 @@ class BackupSummary extends ConsumerWidget {
       DateTime.now().millisecondsSinceEpoch,
     );
     final stopped = stoppedText(s, status.stopped);
-    final formats = Formats(s);
+    final formats = Formats.of(context);
     return ListTile(
       leading: Icon(
         overdue ? Icons.cloud_off_outlined : Icons.cloud_done_outlined,
@@ -305,7 +305,7 @@ class _Waiting extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final s = AppLocalizations.of(context);
-    final formats = Formats(s);
+    final formats = Formats.of(context);
     // The states and reasons one explanation covers, with how many wait and
     // the first retry.
     final groups = <String, (List<BackupReasonsResult>, int, int?)>{};

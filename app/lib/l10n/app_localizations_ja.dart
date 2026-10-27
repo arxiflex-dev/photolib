@@ -865,6 +865,18 @@ class AppLocalizationsJa extends AppLocalizations {
   String get commandPaletteHint => 'コマンドを入力';
 
   @override
+  String get dateFormatDefault => '言語の既定';
+
+  @override
+  String get dateFormatDmy => '日-月-年';
+
+  @override
+  String get dateFormatMdy => '月-日-年';
+
+  @override
+  String get dateFormatYmd => '年-月-日';
+
+  @override
   String deleteBoth(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -2721,6 +2733,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get settingsBackground => '透明な画像の背景';
+
+  @override
+  String get settingsDateFormat => '日付の形式';
 
   @override
   String get settingsDefaultTab => 'フォルダとアルバムで最初に開くタブ';
