@@ -154,7 +154,8 @@ class _What extends ConsumerWidget {
           subtitle: Text(
             since == null
                 ? s.backupAnyDate
-                : Formats.of(context).date(DateTime.fromMillisecondsSinceEpoch(since)),
+                : Formats.of(context)
+                      .date(DateTime.fromMillisecondsSinceEpoch(since)),
           ),
           trailing: since == null
               ? null

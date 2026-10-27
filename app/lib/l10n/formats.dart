@@ -10,12 +10,19 @@ String isolated(String path) => '\u2066$path\u2069';
 /// way, or day-month-year, month-day-year or year-month-day, always with the
 /// month names of the app's language.
 enum DateOrder {
+  /// The order of the app's language.
   languageDefault(null),
+
+  /// Day, month, year.
   dmy(('d MMM y', 'MMM y')),
+
+  /// Month, day, year.
   mdy(('MMM d, y', 'MMM y')),
+
+  /// Year, month, day.
   ymd(('y MMM d', 'y MMM'));
 
-  const DateOrder(this._patterns);
+  new(this._patterns);
 
   /// The day and the month patterns, or null for the language's own.
   final (String, String)? _patterns;
@@ -27,10 +34,10 @@ enum DateOrder {
 
 /// Dates, numbers and file sizes in the user's locale (docs/17 §1). Dates and
 /// the first day of the week may follow another locale than the language, such
-/// as `en_GB` in an English app, for day-month-year dates; [order] sets how
+/// as `en_GB` in an English app, for day-month-year dates; `order` sets how
 /// dates are laid out, in the language's month names.
 class Formats {
-  Formats(
+  new(
     this.strings, {
     String? dateLocale,
     DateOrder order = DateOrder.languageDefault,
@@ -41,18 +48,17 @@ class Formats {
        _years = DateFormat.y(dateLocale ?? strings.localeName),
        _times = _day(order, dateLocale ?? strings.localeName).add_jm();
 
+  /// The formats of the app's language, with the order Settings chose.
+  factory Formats.of(BuildContext context) =>
+      Formats(AppLocalizations.of(context), order: DateOrderScope.of(context));
+
   static DateFormat _day(DateOrder order, String locale) =>
       _pattern(order._patterns?.$1, locale) ?? DateFormat.yMMMd(locale);
 
   static DateFormat? _pattern(String? pattern, String locale) =>
       pattern == null ? null : DateFormat(pattern, locale);
 
-  /// The formats of the app's language, with the order Settings chose.
-  factory Formats.of(BuildContext context) => Formats(
-    AppLocalizations.of(context),
-    order: DateOrderScope.of(context),
-  );
-
+  /// The strings of the language the formats follow.
   final AppLocalizations strings;
   final DateFormat _dates;
   final DateFormat _months;
@@ -113,8 +119,10 @@ class Formats {
 
 /// The [DateOrder] Settings chose, for [Formats.of] below it.
 class DateOrderScope extends InheritedWidget {
-  const DateOrderScope({required this.order, required super.child, super.key});
+  /// Tells what is below it to lay dates out as [order] says.
+  const new({required this.order, required super.child, super.key});
 
+  /// The order Settings chose.
   final DateOrder order;
 
   /// The order in effect at [context]; the language's own without a scope.

@@ -41,8 +41,9 @@ String _details(AppLocalizations strings, Formats formats, SourceNode node) {
       SourceState.present => strings.folderItems(node.itemsBelow),
     },
     if (newest != null)
-      formats
-          .date(DateTime(newest ~/ 10000, newest ~/ 100 % 100, newest % 100)),
+      formats.date(
+        DateTime(newest ~/ 10000, newest ~/ 100 % 100, newest % 100),
+      ),
     if (node.kind == SourceKind.device)
       if (node.shown) strings.deviceFoldersAll else strings.deviceFoldersChosen,
     if (node.partly) strings.sourcePartly,

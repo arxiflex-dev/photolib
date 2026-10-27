@@ -117,7 +117,8 @@ class _CheckState extends ConsumerState<ConnectionCheckPage> {
         Fault.timedOut => (s.checkTimedOut, s.checkTimedOutNext),
         Fault.certificateExpired => (
           s.checkExpired(
-            Formats.of(context).date((finding.date ?? DateTime.now()).toLocal()),
+            Formats.of(context)
+                .date((finding.date ?? DateTime.now()).toLocal()),
           ),
           s.nextAskAdmin,
         ),
