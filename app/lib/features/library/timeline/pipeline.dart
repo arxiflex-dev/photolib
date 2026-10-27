@@ -639,6 +639,7 @@ class ThumbnailPipeline {
         .whereType<NoThumbnail>()
         .any((e) => e.unplayable),
     duration: _durations[item.key],
+    noHevc: noHevcDecoder(item.uri, video: item.video),
     cause: [
       for (final (name, answer) in misses)
         '$name: ${switch (answer) {

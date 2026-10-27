@@ -24,8 +24,15 @@ IconData failureMark(Object error) => switch (error) {
   _ => Icons.broken_image_outlined,
 };
 
+/// What a HEIC no decoder takes says on a desktop with no HEVC decoder to
+/// install: connected mode or a Mac, never a codec (ADR-0214).
+String noHeicText(AppLocalizations strings) =>
+    defaultTargetPlatform == TargetPlatform.windows
+    ? strings.timelineNoHeicWindows
+    : strings.timelineNoHeicLinux;
+
 /// The [failureMark] of [error], filling its box, which says why on hover or
-/// a long press.
+/// a long press: the way out for a HEIC no decoder takes, else the cause.
 class FailureMark extends StatelessWidget {
   const FailureMark(
     this.error, {
@@ -41,6 +48,7 @@ class FailureMark extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Tooltip(
     message: switch (error) {
+      NoThumbnail(noHevc: true) => noHeicText(AppLocalizations.of(context)),
       NoThumbnail(:final cause) => cause,
       // error-ok: the technical cause, behind a long press (ADR-0070)
       _ => '$error',

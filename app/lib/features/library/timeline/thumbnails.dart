@@ -56,6 +56,7 @@ class NoThumbnail implements Exception {
     required this.cause,
     this.unplayable = false,
     this.duration,
+    this.noHevc = false,
   });
 
   final bool video;
@@ -65,9 +66,27 @@ class NoThumbnail implements Exception {
   final bool unplayable;
   final Duration? duration;
 
+  /// A HEIC no decoder took on a desktop with no HEVC decoder to install
+  /// (ADR-0214): its mark says to connect a server or open it on a Mac.
+  final bool noHevc;
+
   @override
   String toString() => 'NoThumbnail(video: $video, cause: $cause)';
 }
+
+/// Whether a refused file at [uri] is a HEIC on Windows or Linux outside the
+/// browser: no codec ships there and none is to be installed (ADR-0214), so
+/// its cell names connected mode or a Mac. The web says its own reason.
+bool noHevcDecoder(Uri uri, {required bool video}) =>
+    !kIsWeb &&
+    !video &&
+    const {
+      'heic',
+      'heif',
+      'hif',
+    }.contains(uri.path.split('.').last.toLowerCase()) &&
+    (defaultTargetPlatform == TargetPlatform.windows ||
+        defaultTargetPlatform == TargetPlatform.linux);
 
 /// The source has no thumbnail of an item yet but will, for the [cause]: a
 /// rendition the server still makes, or a server out of reach. Its cells keep

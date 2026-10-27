@@ -738,6 +738,7 @@ class TimelineViewState extends State<TimelineView>
           view: widget,
           clock: formats.duration,
           cannotPlay: strings.timelineCannotPlay,
+          noHeic: noHeicText(strings),
           excluded: strings.timelineExcluded,
           sphere: strings.timelineSphere,
           markLabel: (mark) => strings.mark(mark.name),

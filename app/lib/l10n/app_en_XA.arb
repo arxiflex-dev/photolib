@@ -750,6 +750,8 @@
   "timelineCell": "[{date}, {position} öƒ {count} one two three]",
   "timelineCellNoPreview": "[{date}, {position} öƒ {count}, ñö þŕéṽîéŵ one two three]",
   "timelineExcluded": "[Îñ åñ éẋçļûðéð ƒöļðéŕ one two three]",
+  "timelineNoHeicLinux": "[Þĥöţöļîƀ çåñ'ţ šĥöŵ ĤÉÎÇ þĥöţöš öñ ţĥîš çöɱþûţéŕ. Çöññéçţ å Þĥöţöļîƀ šéŕṽéŕ ţö šéé îţš çöþý, öŕ öþéñ ţĥéɱ öñ å Ṁåç. one two three four five six seven one two three]",
+  "timelineNoHeicWindows": "[Þĥöţöļîƀ çåñ'ţ šĥöŵ ĤÉÎÇ þĥöţöš öñ ţĥîš ÞÇ. Çöññéçţ å Þĥöţöļîƀ šéŕṽéŕ ţö šéé îţš çöþý, öŕ öþéñ ţĥéɱ öñ å Ṁåç. one two three four five six seven one two three]",
   "timelineScrubber": "[Šçŕöļļ ƀý ðåţé one two]",
   "timelineSphere": "[360° one]",
   "timelineUndated": "[Ðåţé ûñķñöŵñ one two]",

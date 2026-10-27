@@ -398,6 +398,12 @@ next time; nothing is kept but the vault's settings.
 acceptance = ["A folder of the corpus shows in Safari and Firefox after a pick, and asks to be picked after a reload"]
 ```
 
+## Built
+
+M1-49 and M2-49 are built as [ADR-0405](../adr/0405-rendition-quality-and-desktop-heic-placeholders.md) says:
+`libraries.rendition_quality` and the `preview` specs (`server/crates/photolib-server/src/render.rs`), and the
+`noHevc` mark of `app/lib/features/library/timeline/` with its two texts in every launched language.
+
 ## Found on the way
 
 * The kernel read `imir` the other way round from ISO/IEC 23008-12:2022, which libheif and libavif follow: axis 0

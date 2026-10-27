@@ -217,6 +217,35 @@ async fn an_ultra_hdr_preview_keeps_its_scaled_gain_map() {
     );
 }
 
+/// M2-49: the `high` preview of an Ultra HDR JPEG is the picture's full size with its gain map at its own size, and
+/// the `standard` one is what ADR-0390 had.
+#[tokio::test]
+async fn the_high_preview_keeps_the_full_size_picture_and_its_whole_gain_map() {
+    let output = |spec: &Spec| Output {
+        file: "p".into(),
+        format: spec.format,
+        short: spec.short,
+        long: spec.long,
+        quality: spec.quality,
+        wide: spec.wide,
+    };
+    let specs = render::specs();
+    let high = specs.iter().find(|s| s.role == "preview" && s.applies("high")).unwrap();
+    let (rendered, files) = render_file(&corpus("hdr/ultra-hdr.jpg"), "image/jpeg", vec![output(high)]).await;
+    assert_eq!(rendered.unwrap().outputs[0], (Format::Jpeg, 4032, 3024));
+    let file = tempfile::NamedTempFile::new_in(env!("CARGO_TARGET_TMPDIR")).unwrap();
+    std::fs::write(file.path(), &files[0]).unwrap();
+    let map = photolib_media::gainmap::read(file.path()).expect("the full-size preview has its gain map");
+    let size = photolib_media::probe::probe(&map.image, u64::MAX).unwrap();
+    assert_eq!((size.width, size.height), (1008, 756), "the map is the original's");
+    let standard = specs
+        .iter()
+        .find(|s| s.role == "preview" && s.applies("standard"))
+        .unwrap();
+    let (rendered, _) = render_file(&corpus("hdr/ultra-hdr.jpg"), "image/jpeg", vec![output(standard)]).await;
+    assert_eq!(rendered.unwrap().outputs[0], (Format::Jpeg, 2160, 1620));
+}
+
 /// How a HEIC carries its gain map.
 #[derive(Clone, Copy, PartialEq)]
 enum Maps {
@@ -1252,6 +1281,51 @@ impl Instance {
     }
 }
 
+/// M2-49: a library's universal JPEG is as big as the original by default (`high`) and 2160 px once the library is
+/// `standard`; the reconciler renders only the preview again, and the job deletes the old file.
+#[tokio::test]
+async fn the_preview_is_full_size_until_its_library_is_standard() {
+    vips();
+    let at = instance().await;
+    at.upload("DCIM/IMG_M249.JPG", &phone_jpeg(&[], 7)).await;
+    let specs = render::specs();
+    at.work(specs.clone()).await;
+    let preview = async |at: &Instance| {
+        let sizes = at.made_for().await;
+        let found: Vec<_> = sizes.iter().filter(|r| r.0 == "preview").collect();
+        assert_eq!(found.len(), 1, "one preview: {sizes:?}");
+        (found[0].2, found[0].3)
+    };
+    assert_eq!(preview(&at).await, (4000, 3000), "full size by default");
+    let high: Vec<(String, String, String)> = at.renditions().await;
+
+    sqlx::query("UPDATE libraries SET rendition_quality = 'standard'")
+        .execute(&at.pool)
+        .await
+        .unwrap();
+    assert_eq!(
+        reconcile(&at.pool, &render::profile(&specs)).await.unwrap(),
+        1,
+        "only the preview"
+    );
+    at.work(specs.clone()).await;
+    assert_eq!(preview(&at).await, (2160, 1620), "2160 px once standard");
+    let standard = at.renditions().await;
+    assert_eq!(standard.len(), 3);
+    let store = at.journal.stores().get("local").unwrap();
+    let old = high.iter().find(|r| r.0 == "preview").unwrap();
+    assert_eq!(store.head(&old.2).await.unwrap(), None, "the full-size file is deleted");
+    assert_eq!(reconcile(&at.pool, &render::profile(&specs)).await.unwrap(), 0);
+
+    sqlx::query("UPDATE libraries SET rendition_quality = 'high'")
+        .execute(&at.pool)
+        .await
+        .unwrap();
+    assert_eq!(reconcile(&at.pool, &render::profile(&specs)).await.unwrap(), 1);
+    at.work(specs).await;
+    assert_eq!(preview(&at).await, (4000, 3000));
+}
+
 /// The thumbnails, the preview and so the covers that show them are of the current version: an edit makes the reconciler
 /// render them again from the edited picture, a revert from the original, and the edited picture is what the kernel's
 /// renderer makes of the original.
@@ -1265,7 +1339,10 @@ async fn an_edit_makes_the_renditions_and_the_covers_that_show_them_follow_the_c
         &std::fs::read(corpus("compound/edited/IMG_E3001.JPG")).unwrap(),
     )
     .await;
-    let specs = render::specs();
+    let specs: Vec<Spec> = render::specs()
+        .into_iter()
+        .filter(|s| s.applies(render::DEFAULT_QUALITY))
+        .collect();
     at.work(specs.clone()).await;
     let (asset, original, (width, height), orientation): (Uuid, Uuid, (i32, i32), Option<i16>) =
         sqlx::query_as("SELECT id, current_version_id, (width, height), orientation FROM assets")

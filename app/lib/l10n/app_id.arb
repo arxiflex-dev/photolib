@@ -750,6 +750,8 @@
   "timelineCell": "{date}, {position} dari {count}",
   "timelineCellNoPreview": "{date}, {position} dari {count}, tanpa pratinjau",
   "timelineExcluded": "Di folder yang dikecualikan",
+  "timelineNoHeicLinux": "Photolib tidak dapat menampilkan foto HEIC di komputer ini. Hubungkan server Photolib untuk melihat salinannya, atau buka di Mac.",
+  "timelineNoHeicWindows": "Photolib tidak dapat menampilkan foto HEIC di PC ini. Hubungkan server Photolib untuk melihat salinannya, atau buka di Mac.",
   "timelineScrubber": "Gulir menurut tanggal",
   "timelineSphere": "360°",
   "timelineUndated": "Tanggal tidak diketahui",

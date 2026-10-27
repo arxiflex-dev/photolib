@@ -3148,6 +3148,14 @@ class AppLocalizationsVi extends AppLocalizations {
   String get timelineExcluded => 'Trong thư mục bị loại trừ';
 
   @override
+  String get timelineNoHeicLinux =>
+      'Photolib không thể hiển thị ảnh HEIC trên máy tính này. Hãy kết nối máy chủ Photolib để xem bản sao, hoặc mở ảnh trên máy Mac.';
+
+  @override
+  String get timelineNoHeicWindows =>
+      'Photolib không thể hiển thị ảnh HEIC trên máy tính này. Hãy kết nối máy chủ Photolib để xem bản sao, hoặc mở ảnh trên máy Mac.';
+
+  @override
   String get timelineScrubber => 'Cuộn theo ngày';
 
   @override

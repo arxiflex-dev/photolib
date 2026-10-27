@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:crypto/crypto.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
 import 'package:photolib/features/library/timeline/disk_cache.dart';
@@ -238,6 +238,33 @@ void main() {
     );
     expect(pipeline.duration(movie), const Duration(seconds: 5));
   });
+
+  // M1-49 (ADR-0214): a HEIC nothing decodes names the way out, on the
+  // desktops where no codec ships; any other format keeps its own cause.
+  for (final (name, uri, noHevc) in [
+    ('IMG_1.HEIC', 'file:///p/IMG_1.HEIC', true),
+    ('a heif', 'file:///p/a.heif', true),
+    ('a JPEG', 'file:///p/a.jpg', false),
+  ]) {
+    test(
+      '$name that every decoder refused is marked '
+      '${noHevc ? 'as lacking an HEVC decoder' : 'as any refused file'}',
+      () async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.linux;
+        final pipeline = ThumbnailPipeline(decoders: [refuses]);
+        try {
+          await expectLater(
+            pipeline.load(ThumbnailItem('k', Uri.parse(uri)), 128, never),
+            throwsA(
+              isA<NoThumbnail>().having((e) => e.noHevc, 'noHevc', noHevc),
+            ),
+          );
+        } finally {
+          debugDefaultTargetPlatformOverride = null;
+        }
+      },
+    );
+  }
 
   test("the cause names, in order, each decoder's answer: declined, with "
       'why when it says, refused with its message, or threw', () async {

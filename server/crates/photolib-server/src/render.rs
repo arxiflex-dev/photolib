@@ -51,9 +51,24 @@ pub struct Spec {
     pub quality: u8,
     /// Keeps a wide-gamut source as Display P3.
     pub wide: bool,
+    /// The library rendition quality this spec is for; none for every library.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub only_for: Option<&'static str>,
 }
 
+/// A library's rendition quality (M2-49): the universal JPEG at the original's size.
+pub const HIGH: &str = "high";
+/// A library's rendition quality for small disks: the universal JPEG at 2160 px.
+pub const STANDARD: &str = "standard";
+/// What a library gets until its administrator says otherwise (the owner's answer to M1-44's question 4).
+pub const DEFAULT_QUALITY: &str = HIGH;
+
 impl Spec {
+    /// Whether a library of rendition `quality` wants this spec.
+    pub fn applies(&self, quality: &str) -> bool {
+        self.only_for.is_none_or(|only| only == quality)
+    }
+
     /// 16 bytes of the BLAKE3 hash of the spec's JSON, in hex.
     pub fn id(&self) -> String {
         let json = serde_json::to_vec(self).expect("a spec serialises");
@@ -74,11 +89,21 @@ pub fn specs() -> Vec<Spec> {
         sphere_long,
         quality,
         wide,
+        only_for: None,
     };
     vec![
         spec("thumb_s", Format::Webp, 256, 1024, 0, 70, false),
         spec("thumb_m", Format::Webp, 720, 2048, 0, 75, false),
-        spec("preview", Format::Jpeg, 0, 2160, 8192, 85, true),
+        // The universal JPEG of M2-49: at the original's size (a JPEG's largest side), q 93 with optimised coding and
+        // the gain map of ADR-0390; or 2160 px, as before, for a library on a small disk.
+        Spec {
+            only_for: Some(HIGH),
+            ..spec("preview", Format::Jpeg, 0, 65535, 65535, 93, true)
+        },
+        Spec {
+            only_for: Some(STANDARD),
+            ..spec("preview", Format::Jpeg, 0, 2160, 8192, 85, true)
+        },
     ]
 }
 
@@ -88,6 +113,7 @@ pub fn profile(specs: &[Spec]) -> Profile {
         kind: "image".into(),
         role: spec.role.into(),
         spec_id: spec.id(),
+        only_for: spec.only_for.map(str::to_string),
     };
     Profile {
         renditions: specs.iter().map(rendition).collect(),
@@ -256,7 +282,10 @@ impl Render {
             return Ok(());
         };
         let present: Vec<String> = row.get("specs");
-        let missing: Vec<&Spec> = self.specs.iter().filter(|s| !present.contains(&s.id())).collect();
+        let quality: String = row.get("rendition_quality");
+        let missing: Vec<&Spec> = (self.specs.iter())
+            .filter(|s| s.applies(&quality) && !present.contains(&s.id()))
+            .collect();
         if missing.is_empty() {
             return Ok(());
         }
@@ -348,7 +377,7 @@ impl Render {
 
 /// An image's original and the ids of the specs of its present renditions.
 pub(crate) const ORIGINAL: &str = "
-SELECT a.library_id, a.facets, a.orientation, a.current_version_id, v.recipe, f.storage, f.key, f.content_hash,
+SELECT a.library_id, (SELECT rendition_quality FROM libraries WHERE id = a.library_id) AS rendition_quality, a.facets, a.orientation, a.current_version_id, v.recipe, f.storage, f.key, f.content_hash,
     f.size, coalesce(f.mime, '') AS mime,
     array(SELECT r.render_spec ->> 'spec_id' FROM asset_files r
           WHERE r.asset_id = a.id AND r.state = 'present' AND r.render_spec IS NOT NULL
@@ -356,3 +385,35 @@ SELECT a.library_id, a.facets, a.orientation, a.current_version_id, v.recipe, f.
 FROM assets a LEFT JOIN versions v ON v.id = a.current_version_id AND v.kind = 'edit'
 JOIN asset_files f ON f.asset_id = a.id AND f.role = 'original' AND f.byte_offset IS NULL
 WHERE a.id = $1 AND a.media_kind = 'image'";
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// M2-49: `high` (full size, q 92-95) is the default universal JPEG, `standard` (2160 px, q85) the library's option
+    /// for small disks; the thumbnails are the same for both.
+    #[test]
+    fn the_preview_is_high_by_default_and_standard_for_small_disks() {
+        let specs = specs();
+        assert_eq!(DEFAULT_QUALITY, HIGH);
+        let preview = |quality: &str| {
+            let found: Vec<&Spec> = (specs.iter())
+                .filter(|s| s.role == "preview" && s.applies(quality))
+                .collect();
+            assert_eq!(found.len(), 1, "one preview for {quality}");
+            found[0].clone()
+        };
+        let (high, standard) = (preview(HIGH), preview(STANDARD));
+        assert_eq!((high.short, high.long), (0, 65535), "full size: a JPEG's largest side");
+        assert!((92..=95).contains(&high.quality), "q {}", high.quality);
+        assert_eq!((standard.short, standard.long, standard.quality), (0, 2160, 85));
+        assert_ne!(high.id(), standard.id());
+        for quality in [HIGH, STANDARD] {
+            let thumbs = specs
+                .iter()
+                .filter(|s| s.role.starts_with("thumb") && s.applies(quality));
+            assert_eq!(thumbs.count(), 2, "both thumbnails for {quality}");
+        }
+        assert!(!high.applies("lossless"), "no other quality");
+    }
+}

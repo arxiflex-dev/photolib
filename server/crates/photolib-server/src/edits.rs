@@ -186,6 +186,7 @@ mod tests {
                 kind: "image".into(),
                 role: "thumb_s".into(),
                 spec_id: "s".into(),
+                only_for: None,
             }],
             export: Some(EXPORT_SPEC.into()),
             ..Profile::default()

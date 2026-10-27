@@ -3152,6 +3152,14 @@ class AppLocalizationsId extends AppLocalizations {
   String get timelineExcluded => 'Di folder yang dikecualikan';
 
   @override
+  String get timelineNoHeicLinux =>
+      'Photolib tidak dapat menampilkan foto HEIC di komputer ini. Hubungkan server Photolib untuk melihat salinannya, atau buka di Mac.';
+
+  @override
+  String get timelineNoHeicWindows =>
+      'Photolib tidak dapat menampilkan foto HEIC di PC ini. Hubungkan server Photolib untuk melihat salinannya, atau buka di Mac.';
+
+  @override
   String get timelineScrubber => 'Gulir menurut tanggal';
 
   @override

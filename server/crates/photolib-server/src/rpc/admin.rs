@@ -25,6 +25,7 @@ use crate::{
     guard::Dry,
     logging::Tail,
     policy::PRESETS,
+    render,
 };
 
 /// The admin console's service on the instance's database.
@@ -1245,6 +1246,39 @@ impl AdminService for Admin {
         .await?;
         Ok(pb::RelocateLibraryResponse::default().into())
     }
+
+    async fn set_rendition_quality(
+        &self,
+        ctx: RequestContext,
+        request: ServiceRequest<'_, pb::SetRenditionQualityRequest>,
+    ) -> ServiceResult<pb::SetRenditionQualityResponse> {
+        let request = request.to_owned_message();
+        let id = uuid(&request.library_id, "library_id")?;
+        if ![render::HIGH, render::STANDARD].contains(&request.quality.as_str()) {
+            return Err(invalid("quality"));
+        }
+        let mut tx = self.begin().await?;
+        let changed = sqlx::query("UPDATE libraries SET rendition_quality = $2 WHERE id = $1")
+            .bind(id)
+            .bind(&request.quality)
+            .execute(&mut *tx)
+            .await
+            .map_err(internal)?;
+        if changed.rows_affected() == 0 {
+            return Err(ApiError::new(ErrorCode::NotFound, "library.not_found").into());
+        }
+        // The scheduler's reconciler renders the library's previews again: the other spec is missing.
+        let target = json!({ "library_id": id.to_string() });
+        self.commit(
+            tx,
+            &ctx,
+            "library.rendition_quality",
+            target,
+            json!({ "quality": request.quality }),
+        )
+        .await?;
+        Ok(pb::SetRenditionQualityResponse::default().into())
+    }
 }
 
 #[cfg(test)]
@@ -1753,6 +1787,61 @@ FROM (VALUES ('a', 'original', '2024/05/a.jpg'), ('b', 'original', '2024/05/x/b.
                 .await
                 .unwrap();
         assert_eq!(audited.len(), 1);
+    }
+
+    /// An administrator sets a library's rendition quality to `standard` or `high`: its `rendition_quality` changes and
+    /// the change is audited; another quality or no such library is refused.
+    #[tokio::test]
+    async fn a_library_gets_the_rendition_quality_the_administrator_sets() {
+        let (api, root) = with_admin().await;
+        sql(&api, WORLD).await;
+        let admin = Some(&root);
+        let library: String = sqlx::query_scalar("SELECT md5('L1')::uuid::text")
+            .fetch_one(&api.pool)
+            .await
+            .unwrap();
+        let quality = async || -> String {
+            sqlx::query_scalar("SELECT rendition_quality FROM libraries WHERE id = $1::uuid")
+                .bind(&library)
+                .fetch_one(&api.pool)
+                .await
+                .unwrap()
+        };
+        assert_eq!(quality().await, "high", "the default");
+        let set = async |id: &str, quality: &str| {
+            call(
+                &api.app,
+                "AdminService/SetRenditionQuality",
+                admin,
+                json!({ "libraryId": id, "quality": quality }),
+            )
+            .await
+        };
+        assert_eq!(set(&library, "standard").await, (StatusCode::OK, json!({})));
+        assert_eq!(quality().await, "standard");
+        let mut invalid = denied("invalid_argument", "field.invalid");
+        invalid["field"] = "quality".into();
+        for other in ["lossless", "", "High"] {
+            assert_eq!(set(&library, other).await, (StatusCode::BAD_REQUEST, invalid.clone()));
+        }
+        assert_eq!(quality().await, "standard", "refused values change nothing");
+        let none: String = sqlx::query_scalar("SELECT md5('none')::uuid::text")
+            .fetch_one(&api.pool)
+            .await
+            .unwrap();
+        assert_eq!(
+            set(&none, "high").await,
+            (StatusCode::NOT_FOUND, denied("not_found", "library.not_found"))
+        );
+        assert_eq!(set(&library, "high").await, (StatusCode::OK, json!({})));
+        assert_eq!(quality().await, "high");
+        let audited: Vec<String> = sqlx::query_scalar(
+            "SELECT details ->> 'quality' FROM audit_events WHERE action = 'library.rendition_quality' ORDER BY id",
+        )
+        .fetch_all(&api.pool)
+        .await
+        .unwrap();
+        assert_eq!(audited, ["standard", "high"]);
     }
 
     /// The database's clock, read before a request.

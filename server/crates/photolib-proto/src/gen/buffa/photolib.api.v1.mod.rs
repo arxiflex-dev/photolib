@@ -115,6 +115,8 @@ pub mod __buffa {
         reg.register_json_any(super::__HINT_PATHS_RESPONSE_JSON_ANY);
         reg.register_json_any(super::__RELOCATE_LIBRARY_REQUEST_JSON_ANY);
         reg.register_json_any(super::__RELOCATE_LIBRARY_RESPONSE_JSON_ANY);
+        reg.register_json_any(super::__SET_RENDITION_QUALITY_REQUEST_JSON_ANY);
+        reg.register_json_any(super::__SET_RENDITION_QUALITY_RESPONSE_JSON_ANY);
         reg.register_json_any(super::__API_KEY_JSON_ANY);
         reg.register_json_any(super::__LIST_API_KEYS_REQUEST_JSON_ANY);
         reg.register_json_any(super::__LIST_API_KEYS_RESPONSE_JSON_ANY);
@@ -492,6 +494,14 @@ pub use self::__buffa::view::RelocateLibraryRequestOwnedView;
 pub use self::__buffa::view::RelocateLibraryResponseView;
 #[doc(inline)]
 pub use self::__buffa::view::RelocateLibraryResponseOwnedView;
+#[doc(inline)]
+pub use self::__buffa::view::SetRenditionQualityRequestView;
+#[doc(inline)]
+pub use self::__buffa::view::SetRenditionQualityRequestOwnedView;
+#[doc(inline)]
+pub use self::__buffa::view::SetRenditionQualityResponseView;
+#[doc(inline)]
+pub use self::__buffa::view::SetRenditionQualityResponseOwnedView;
 #[doc(inline)]
 pub use self::__buffa::view::ApiKeyView;
 #[doc(inline)]

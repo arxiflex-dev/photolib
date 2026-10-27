@@ -750,6 +750,8 @@
   "timelineCell": "{date}, {count} में से {position}",
   "timelineCellNoPreview": "{date}, {count} में से {position}, कोई पूर्वावलोकन नहीं",
   "timelineExcluded": "बाहर रखे गए फ़ोल्डर में",
+  "timelineNoHeicLinux": "Photolib इस कंप्यूटर पर HEIC फ़ोटो नहीं दिखा सकता। उनकी कॉपी देखने के लिए Photolib सर्वर से कनेक्ट करें, या उन्हें Mac पर खोलें।",
+  "timelineNoHeicWindows": "Photolib इस पीसी पर HEIC फ़ोटो नहीं दिखा सकता। उनकी कॉपी देखने के लिए Photolib सर्वर से कनेक्ट करें, या उन्हें Mac पर खोलें।",
   "timelineScrubber": "तारीख के हिसाब से स्क्रोल करें",
   "timelineSphere": "360°",
   "timelineUndated": "अज्ञात तारीख",

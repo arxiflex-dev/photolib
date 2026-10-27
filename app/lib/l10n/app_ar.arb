@@ -750,6 +750,8 @@
   "timelineCell": "{date}، {position} من {count}",
   "timelineCellNoPreview": "{date}، {position} من {count}، بلا معاينة",
   "timelineExcluded": "في مجلد مستبعد",
+  "timelineNoHeicLinux": "لا يستطيع Photolib عرض صور HEIC على هذا الكمبيوتر. اتصل بخادم Photolib لرؤية نسختها، أو افتحها على جهاز Mac.",
+  "timelineNoHeicWindows": "لا يستطيع Photolib عرض صور HEIC على هذا الكمبيوتر. اتصل بخادم Photolib لرؤية نسختها، أو افتحها على جهاز Mac.",
   "timelineScrubber": "التمرير حسب التاريخ",
   "timelineSphere": "360°",
   "timelineUndated": "تاريخ غير معروف",

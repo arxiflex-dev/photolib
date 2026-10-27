@@ -186,6 +186,18 @@ pub type OwnedRelocateLibraryRequestView = ::buffa::view::OwnedView<
 pub type OwnedRelocateLibraryResponseView = ::buffa::view::OwnedView<
     crate::proto::photolib::api::v1::__buffa::view::RelocateLibraryResponseView<'static>,
 >;
+///Shorthand for `OwnedView<SetRenditionQualityRequestView<'static>>`.
+pub type OwnedSetRenditionQualityRequestView = ::buffa::view::OwnedView<
+    crate::proto::photolib::api::v1::__buffa::view::SetRenditionQualityRequestView<
+        'static,
+    >,
+>;
+///Shorthand for `OwnedView<SetRenditionQualityResponseView<'static>>`.
+pub type OwnedSetRenditionQualityResponseView = ::buffa::view::OwnedView<
+    crate::proto::photolib::api::v1::__buffa::view::SetRenditionQualityResponseView<
+        'static,
+    >,
+>;
 impl ::connectrpc::Encodable<crate::proto::photolib::api::v1::GetStatusResponse>
 for crate::proto::photolib::api::v1::__buffa::view::GetStatusResponseView<'_> {
     fn encode(
@@ -976,6 +988,46 @@ for ::buffa::view::OwnedView<
         )
     }
 }
+impl ::connectrpc::Encodable<
+    crate::proto::photolib::api::v1::SetRenditionQualityResponse,
+>
+for crate::proto::photolib::api::v1::__buffa::view::SetRenditionQualityResponseView<'_> {
+    fn encode(
+        &self,
+        codec: ::connectrpc::CodecFormat,
+    ) -> ::std::result::Result<::buffa::bytes::Bytes, ::connectrpc::ConnectError> {
+        ::connectrpc::__codegen::encode_view_body(self, codec)
+    }
+}
+impl ::connectrpc::Encodable<
+    crate::proto::photolib::api::v1::SetRenditionQualityResponse,
+>
+for ::buffa::view::OwnedView<
+    crate::proto::photolib::api::v1::__buffa::view::SetRenditionQualityResponseView<
+        'static,
+    >,
+> {
+    fn encode(
+        &self,
+        codec: ::connectrpc::CodecFormat,
+    ) -> ::std::result::Result<::buffa::bytes::Bytes, ::connectrpc::ConnectError> {
+        ::connectrpc::__codegen::encode_view_body(self.reborrow(), codec)
+    }
+    /// An `OwnedView` still holds the buffer it was decoded from, so
+    /// its large fields can be handed to the response body by
+    /// reference count instead of copied. The bare view impl above
+    /// cannot do this: it has borrows but no buffer to name.
+    fn encode_segments(
+        &self,
+        codec: ::connectrpc::CodecFormat,
+    ) -> ::std::result::Result<::connectrpc::EncodedBody, ::connectrpc::ConnectError> {
+        ::connectrpc::__codegen::encode_view_body_segments(
+            self.reborrow(),
+            self.bytes(),
+            codec,
+        )
+    }
+}
 /// Full service name for this service.
 pub const ADMIN_SERVICE_SERVICE_NAME: &str = "photolib.api.v1.AdminService";
 /// Static [`Spec`](::connectrpc::Spec) for the `GetStatus` RPC, as seen by the server; the generated client passes it with [`origin`](::connectrpc::Spec::origin) `Client` (compare across sides with [`Spec::same_method`](::connectrpc::Spec::same_method)).
@@ -1113,6 +1165,12 @@ pub const ADMIN_SERVICE_HINT_PATHS_SPEC: ::connectrpc::Spec = ::connectrpc::Spec
 /// Static [`Spec`](::connectrpc::Spec) for the `RelocateLibrary` RPC, as seen by the server; the generated client passes it with [`origin`](::connectrpc::Spec::origin) `Client` (compare across sides with [`Spec::same_method`](::connectrpc::Spec::same_method)).
 pub const ADMIN_SERVICE_RELOCATE_LIBRARY_SPEC: ::connectrpc::Spec = ::connectrpc::Spec::server(
         "/photolib.api.v1.AdminService/RelocateLibrary",
+        ::connectrpc::StreamType::Unary,
+    )
+    .with_idempotency_level(::connectrpc::IdempotencyLevel::Unknown);
+/// Static [`Spec`](::connectrpc::Spec) for the `SetRenditionQuality` RPC, as seen by the server; the generated client passes it with [`origin`](::connectrpc::Spec::origin) `Client` (compare across sides with [`Spec::same_method`](::connectrpc::Spec::same_method)).
+pub const ADMIN_SERVICE_SET_RENDITION_QUALITY_SPEC: ::connectrpc::Spec = ::connectrpc::Spec::server(
+        "/photolib.api.v1.AdminService/SetRenditionQuality",
         ::connectrpc::StreamType::Unary,
     )
     .with_idempotency_level(::connectrpc::IdempotencyLevel::Unknown);
@@ -1707,6 +1765,31 @@ pub trait AdminService: Send + Sync + 'static {
         Output = ::connectrpc::ServiceResult<
             impl ::connectrpc::Encodable<
                 crate::proto::photolib::api::v1::RelocateLibraryResponse,
+            > + Send + use<'a, Self>,
+        >,
+    > + Send;
+    /// Sets how big the universal JPEG of a library's stills is (M2-49): `high` (the default) is as big as the original,
+    /// `standard` is 2160 px for a small disk. The reconciler renders every preview of the library again. No such library
+    /// is not_found `library.not_found`; any other quality is invalid_argument `field.invalid` on `quality`.
+    ///
+    /// `'a` lets the response body borrow from `&self` (e.g. server-resident state).
+    ///
+    /// `request` is borrowed from the request body and is valid for the
+    /// duration of the call; message fields are read directly on it
+    /// (zero-copy). The response cannot borrow from `request` — use
+    /// `.to_owned_message()` (or copy the specific fields) for anything
+    /// returned, stored, or moved into `tokio::spawn`.
+    fn set_rendition_quality<'a>(
+        &'a self,
+        ctx: ::connectrpc::RequestContext,
+        request: ::connectrpc::ServiceRequest<
+            '_,
+            crate::proto::photolib::api::v1::SetRenditionQualityRequest,
+        >,
+    ) -> impl ::std::future::Future<
+        Output = ::connectrpc::ServiceResult<
+            impl ::connectrpc::Encodable<
+                crate::proto::photolib::api::v1::SetRenditionQualityResponse,
             > + Send + use<'a, Self>,
         >,
     > + Send;
@@ -2409,6 +2492,35 @@ impl<S: AdminService> AdminServiceExt for S {
                 },
             )
             .with_spec(ADMIN_SERVICE_RELOCATE_LIBRARY_SPEC)
+            .route_view(
+                ADMIN_SERVICE_SERVICE_NAME,
+                "SetRenditionQuality",
+                {
+                    let svc = ::std::sync::Arc::clone(&self);
+                    ::connectrpc::view_handler_fn(move |
+                        ctx,
+                        req: ::buffa::view::OwnedView<
+                            crate::proto::photolib::api::v1::__buffa::view::SetRenditionQualityRequestView<
+                                'static,
+                            >,
+                        >,
+                        format|
+                    {
+                        let svc = ::std::sync::Arc::clone(&svc);
+                        async move {
+                            let sreq = ::connectrpc::ServiceRequest::<
+                                crate::proto::photolib::api::v1::SetRenditionQualityRequest,
+                            >::from_parts(req.reborrow(), req.bytes());
+                            svc.set_rendition_quality(ctx, sreq)
+                                .await?
+                                .encode::<
+                                    crate::proto::photolib::api::v1::SetRenditionQualityResponse,
+                                >(format)
+                        }
+                    })
+                },
+            )
+            .with_spec(ADMIN_SERVICE_SET_RENDITION_QUALITY_SPEC)
     }
 }
 /// Type-inference marker used by [`Router::add_service`](::connectrpc::Router::add_service).
@@ -2599,6 +2711,12 @@ impl<T: AdminService> ::connectrpc::Dispatcher for AdminServiceServer<T> {
                 Some(
                     ::connectrpc::dispatcher::codegen::MethodDescriptor::unary(false)
                         .with_spec(ADMIN_SERVICE_RELOCATE_LIBRARY_SPEC),
+                )
+            }
+            "SetRenditionQuality" => {
+                Some(
+                    ::connectrpc::dispatcher::codegen::MethodDescriptor::unary(false)
+                        .with_spec(ADMIN_SERVICE_SET_RENDITION_QUALITY_SPEC),
                 )
             }
             _ => None,
@@ -3119,6 +3237,28 @@ impl<T: AdminService> ::connectrpc::Dispatcher for AdminServiceServer<T> {
                         .await?
                         .encode::<
                             crate::proto::photolib::api::v1::RelocateLibraryResponse,
+                        >(format)
+                })
+            }
+            "SetRenditionQuality" => {
+                let svc = ::std::sync::Arc::clone(&self.inner);
+                Box::pin(async move {
+                    let body = ::connectrpc::dispatcher::codegen::request_proto_bytes::<
+                        crate::proto::photolib::api::v1::SetRenditionQualityRequest,
+                    >(request.encoded()?, format)?;
+                    let req: crate::proto::photolib::api::v1::__buffa::view::SetRenditionQualityRequestView<
+                        '_,
+                    > = ::connectrpc::dispatcher::codegen::decode_borrowed_request_view(
+                        &body,
+                        ctx.decode_options(),
+                    )?;
+                    let req = ::connectrpc::ServiceRequest::<
+                        crate::proto::photolib::api::v1::SetRenditionQualityRequest,
+                    >::from_parts(&req, &body);
+                    svc.set_rendition_quality(ctx, req)
+                        .await?
+                        .encode::<
+                            crate::proto::photolib::api::v1::SetRenditionQualityResponse,
                         >(format)
                 })
             }
@@ -4281,6 +4421,51 @@ where
                 &self.transport,
                 &self.config,
                 ADMIN_SERVICE_RELOCATE_LIBRARY_SPEC
+                    .with_origin(::connectrpc::SpecOrigin::Client),
+                request,
+                options,
+            )
+            .await
+    }
+    /// Call the SetRenditionQuality RPC. Sends a request to /photolib.api.v1.AdminService/SetRenditionQuality.
+    pub async fn set_rendition_quality(
+        &self,
+        request: crate::proto::photolib::api::v1::SetRenditionQualityRequest,
+    ) -> Result<
+        ::connectrpc::client::UnaryResponse<
+            ::buffa::view::OwnedView<
+                crate::proto::photolib::api::v1::__buffa::view::SetRenditionQualityResponseView<
+                    'static,
+                >,
+            >,
+        >,
+        ::connectrpc::ConnectError,
+    > {
+        self.set_rendition_quality_with_options(
+                request,
+                ::connectrpc::client::CallOptions::default(),
+            )
+            .await
+    }
+    /// Call the SetRenditionQuality RPC with explicit per-call options. Options override [`ClientConfig`](::connectrpc::client::ClientConfig) defaults.
+    pub async fn set_rendition_quality_with_options(
+        &self,
+        request: crate::proto::photolib::api::v1::SetRenditionQualityRequest,
+        options: ::connectrpc::client::CallOptions,
+    ) -> Result<
+        ::connectrpc::client::UnaryResponse<
+            ::buffa::view::OwnedView<
+                crate::proto::photolib::api::v1::__buffa::view::SetRenditionQualityResponseView<
+                    'static,
+                >,
+            >,
+        >,
+        ::connectrpc::ConnectError,
+    > {
+        ::connectrpc::client::call_unary(
+                &self.transport,
+                &self.config,
+                ADMIN_SERVICE_SET_RENDITION_QUALITY_SPEC
                     .with_origin(::connectrpc::SpecOrigin::Client),
                 request,
                 options,

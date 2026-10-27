@@ -59,6 +59,7 @@ pub const ROUTES: Routes = &[
     ("/photolib.api.v1.AdminService/ConfirmScan", SERVER),
     ("/photolib.api.v1.AdminService/HintPaths", SERVER),
     ("/photolib.api.v1.AdminService/RelocateLibrary", SERVER),
+    ("/photolib.api.v1.AdminService/SetRenditionQuality", SERVER),
     // A password, a password setup token, a second factor, a passkey or the calling session is the credential, which
     // the handler checks; the session procedures act only on the caller's own session, devices and factors.
     ("/photolib.api.v1.AuthService/StartPasswordSetup", Rule::Anyone),
@@ -270,6 +271,7 @@ AdminService/RestoreBackup         401    401      401     401      401     403 
 AdminService/ConfirmScan           401    401      401     401      401     403    403  2fa       403   401    scope   403     ok    ok       ok
 AdminService/HintPaths             401    401      401     401      401     403    403  2fa       403   401    scope   403     ok    ok       ok
 AdminService/RelocateLibrary       401    401      401     401      401     403    403  2fa       403   401    scope   403     ok    ok       ok
+AdminService/SetRenditionQuality   401    401      401     401      401     403    403  2fa       403   401    scope   403     ok    ok       ok
 SyncService/Sync                   401    401      401     401      401     ok     ok   2fa       ok    401    ok      ok      ok    ok       scope
 SyncService/GetTimelineSummary     401    401      401     401      401     ok     ok   2fa       ok    401    ok      ok      ok    ok       scope
 SyncService/CheckHashes            401    401      401     401      401     ok     ok   2fa       ok    401    ok      ok      ok    ok       scope

@@ -3224,6 +3224,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get timelineExcluded => 'В исключённой папке';
 
   @override
+  String get timelineNoHeicLinux =>
+      'Photolib не может показать фото HEIC на этом компьютере. Подключите сервер Photolib, чтобы увидеть их копию, или откройте фото на Mac.';
+
+  @override
+  String get timelineNoHeicWindows =>
+      'Photolib не может показать фото HEIC на этом ПК. Подключите сервер Photolib, чтобы увидеть их копию, или откройте фото на Mac.';
+
+  @override
   String get timelineScrubber => 'Прокрутка по датам';
 
   @override

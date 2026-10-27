@@ -750,6 +750,8 @@
   "timelineCell": "{date}, {position} van {count}",
   "timelineCellNoPreview": "{date}, {position} van {count}, geen voorbeeld",
   "timelineExcluded": "In een uitgesloten map",
+  "timelineNoHeicLinux": "Photolib kan HEIC-foto's op deze computer niet tonen. Verbind een Photolib-server om de kopie te zien, of open ze op een Mac.",
+  "timelineNoHeicWindows": "Photolib kan HEIC-foto's op deze pc niet tonen. Verbind een Photolib-server om de kopie te zien, of open ze op een Mac.",
   "timelineScrubber": "Scrollen op datum",
   "timelineSphere": "360°",
   "timelineUndated": "Datum onbekend",

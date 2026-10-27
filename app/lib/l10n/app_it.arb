@@ -750,6 +750,8 @@
   "timelineCell": "{date}, {position} di {count}",
   "timelineCellNoPreview": "{date}, {position} di {count}, nessuna anteprima",
   "timelineExcluded": "In una cartella esclusa",
+  "timelineNoHeicLinux": "Photolib non può mostrare le foto HEIC su questo computer. Collega un server Photolib per vederne la copia oppure aprile su un Mac.",
+  "timelineNoHeicWindows": "Photolib non può mostrare le foto HEIC su questo PC. Collega un server Photolib per vederne la copia oppure aprile su un Mac.",
   "timelineScrubber": "Scorri per data",
   "timelineSphere": "360°",
   "timelineUndated": "Data sconosciuta",

@@ -3228,6 +3228,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get timelineExcluded => 'في مجلد مستبعد';
 
   @override
+  String get timelineNoHeicLinux =>
+      'لا يستطيع Photolib عرض صور HEIC على هذا الكمبيوتر. اتصل بخادم Photolib لرؤية نسختها، أو افتحها على جهاز Mac.';
+
+  @override
+  String get timelineNoHeicWindows =>
+      'لا يستطيع Photolib عرض صور HEIC على هذا الكمبيوتر. اتصل بخادم Photolib لرؤية نسختها، أو افتحها على جهاز Mac.';
+
+  @override
   String get timelineScrubber => 'التمرير حسب التاريخ';
 
   @override
@@ -6759,6 +6767,14 @@ class AppLocalizationsArXb extends AppLocalizationsAr {
 
   @override
   String get timelineExcluded => '‏In an excluded folder‏';
+
+  @override
+  String get timelineNoHeicLinux =>
+      '‏Photolib can\'t show HEIC photos on this computer. Connect a Photolib server to see its copy, or open them on a Mac.‏';
+
+  @override
+  String get timelineNoHeicWindows =>
+      '‏Photolib can\'t show HEIC photos on this PC. Connect a Photolib server to see its copy, or open them on a Mac.‏';
 
   @override
   String get timelineScrubber => '‏Scroll by date‏';

@@ -3152,6 +3152,14 @@ class AppLocalizationsHe extends AppLocalizations {
   String get timelineExcluded => 'בתיקייה מוחרגת';
 
   @override
+  String get timelineNoHeicLinux =>
+      'Photolib אינו יכול להציג תמונות HEIC במחשב זה. חברו שרת Photolib כדי לראות את העותק שלהן, או פתחו אותן ב-Mac.';
+
+  @override
+  String get timelineNoHeicWindows =>
+      'Photolib אינו יכול להציג תמונות HEIC במחשב זה. חברו שרת Photolib כדי לראות את העותק שלהן, או פתחו אותן ב-Mac.';
+
+  @override
   String get timelineScrubber => 'גלילה לפי תאריך';
 
   @override

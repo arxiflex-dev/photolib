@@ -146,6 +146,7 @@ here; the two share one numbering.
 | [0384](0384-map-view.md) | The map view: kernel clustering on the device, raster tiles on consent, area as a search filter | **Proposed — owner to confirm** |
 | [0385](0385-web-client-v1.md) | The web client v1: served by photolibd, driven in the browsers it supports | **Proposed — owner to confirm** |
 | [0386](0386-organisation-v1.md) | Organisation v1: trash retention, emptying through the intent log, albums made on devices, per-surface hiding | **Proposed — owner to confirm** |
+| [0405](0405-rendition-quality-and-desktop-heic-placeholders.md) | Rendition quality per library (`high` full-size JPEG by default, `standard` 2160 px) and desktop HEIC placeholders that name connected mode or a Mac | **Proposed — owner to confirm** |
 | [0387](0387-heic-in-the-browser-with-webcodecs.md) | HEIC in the browser: the kernel finds the HEIF tiles, WebCodecs decodes them with the system's HEVC decoder | **Proposed — owner to confirm** |
 | [0388](0388-ocr-and-text-search.md) | OCR and text search: PP-OCRv5 on the ml role, text as untrusted data, a job and a search API | **Proposed — owner to confirm** |
 | [0389](0389-face-detection-and-embeddings.md) | Faces: YuNet and SFace behind one consent, boxes kept against the original and moved by the kernel | **Proposed — owner to confirm** |

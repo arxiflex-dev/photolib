@@ -66,6 +66,10 @@ service AdminService {
   // keeps its id, albums, faces and edits, and nothing is read again. The folder must hold a name the library's root
   // held, else failed_precondition `library.root_differs`; it is checked as CreateExternalLibrary checks a root.
   rpc RelocateLibrary(RelocateLibraryRequest) returns (RelocateLibraryResponse);
+  // Sets how big the universal JPEG of a library's stills is (M2-49): `high` (the default) is as big as the original,
+  // `standard` is 2160 px for a small disk. The reconciler renders every preview of the library again. No such library
+  // is not_found `library.not_found`; any other quality is invalid_argument `field.invalid` on `quality`.
+  rpc SetRenditionQuality(SetRenditionQualityRequest) returns (SetRenditionQualityResponse);
 }
 
 // Asks for the status.
@@ -647,3 +651,13 @@ message RelocateLibraryRequest {
 
 // The library, scanning at its new root; while it scans already, failed_precondition `library.scanning`.
 message RelocateLibraryResponse {}
+
+// Which library, and the quality its universal JPEG gets.
+message SetRenditionQualityRequest {
+  string library_id = 1;
+  // `high` or `standard`.
+  string quality = 2;
+}
+
+// The library's previews are rendered again.
+message SetRenditionQualityResponse {}

@@ -3155,6 +3155,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get timelineExcluded => 'In an excluded folder';
 
   @override
+  String get timelineNoHeicLinux =>
+      'Photolib can\'t show HEIC photos on this computer. Connect a Photolib server to see its copy, or open them on a Mac.';
+
+  @override
+  String get timelineNoHeicWindows =>
+      'Photolib can\'t show HEIC photos on this PC. Connect a Photolib server to see its copy, or open them on a Mac.';
+
+  @override
   String get timelineScrubber => 'Scroll by date';
 
   @override
@@ -6747,6 +6755,14 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get timelineExcluded => '[Îñ åñ éẋçļûðéð ƒöļðéŕ one two three]';
+
+  @override
+  String get timelineNoHeicLinux =>
+      '[Þĥöţöļîƀ çåñ\'ţ šĥöŵ ĤÉÎÇ þĥöţöš öñ ţĥîš çöɱþûţéŕ. Çöññéçţ å Þĥöţöļîƀ šéŕṽéŕ ţö šéé îţš çöþý, öŕ öþéñ ţĥéɱ öñ å Ṁåç. one two three four five six seven one two three]';
+
+  @override
+  String get timelineNoHeicWindows =>
+      '[Þĥöţöļîƀ çåñ\'ţ šĥöŵ ĤÉÎÇ þĥöţöš öñ ţĥîš ÞÇ. Çöññéçţ å Þĥöţöļîƀ šéŕṽéŕ ţö šéé îţš çöþý, öŕ öþéñ ţĥéɱ öñ å Ṁåç. one two three four five six seven one two three]';
 
   @override
   String get timelineScrubber => '[Šçŕöļļ ƀý ðåţé one two]';
