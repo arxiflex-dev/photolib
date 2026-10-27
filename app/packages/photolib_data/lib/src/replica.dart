@@ -6,17 +6,20 @@ import 'package:photolib_data/src/replica.steps.dart';
 
 part 'replica.g.dart';
 
-/// Schema 21's own visibility of a folder from schema 20's two lists, the mode's list first (ADR-0290).
+/// Schema 21's own visibility of a folder from schema 20's two lists, the
+/// mode's list first (ADR-0290).
 const visibilityFromLists =
     'CASE WHEN chosen AND (NOT excluded OR '
     "(SELECT only_chosen FROM device_folder_mode)) THEN 'shown' "
     "WHEN excluded THEN 'hidden' ELSE 'inherit' END";
 
-/// Gives a folder on neither list, whose inherited value is not what the mode showed of it, that value as its own.
+/// Gives a folder on neither list, whose inherited value is not what the mode
+/// showed of it, that value as its own.
 const keepModeVisibility =
-    "UPDATE device_folder SET visibility = IIF(EXISTS (SELECT 1 FROM device_folder_mode WHERE only_chosen), 'hidden', 'shown') "
-    "WHERE visibility = 'inherit' AND (id IN (SELECT id FROM excluded_folder)) <> "
-    'EXISTS (SELECT 1 FROM device_folder_mode WHERE only_chosen)';
+    'UPDATE device_folder SET visibility = IIF($_chosen, '
+    "'hidden', 'shown') WHERE visibility = 'inherit' "
+    'AND (id IN (SELECT id FROM excluded_folder)) <> $_chosen';
+const _chosen = 'EXISTS (SELECT 1 FROM device_folder_mode WHERE only_chosen)';
 
 /// The local replica (docs/10-client-app.md §2), defined in replica.drift.
 @DriftDatabase(include: {'replica.drift'})

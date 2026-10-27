@@ -103,7 +103,8 @@ Future<void> upgradeKeepingLocalOnly(
             for (final c in saved)
               if (current.contains(c)) c,
           ];
-          // Schema 21 replaced the two folder lists by one column: map them rather than leave the default.
+          // Schema 21 made the two folder lists one column: map them,
+          // not leave the default.
           final lists =
               name == 'device_folder' &&
               !saved.contains('visibility') &&
