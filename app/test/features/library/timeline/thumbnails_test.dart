@@ -44,7 +44,7 @@ void main() {
     );
   });
 
-  test('the defaults are the design\'s: cores − 1 decodes at once, and '
+  test('the defaults are the design\'s: cores − 1 (two at least) decodes at once, and '
       'memory for images by RAM', () {
     List<int> mib(List<int> gib, {required bool phone}) => [
       for (final g in gib) memoryCacheBytes(g << 30, phone: phone) >> 20,
@@ -53,12 +53,34 @@ void main() {
     expect(mib([4, 8, 16, 64], phone: false), [128, 256, 512, 512]);
     expect(memoryCacheBytes(null, phone: false), 128 << 20);
     final thumbnails = Thumbnails(source);
-    expect(thumbnails.concurrency, max(1, Platform.numberOfProcessors - 1));
+    expect(thumbnails.concurrency, max(2, Platform.numberOfProcessors - 1));
     expect(
       thumbnails.maxBytes,
       memoryCacheBytes(physicalMemory(), phone: true),
       reason: 'tests run as Android',
     );
+  });
+
+  test('a machine of one or two cores still decodes two at once, so that '
+      'one slow decode does not hold every cell', () async {
+    final cores = Thumbnails.processors;
+    addTearDown(() => Thumbnails.processors = cores);
+    Thumbnails.processors = () => 4;
+    expect(Thumbnails(source).concurrency, 3);
+    for (final count in [1, 2, 3]) {
+      Thumbnails.processors = () => count;
+      expect(Thumbnails(source).concurrency, 2, reason: '$count cores');
+    }
+    Thumbnails.processors = () => 2;
+    final thumbnails = Thumbnails(source)..focus(0, 3, forward: true);
+    for (final asset in [0, 1]) {
+      thumbnails.want(asset, 256, () {}, at: asset);
+    }
+    await pumpEventQueue();
+    expect(started, [0, 1], reason: 'the first decode never ends');
+    decodes[1]!.complete(image(256));
+    await pumpEventQueue();
+    expect(thumbnails.get(1, 256), isNotNull);
   });
 
   test('decodes the visible cells, the newest requests first, then two '

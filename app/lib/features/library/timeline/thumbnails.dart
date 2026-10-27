@@ -171,8 +171,9 @@ bool _before(int distance, _Request request, _Wanted other) =>
 /// its cells and is retried once, when its row is next shown; one [Pending]
 /// rests, unmarked, 1 s, then twice as long each time up to a minute, and is
 /// asked for again while wanted. By default as
-/// many decode at once as native decoder pools have threads, cores − 1, and
-/// four on the web (ADR-0040).
+/// many decode at once as native decoder pools have threads, cores − 1 but at
+/// least two (one slow decode must not hold every cell), and four on the web
+/// (ADR-0040).
 class Thumbnails {
   Thumbnails(
     this.source, {
@@ -183,7 +184,7 @@ class Thumbnails {
     this.cached,
     this.onError,
     this.onTile,
-  }) : concurrency = concurrency ?? (kIsWeb ? 4 : max(1, processors() - 1)),
+  }) : concurrency = concurrency ?? (kIsWeb ? 4 : max(2, processors() - 1)),
        maxBytes =
            maxBytes ??
            memoryCacheBytes(
