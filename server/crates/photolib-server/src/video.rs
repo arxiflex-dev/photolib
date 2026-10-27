@@ -33,6 +33,7 @@ pub fn renditions() -> Vec<Rendition> {
             kind: "video".into(),
             role: (*role).into(),
             spec_id: spec(role).unwrap()["spec_id"].as_str().unwrap().into(),
+            only_for: None,
         })
         .collect()
 }

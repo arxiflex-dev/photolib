@@ -805,6 +805,48 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/photolib.api.v1.ScanLibraryResponse'
+  /photolib.api.v1.AdminService/SetRenditionQuality:
+    post:
+      tags:
+        - photolib.api.v1.AdminService
+      summary: SetRenditionQuality
+      description: |-
+        Sets how big the universal JPEG of a library's stills is (M2-49): `high` (the default) is as big as the original,
+         `standard` is 2160 px for a small disk. The reconciler renders every preview of the library again. No such library
+         is not_found `library.not_found`; any other quality is invalid_argument `field.invalid` on `quality`.
+      operationId: photolib.api.v1.AdminService.SetRenditionQuality
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/photolib.api.v1.SetRenditionQualityRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/photolib.api.v1.SetRenditionQualityResponse'
   /photolib.api.v1.AdminService/TailLogs:
     post:
       tags:
@@ -5551,6 +5593,24 @@ components:
       title: SetFaceConsentResponse
       additionalProperties: false
       description: The account's state after the change.
+    photolib.api.v1.SetRenditionQualityRequest:
+      type: object
+      properties:
+        libraryId:
+          type: string
+          title: library_id
+        quality:
+          type: string
+          title: quality
+          description: '`high` or `standard`.'
+      title: SetRenditionQualityRequest
+      additionalProperties: false
+      description: Which library, and the quality its universal JPEG gets.
+    photolib.api.v1.SetRenditionQualityResponse:
+      type: object
+      title: SetRenditionQualityResponse
+      additionalProperties: false
+      description: The library's previews are rendered again.
     photolib.api.v1.Settings:
       type: object
       properties:

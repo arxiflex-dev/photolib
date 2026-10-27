@@ -1524,6 +1524,30 @@ const RelocateLibraryResponse$json = {
 final $typed_data.Uint8List relocateLibraryResponseDescriptor =
     $convert.base64Decode('ChdSZWxvY2F0ZUxpYnJhcnlSZXNwb25zZQ==');
 
+@$core.Deprecated('Use setRenditionQualityRequestDescriptor instead')
+const SetRenditionQualityRequest$json = {
+  '1': 'SetRenditionQualityRequest',
+  '2': [
+    {'1': 'library_id', '3': 1, '4': 1, '5': 9, '10': 'libraryId'},
+    {'1': 'quality', '3': 2, '4': 1, '5': 9, '10': 'quality'},
+  ],
+};
+
+/// Descriptor for `SetRenditionQualityRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List setRenditionQualityRequestDescriptor =
+    $convert.base64Decode(
+        'ChpTZXRSZW5kaXRpb25RdWFsaXR5UmVxdWVzdBIdCgpsaWJyYXJ5X2lkGAEgASgJUglsaWJyYX'
+        'J5SWQSGAoHcXVhbGl0eRgCIAEoCVIHcXVhbGl0eQ==');
+
+@$core.Deprecated('Use setRenditionQualityResponseDescriptor instead')
+const SetRenditionQualityResponse$json = {
+  '1': 'SetRenditionQualityResponse',
+};
+
+/// Descriptor for `SetRenditionQualityResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List setRenditionQualityResponseDescriptor =
+    $convert.base64Decode('ChtTZXRSZW5kaXRpb25RdWFsaXR5UmVzcG9uc2U=');
+
 const $core.Map<$core.String, $core.dynamic> AdminServiceBase$json = {
   '1': 'AdminService',
   '2': [
@@ -1642,6 +1666,11 @@ const $core.Map<$core.String, $core.dynamic> AdminServiceBase$json = {
       '2': '.photolib.api.v1.RelocateLibraryRequest',
       '3': '.photolib.api.v1.RelocateLibraryResponse'
     },
+    {
+      '1': 'SetRenditionQuality',
+      '2': '.photolib.api.v1.SetRenditionQualityRequest',
+      '3': '.photolib.api.v1.SetRenditionQualityResponse'
+    },
   ],
 };
 
@@ -1714,6 +1743,10 @@ const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>>
   '.photolib.api.v1.HintPathsResponse': HintPathsResponse$json,
   '.photolib.api.v1.RelocateLibraryRequest': RelocateLibraryRequest$json,
   '.photolib.api.v1.RelocateLibraryResponse': RelocateLibraryResponse$json,
+  '.photolib.api.v1.SetRenditionQualityRequest':
+      SetRenditionQualityRequest$json,
+  '.photolib.api.v1.SetRenditionQualityResponse':
+      SetRenditionQualityResponse$json,
 };
 
 /// Descriptor for `AdminService`. Decode as a `google.protobuf.ServiceDescriptorProto`.
@@ -1755,4 +1788,7 @@ final $typed_data.Uint8List adminServiceDescriptor = $convert.base64Decode(
     'cGhvdG9saWIuYXBpLnYxLkNvbmZpcm1TY2FuUmVzcG9uc2USUgoJSGludFBhdGhzEiEucGhvdG'
     '9saWIuYXBpLnYxLkhpbnRQYXRoc1JlcXVlc3QaIi5waG90b2xpYi5hcGkudjEuSGludFBhdGhz'
     'UmVzcG9uc2USZAoPUmVsb2NhdGVMaWJyYXJ5EicucGhvdG9saWIuYXBpLnYxLlJlbG9jYXRlTG'
-    'licmFyeVJlcXVlc3QaKC5waG90b2xpYi5hcGkudjEuUmVsb2NhdGVMaWJyYXJ5UmVzcG9uc2U=');
+    'licmFyeVJlcXVlc3QaKC5waG90b2xpYi5hcGkudjEuUmVsb2NhdGVMaWJyYXJ5UmVzcG9uc2US'
+    'cAoTU2V0UmVuZGl0aW9uUXVhbGl0eRIrLnBob3RvbGliLmFwaS52MS5TZXRSZW5kaXRpb25RdW'
+    'FsaXR5UmVxdWVzdBosLnBob3RvbGliLmFwaS52MS5TZXRSZW5kaXRpb25RdWFsaXR5UmVzcG9u'
+    'c2U=');

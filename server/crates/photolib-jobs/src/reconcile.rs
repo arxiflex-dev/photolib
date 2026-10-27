@@ -13,6 +13,8 @@ pub struct Rendition {
     pub kind: String,
     pub role: String,
     pub spec_id: String,
+    /// The library rendition quality (`libraries.rendition_quality`) this rendition is for; none for every library.
+    pub only_for: Option<String>,
 }
 
 /// The derivatives the server wants: renditions, and an embedding by each active model.
@@ -53,6 +55,7 @@ async fn queue(conn: &mut PgConnection, profile: &Profile, only: Option<&[Uuid]>
     let kinds: Vec<&str> = renditions.iter().map(|r| r.kind.as_str()).collect();
     let roles: Vec<&str> = renditions.iter().map(|r| r.role.as_str()).collect();
     let specs: Vec<&str> = renditions.iter().map(|r| r.spec_id.as_str()).collect();
+    let qualities: Vec<&str> = renditions.iter().map(|r| r.only_for.as_deref().unwrap_or("")).collect();
     let ids: Vec<Uuid> = sqlx::query_scalar(RECONCILE)
         .bind(&kinds)
         .bind(&roles)
@@ -62,6 +65,7 @@ async fn queue(conn: &mut PgConnection, profile: &Profile, only: Option<&[Uuid]>
         .bind(only)
         .bind(&profile.ocr)
         .bind(&profile.export)
+        .bind(&qualities)
         .fetch_all(&mut *conn)
         .await?;
     if let Some(id) = ids.first() {
@@ -81,7 +85,8 @@ WITH desired AS (
         json_build_object('asset', a.id, 'role', s.role, 'spec_id', s.spec_id) AS payload
     FROM assets a
     JOIN libraries l ON l.id = a.library_id
-    JOIN unnest($1::text[], $2::text[], $3::text[]) AS s (kind, role, spec_id) ON s.kind = a.media_kind
+    JOIN unnest($1::text[], $2::text[], $3::text[], $9::text[]) AS s (kind, role, spec_id, only_for)
+        ON s.kind = a.media_kind AND (s.only_for = '' OR s.only_for = l.rendition_quality)
     WHERE ($6::uuid[] IS NULL OR a.id = ANY($6)) AND NOT EXISTS (
         SELECT FROM asset_files f WHERE f.asset_id = a.id AND f.role = s.role AND f.state = 'present'
             AND f.render_spec ->> 'spec_id' = s.spec_id
@@ -173,6 +178,7 @@ mod tests {
             kind: kind.into(),
             role: "thumb_s".into(),
             spec_id: "s1".into(),
+            only_for: None,
         };
         Profile {
             renditions: vec![rendition("image"), rendition("video")],
@@ -353,6 +359,7 @@ mod tests {
                 kind: "image".into(),
                 role: "thumb_s".into(),
                 spec_id: "s1".into(),
+                only_for: None,
             }],
             ocr: vec!["ppocr-v5".into()],
             export: Some("x1".into()),

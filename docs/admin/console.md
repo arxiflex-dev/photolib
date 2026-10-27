@@ -52,6 +52,9 @@ configuration's [`external_roots`](configuration.md#external-libraries) and over
 at once. *Scan now* looks for new, moved and missing files. With the API you can also set how many files and bytes
 per second it may read (`CreateExternalLibrary`), hide what a held scan did not find with the token its status shows
 (`ConfirmScan`), announce new files (`HintPaths`) and move a library to its share's new path (`RelocateLibrary`).
+A library's previews, the JPEGs that clients which cannot decode a HEIC or RAW show, are as big as the original by
+default (`high`); `SetRenditionQuality` makes them 2160 px (`standard`) for a library on a small disk and renders them
+again ([ADR-0405](../adr/0405-rendition-quality-and-desktop-heic-placeholders.md)).
 
 ## Capability switches
 

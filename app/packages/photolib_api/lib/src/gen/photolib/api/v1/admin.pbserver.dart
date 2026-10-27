@@ -67,6 +67,8 @@ abstract class AdminServiceBase extends $pb.GeneratedService {
       $pb.ServerContext ctx, $1.HintPathsRequest request);
   $async.Future<$1.RelocateLibraryResponse> relocateLibrary(
       $pb.ServerContext ctx, $1.RelocateLibraryRequest request);
+  $async.Future<$1.SetRenditionQualityResponse> setRenditionQuality(
+      $pb.ServerContext ctx, $1.SetRenditionQualityRequest request);
 
   $pb.GeneratedMessage createRequest($core.String methodName) {
     switch (methodName) {
@@ -116,6 +118,8 @@ abstract class AdminServiceBase extends $pb.GeneratedService {
         return $1.HintPathsRequest();
       case 'RelocateLibrary':
         return $1.RelocateLibraryRequest();
+      case 'SetRenditionQuality':
+        return $1.SetRenditionQualityRequest();
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }
@@ -171,6 +175,9 @@ abstract class AdminServiceBase extends $pb.GeneratedService {
         return hintPaths(ctx, request as $1.HintPathsRequest);
       case 'RelocateLibrary':
         return relocateLibrary(ctx, request as $1.RelocateLibraryRequest);
+      case 'SetRenditionQuality':
+        return setRenditionQuality(
+            ctx, request as $1.SetRenditionQualityRequest);
       default:
         throw $core.ArgumentError('Unknown method: $methodName');
     }

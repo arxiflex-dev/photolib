@@ -999,6 +999,7 @@ mod tests {
                     kind: kind.into(),
                     role: "thumb_s".into(),
                     spec_id: "s1".into(),
+                    only_for: None,
                 })
                 .into(),
             models: vec![],
@@ -1256,6 +1257,7 @@ mod tests {
             kind: "image".into(),
             role: "thumb_s".into(),
             spec_id: "s1".into(),
+            only_for: None,
         };
         let profile = Profile {
             renditions: vec![image],

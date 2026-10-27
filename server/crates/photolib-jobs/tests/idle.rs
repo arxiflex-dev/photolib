@@ -75,6 +75,7 @@ async fn an_idle_server_writes_nothing_for_ten_minutes() {
             kind: "image".into(),
             role: "thumb_s".into(),
             spec_id: "s1".into(),
+            only_for: None,
         }],
         models: vec!["clip@1".into()],
         ocr: vec![],

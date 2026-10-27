@@ -4832,6 +4832,132 @@ class RelocateLibraryResponse extends $pb.GeneratedMessage {
   static RelocateLibraryResponse? _defaultInstance;
 }
 
+/// Which library, and the quality its universal JPEG gets.
+class SetRenditionQualityRequest extends $pb.GeneratedMessage {
+  factory SetRenditionQualityRequest({
+    $core.String? libraryId,
+    $core.String? quality,
+  }) {
+    final result = SetRenditionQualityRequest._();
+    if (libraryId != null) result.libraryId = libraryId;
+    if (quality != null) result.quality = quality;
+    return result;
+  }
+
+  SetRenditionQualityRequest._();
+
+  factory SetRenditionQualityRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SetRenditionQualityRequest()..mergeFromBuffer(data, registry);
+  factory SetRenditionQualityRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SetRenditionQualityRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'SetRenditionQualityRequest',
+      package:
+          const $pb.PackageName(_omitMessageNames ? '' : 'photolib.api.v1'),
+      createEmptyInstance: SetRenditionQualityRequest.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'libraryId')
+    ..aOS(2, _omitFieldNames ? '' : 'quality')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SetRenditionQualityRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SetRenditionQualityRequest copyWith(
+          void Function(SetRenditionQualityRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as SetRenditionQualityRequest))
+          as SetRenditionQualityRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use SetRenditionQualityRequest() / SetRenditionQualityRequest.new instead')
+  static SetRenditionQualityRequest create() => SetRenditionQualityRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      SetRenditionQualityRequest._();
+  @$core.override
+  SetRenditionQualityRequest createEmptyInstance() =>
+      SetRenditionQualityRequest._();
+  @$core.pragma('dart2js:noInline')
+  static SetRenditionQualityRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<SetRenditionQualityRequest>(
+          SetRenditionQualityRequest.$_createMessage);
+  static SetRenditionQualityRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get libraryId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set libraryId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasLibraryId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearLibraryId() => $_clearField(1);
+
+  /// `high` or `standard`.
+  @$pb.TagNumber(2)
+  $core.String get quality => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set quality($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasQuality() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearQuality() => $_clearField(2);
+}
+
+/// The library's previews are rendered again.
+class SetRenditionQualityResponse extends $pb.GeneratedMessage {
+  factory SetRenditionQualityResponse() => SetRenditionQualityResponse._();
+
+  SetRenditionQualityResponse._();
+
+  factory SetRenditionQualityResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SetRenditionQualityResponse()..mergeFromBuffer(data, registry);
+  factory SetRenditionQualityResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SetRenditionQualityResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'SetRenditionQualityResponse',
+      package:
+          const $pb.PackageName(_omitMessageNames ? '' : 'photolib.api.v1'),
+      createEmptyInstance: SetRenditionQualityResponse.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SetRenditionQualityResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SetRenditionQualityResponse copyWith(
+          void Function(SetRenditionQualityResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as SetRenditionQualityResponse))
+          as SetRenditionQualityResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use SetRenditionQualityResponse() / SetRenditionQualityResponse.new instead')
+  static SetRenditionQualityResponse create() =>
+      SetRenditionQualityResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      SetRenditionQualityResponse._();
+  @$core.override
+  SetRenditionQualityResponse createEmptyInstance() =>
+      SetRenditionQualityResponse._();
+  @$core.pragma('dart2js:noInline')
+  static SetRenditionQualityResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<SetRenditionQualityResponse>(
+          SetRenditionQualityResponse.$_createMessage);
+  static SetRenditionQualityResponse? _defaultInstance;
+}
+
 /// Runs the server, for its administrators: the admin console (OPS-02). Changes are recorded in the audit log.
 class AdminServiceApi {
   final $pb.RpcClient _client;
@@ -4989,6 +5115,14 @@ class AdminServiceApi {
           $pb.ClientContext? ctx, RelocateLibraryRequest request) =>
       _client.invoke<RelocateLibraryResponse>(ctx, 'AdminService',
           'RelocateLibrary', request, RelocateLibraryResponse());
+
+  /// Sets how big the universal JPEG of a library's stills is (M2-49): `high` (the default) is as big as the original,
+  /// `standard` is 2160 px for a small disk. The reconciler renders every preview of the library again. No such library
+  /// is not_found `library.not_found`; any other quality is invalid_argument `field.invalid` on `quality`.
+  $async.Future<SetRenditionQualityResponse> setRenditionQuality(
+          $pb.ClientContext? ctx, SetRenditionQualityRequest request) =>
+      _client.invoke<SetRenditionQualityResponse>(ctx, 'AdminService',
+          'SetRenditionQuality', request, SetRenditionQualityResponse());
 }
 
 const $core.bool _omitFieldNames =
