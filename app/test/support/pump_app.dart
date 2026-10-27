@@ -42,6 +42,20 @@ extension SettledTap on WidgetTester {
     await pumpAndSettle();
   }
 
+  /// Taps the selection bar's action [tooltip], in the bar's `More` menu when
+  /// the window is too narrow to hold it.
+  Future<void> tapAction(String tooltip) async {
+    final button = find.byTooltip(tooltip);
+    if (button.evaluate().isNotEmpty) {
+      await tap(button.last);
+    } else {
+      await tap(find.byTooltip('More'));
+      await pumpAndSettle();
+      await tap(find.text(tooltip));
+    }
+    await pumpAndSettle();
+  }
+
   /// Scrolls the page to [finder], which a long list such as Settings builds
   /// only near the screen, and lays the jump out before anything taps it.
   Future<void> scrollTo(Finder finder) async {
@@ -102,6 +116,12 @@ Future<void> pumpApp(
   tester.view.physicalSize = size * dpr;
   tester.view.devicePixelRatio = dpr;
   addTearDown(tester.view.reset);
+  // Last in, first out: the app is gone, and its streams with it, before a
+  // test's `tearDown` closes the database they read, which waits for them.
+  addTearDown(() async {
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(Duration.zero);
+  });
   if (locales != null) {
     tester.platformDispatcher.localesTestValue = locales;
     addTearDown(tester.platformDispatcher.clearLocalesTestValue);

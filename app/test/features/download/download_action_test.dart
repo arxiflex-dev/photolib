@@ -149,7 +149,7 @@ void main() {
       'own names', (tester) async {
     await pump(tester);
     await selectAll(tester);
-    await tester.tap(find.byTooltip('Download'));
+    await tester.tapAction('Download');
     await settle(tester);
     final MapEntry(key: name, value: zip) = to.saved.entries.single;
     expect(name, matches(RegExp(r'^Photolib .*\.zip$')));
@@ -176,7 +176,7 @@ void main() {
       },
     );
     await selectAll(tester);
-    await tester.tap(find.byTooltip('Download'));
+    await tester.tapAction('Download');
     await settle(tester);
     expect(find.text('Which version?'), findsNothing);
     expect(reads, 4);
@@ -236,7 +236,7 @@ void main() {
     await tester.longPress(find.text('3.jpg'));
     await tester.pumpAndSettle();
     await tester.tapAndSettle(find.text('1.jpg'));
-    await tester.tap(find.byTooltip('Download'));
+    await tester.tapAction('Download');
     await settle(tester);
     final zip = utf8.decode(
       to.saved.values.single as List<int>,
@@ -262,7 +262,7 @@ void main() {
       ),
     );
     await selectAll(tester);
-    await tester.tap(find.byTooltip('Download'));
+    await tester.tapAction('Download');
     await settle(tester, animating: true);
     await settle(tester, animating: true);
     expect(find.text('Downloading 4 items'), findsOneWidget);
@@ -333,7 +333,7 @@ void main() {
         await tester.pumpAndSettle();
       }
       if (asks) {
-        await tester.tap(find.byTooltip('Download'));
+        await tester.tapAction('Download');
       } else {
         await fromMenu(tester, 'Download');
       }
@@ -386,7 +386,7 @@ void main() {
       await pump(tester, source: ios ? 'photokit' : 'mediastore');
       await selectAll(tester);
       expect(find.byTooltip('Download'), findsNothing);
-      await tester.tap(find.byTooltip('Share'));
+      await tester.tapAction('Share');
       await settle(tester);
       expect(
         [
@@ -439,7 +439,7 @@ void main() {
       });
       await pump(tester, source: 'photokit');
       await selectAll(tester);
-      await tester.tap(find.byTooltip('Share'));
+      await tester.tapAction('Share');
       await settle(tester, animating: true);
       await settle(tester, animating: true);
       expect(find.text('Downloading 4 items'), findsOneWidget);
@@ -470,7 +470,7 @@ void main() {
     );
     await pump(tester, source: 'photokit');
     await selectAll(tester);
-    await tester.tap(find.byTooltip('Share'));
+    await tester.tapAction('Share');
     await settle(tester);
     expect(
       find.text('Too large to share at once: select fewer items'),
@@ -548,7 +548,7 @@ void main() {
       await pump(tester, source: source);
       await selectAll(tester);
       expect(find.text('501 selected'), findsOneWidget);
-      await tester.tap(find.byTooltip('Share'));
+      await tester.tapAction('Share');
       await settle(tester);
       expect(calls, isEmpty);
       expect(

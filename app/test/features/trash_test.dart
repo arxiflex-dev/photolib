@@ -85,7 +85,7 @@ void main() {
     await pump(tester);
     await tester.longPressAt(cell(tester, 0));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Move to trash'));
+    await tester.tapAction('Move to trash');
     await tester.pumpAndSettle();
     expect(find.byType(AlertDialog), findsNothing);
     expect(platform.calls, ['trash 2']);
@@ -105,7 +105,7 @@ void main() {
     await pump(tester);
     await tester.longPressAt(cell(tester, 0));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Move to trash'));
+    await tester.tapAction('Move to trash');
     await tester.pumpAndSettle();
     expect(platform.calls, ['trash 1']);
     expect(find.text('1 item moved to the trash'), findsOneWidget);
@@ -120,7 +120,7 @@ void main() {
     await pump(tester);
     await tester.longPressAt(cell(tester, 0));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Favourite'));
+    await tester.tapAction('Favourite');
     await tester.pumpAndSettle();
     expect(platform.calls, ['favorite true 1']);
     // The timeline follows the index at most once a second.
@@ -255,6 +255,65 @@ void main() {
     expect(find.byType(AlertDialog), findsNothing);
     expect(platform.calls, ['restore 1', 'purge 2']);
     expect(find.text('The trash is empty'), findsOneWidget);
+    await unmount(tester);
+  });
+
+  testWidgets('the time Photolib keeps its trash is the setting: the header '
+      'says it and an item trashed now expires then', (tester) async {
+    await add(1);
+    await pumpApp(
+      tester,
+      replica: (_) => db,
+      settings: MemoryStore('{"trashDays":30}'),
+      overrides: [
+        thumbnailPipelineProvider.overrideWith(
+          (ref) async => ThumbnailPipeline(),
+        ),
+        mediaPlatformProvider.overrideWithValue((_) => platform),
+      ],
+    );
+    final before = DateTime.now();
+    await tester.longPressAt(cell(tester, 0));
+    await tester.pumpAndSettle();
+    await tester.tapAction('Move to trash');
+    await tester.pumpAndSettle();
+    final expires = (await db.trashItems(true).get()).single.expires!;
+    final days = DateTime.fromMillisecondsSinceEpoch(expires)
+        .difference(before)
+        .inHours;
+    expect(days, inInclusiveRange(30 * 24 - 1, 30 * 24 + 1));
+    await tester.tap(find.byTooltip('Trash'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('after 30 days'), findsOneWidget);
+    expect(find.text('30 days left'), findsOneWidget);
+    await unmount(tester);
+  });
+
+  testWidgets('an entry the platform keeps no longer, as its time went by, '
+      'is removed from the list without asking the platform', (tester) async {
+    platform = FakePlatform(expires: true);
+    final in3Days = DateTime.now()
+        .add(const Duration(days: 2, hours: 12))
+        .millisecondsSinceEpoch;
+    await add(1, trashed: 1, expires: 1);
+    await add(2, trashed: 1, expires: in3Days);
+    await pump(tester);
+    await tester.tap(find.byTooltip('Trash'));
+    await tester.pumpAndSettle();
+    expect(find.text('Remove from list'), findsNothing);
+    await tester.tap(find.text('3 days left'));
+    await tester.pumpAndSettle();
+    expect(find.text('Remove from list'), findsNothing, reason: 'it is held');
+    await tester.tap(find.text('3 days left'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Deleted forever today'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Remove from list'));
+    await tester.pumpAndSettle();
+    expect(find.text('Deleted forever today'), findsNothing);
+    expect(find.text('3 days left'), findsOneWidget);
+    expect(platform.calls, isEmpty);
+    expect(await db.trashItems(true).get(), hasLength(1));
     await unmount(tester);
   });
 

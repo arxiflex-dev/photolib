@@ -2947,6 +2947,10 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get settingsTrashKeep =>
+      'المدة التي يحتفظ بها Photolib بالعناصر في سلة المهملات';
+
+  @override
   String get settingsViewerBar => 'الأزرار في شريط العارض';
 
   @override
@@ -3355,6 +3359,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get trashEmptyAll => 'إفراغ سلة المهملات';
 
   @override
+  String trashKeepDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    return '$daysString يومًا';
+  }
+
+  @override
   String trashMoved(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -3372,6 +3386,9 @@ class AppLocalizationsAr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get trashRemoveGone => 'إزالة من القائمة';
 
   @override
   String trashRetention(int days) {
@@ -6502,6 +6519,10 @@ class AppLocalizationsArXb extends AppLocalizationsAr {
   }
 
   @override
+  String get settingsTrashKeep =>
+      '‏How long Photolib keeps items in its trash‏';
+
+  @override
   String get settingsViewerBar => '‏Buttons in the viewer\'s bar‏';
 
   @override
@@ -6896,6 +6917,16 @@ class AppLocalizationsArXb extends AppLocalizationsAr {
   String get trashEmptyAll => '‏Empty trash‏';
 
   @override
+  String trashKeepDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    return '$daysString‏ days‏';
+  }
+
+  @override
   String trashMoved(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -6909,6 +6940,9 @@ class AppLocalizationsArXb extends AppLocalizationsAr {
     );
     return '$_temp0';
   }
+
+  @override
+  String get trashRemoveGone => '‏Remove from list‏';
 
   @override
   String trashRetention(int days) {
