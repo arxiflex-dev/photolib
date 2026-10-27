@@ -23,7 +23,7 @@ queue pushes (`dev` plus the queued pull requests), never on a pull request or a
 * `connect_conformance.sh <dir>`: official Connect suite for the crate's `connect-conformance.yaml`, in the rust gate.
   It, `codegen.sh`, `promtool.sh`, `proxies.sh`, `video/ffmpeg.sh` (LGPL FFmpeg; `--libs` for Firefox in `video/play.mjs`)
   and `ml/fetch.py` (ONNX Runtime, models of `ml/artefacts.json`) cache pinned tools via `fetch_release.sh` (SHA-256).
-* `android_sdk.sh <package>...`: Android SDK packages for `.github/actions/android-sdk`; `windows/`: the [standalone Windows zip](../docs/adr/0404-standalone-windows-client.md).
+* `android_sdk.sh <package>...`: Android SDK packages for `.github/actions/android-sdk`; `windows/`: ADR-0404's zip.
 * `smoke.sh`, then `package.sh` (AppImage, DMG, MSIX), `flutter_upgrade_gate.py` (gate `commits` part), `web_requests.py`
   (`dart` part: web builds in Chrome and Firefox under photolibd's CSP, after `web_probe/`): [Flutter checks](../docs/dev/flutter.md).
 * `synthlib/`: [seeded test libraries](synthlib/README.md); `timeline_bench.py` times the [timeline](../docs/dev/timeline-spike.md).
