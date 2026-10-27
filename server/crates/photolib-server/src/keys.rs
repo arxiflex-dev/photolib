@@ -236,7 +236,9 @@ pub async fn host_api_key(
         .create(user, key)
         .await
         .map_err(|error| format!("cannot make the key: {error:?}"))?;
-    Ok(format!("An API key for {handle}, valid for {days} days; it is shown once:\n{secret}"))
+    Ok(format!(
+        "An API key for {handle}, valid for {days} days; it is shown once:\n{secret}"
+    ))
 }
 
 /// The role `users.role` names; an unknown one gets the fewest rights.

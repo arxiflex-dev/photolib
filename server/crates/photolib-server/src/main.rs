@@ -185,14 +185,17 @@ fn main() -> ExitCode {
             .block_on(auth::host_password_setup(&config, &handle))
             .map(|setup| println!("{setup}")),
         Some(Command::Admin {
-            action: Admin::ApiKey {
-                handle,
-                name,
-                scopes,
-                days,
-            },
+            action:
+                Admin::ApiKey {
+                    handle,
+                    name,
+                    scopes,
+                    days,
+                },
         }) => runtime
-            .block_on(photolib_server::keys::host_api_key(&config, &handle, &name, &scopes, days))
+            .block_on(photolib_server::keys::host_api_key(
+                &config, &handle, &name, &scopes, days,
+            ))
             .map(|key| println!("{key}")),
         Some(Command::Models { action }) => models(&config, action, &runtime),
         Some(Command::MediaChild { .. }) => unreachable!("handled before the runtime starts"),

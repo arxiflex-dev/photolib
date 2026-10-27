@@ -731,12 +731,22 @@ async fn a_new_instance_logs_a_one_time_token_whose_admin_sets_a_password_and_si
     sign_in(addr, "root", b"new");
     // A script has no OPAQUE client: whoever runs the host makes it an API key, shown once.
     let (code, out) = command(&config, &["admin", "api-key", "nobody"]);
-    assert_eq!((code, out.contains("no active account is nobody")), (Some(1), true), "{out}");
+    assert_eq!(
+        (code, out.contains("no active account is nobody")),
+        (Some(1), true),
+        "{out}"
+    );
     let (code, out) = command(&config, &["admin", "api-key", "root", "--scope", "everything"]);
     assert_eq!((code, out.contains("everything")), (Some(1), true), "{out}");
-    let (code, out) = command(&config, &["admin", "api-key", "root", "--scope", "manage_users", "--days", "30"]);
+    let (code, out) = command(
+        &config,
+        &["admin", "api-key", "root", "--scope", "manage_users", "--days", "30"],
+    );
     assert_eq!(code, Some(0), "{out}");
-    let secret = out.lines().find(|line| line.starts_with("plk_")).unwrap_or_else(|| panic!("{out}"));
+    let secret = out
+        .lines()
+        .find(|line| line.starts_with("plk_"))
+        .unwrap_or_else(|| panic!("{out}"));
     let users = rpc(addr, "UserService/ListUsers", Some(secret), json!({}));
     assert_eq!(users["users"][0]["handle"], "root", "{users}");
     stop(child);

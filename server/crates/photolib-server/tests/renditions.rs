@@ -1066,6 +1066,11 @@ impl Instance {
 
     /// Runs ingest and rendering with `specs` until no job is left.
     async fn work(&self, specs: Vec<Spec>) {
+        self.work_at(specs, 4).await;
+    }
+
+    /// [`Self::work`] with `jobs` running at once.
+    async fn work_at(&self, specs: Vec<Spec>, jobs: usize) {
         let photolibd = PathBuf::from(PHOTOLIBD);
         let profile = render::profile(&specs);
         let libraries = Arc::new(Libraries::new(Duration::from_secs(30)));
@@ -1087,7 +1092,7 @@ impl Instance {
             ..Timing::default()
         };
         let shutdown = CancellationToken::new();
-        let worker = (JobWorker::new(self.pool.clone(), "test", 4, timing))
+        let worker = (JobWorker::new(self.pool.clone(), "test", jobs, timing))
             .handle(INGEST, ingest.unwrap())
             .handle(RENDER, render)
             .handle(FOLLOW, follow)
@@ -1962,4 +1967,46 @@ async fn an_edited_image_is_exported_in_full_with_its_metadata_and_how_the_edit_
         (checked.size.0, checked.size.1),
         "the edited size, in full"
     );
+}
+
+/// A small distinct JPEG per `seed`: its own colour and gradient, so that no two photos render to the same bytes.
+fn small_jpeg(seed: u8) -> Vec<u8> {
+    vips();
+    let pixels: Vec<u8> = (0..96 * 64)
+        .flat_map(|i| {
+            [
+                seed.wrapping_mul(37),
+                (i % 96) as u8 * 2,
+                seed.wrapping_mul(91).wrapping_add((i / 96) as u8),
+            ]
+        })
+        .collect();
+    rs_vips::VipsImage::new_from_memory_copy(&pixels, 96, 64, 3, rs_vips::enums::BandFormat::Uchar)
+        .and_then(|image| image.jpegsave_buffer())
+        .unwrap()
+}
+
+/// Photos rendered at once each get their own renditions: a pooled renderer goes back to the pool only after its
+/// output was read, so no job reads (or finds deleted) the files of another photo's job (PHO-243: 7 of 60 render jobs
+/// failed once with ENOENT or an integrity error, and the previews of 21 of 60 photos were another photo's).
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn photos_rendered_at_once_never_share_a_renderers_output_files() {
+    let at = instance().await;
+    for seed in 0..64u8 {
+        at.upload(&format!("DCIM/{seed}.jpg"), &small_jpeg(seed)).await;
+    }
+    at.work_at(render::specs(), 8).await;
+    let retried: i64 = sqlx::query_scalar("SELECT count(*) FROM jobs WHERE attempts > 1")
+        .fetch_one(&at.pool)
+        .await
+        .unwrap();
+    assert_eq!(retried, 0, "no render job needed a second attempt");
+    let shared: Vec<String> = sqlx::query_scalar(
+        "SELECT role || ' of ' || count(*) || ' photos' FROM asset_files WHERE render_spec IS NOT NULL
+         GROUP BY role, content_hash HAVING count(*) > 1",
+    )
+    .fetch_all(&at.pool)
+    .await
+    .unwrap();
+    assert!(shared.is_empty(), "photos with the same rendition bytes: {shared:?}");
 }
