@@ -891,6 +891,18 @@ class AppLocalizationsVi extends AppLocalizations {
   String get commandPaletteHint => 'Nhập lệnh';
 
   @override
+  String get dateFormatDefault => 'Mặc định theo ngôn ngữ';
+
+  @override
+  String get dateFormatDmy => 'Ngày-tháng-năm';
+
+  @override
+  String get dateFormatMdy => 'Tháng-ngày-năm';
+
+  @override
+  String get dateFormatYmd => 'Năm-tháng-ngày';
+
+  @override
   String deleteBoth(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -2811,6 +2823,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get settingsBackground => 'Phía sau ảnh trong suốt';
+
+  @override
+  String get settingsDateFormat => 'Định dạng ngày';
 
   @override
   String get settingsDefaultTab => 'Thư mục và album mở ở thẻ';

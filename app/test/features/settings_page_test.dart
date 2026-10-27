@@ -60,12 +60,12 @@ void main() {
       expect(starts, {for (final title in starts.keys) title: start});
     }
 
-    expectAligned(13);
+    expectAligned(14);
     answered.complete();
     await tester.pumpAndSettle();
     expect(find.text('photos.example.org'), findsOneWidget);
     // The server, one that adds another (ADR-0234) and private libraries.
-    expectAligned(15);
+    expectAligned(16);
   });
 
   testWidgets('each viewing choice has a switch, on or off as it is by '
