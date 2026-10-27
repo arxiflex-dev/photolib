@@ -16,6 +16,7 @@ import 'package:photolib/features/settings/settings.dart';
 import 'package:photolib/features/settings/store.dart';
 import 'package:photolib/features/viewer/toolbar.dart';
 import 'package:photolib/l10n/app_localizations.dart';
+import 'package:photolib/l10n/formats.dart';
 import 'package:photolib/l10n/locales.dart';
 import 'package:photolib/ui/adaptive.dart';
 import 'package:photolib/ui/tokens.dart';
@@ -44,6 +45,7 @@ class SettingsPage extends ConsumerWidget {
           children: [
             StoreBanner(margin: EdgeInsets.only(bottom: tokens.md)),
             const _Language(),
+            const _DateFormat(),
             SizedBox(height: tokens.sm),
             Text(strings.settingsTheme, style: textTheme.titleMedium),
             SizedBox(height: tokens.sm),
@@ -143,6 +145,61 @@ class _Language extends ConsumerWidget {
                 children: [
                   for (final locale in [null, ...launchLocales])
                     RadioListTile<Locale?>(value: locale, title: name(locale)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// How dates are ordered, whatever the language (ADR-0400): each choice with
+/// today's sample in the month names of the language shown.
+class _DateFormat extends ConsumerWidget {
+  const new();
+
+  static final _sample = DateTime(2025, 12, 24);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = AppLocalizations.of(context);
+    final chosen = ref.watch(settingsProvider.select((s) => s.dateFormat));
+    String name(DateOrder order) => switch (order) {
+      DateOrder.languageDefault => strings.dateFormatDefault,
+      DateOrder.dmy => strings.dateFormatDmy,
+      DateOrder.mdy => strings.dateFormatMdy,
+      DateOrder.ymd => strings.dateFormatYmd,
+    };
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: const Icon(Icons.calendar_today_outlined),
+      title: Text(strings.settingsDateFormat),
+      subtitle: Text(name(chosen)),
+      onTap: () => showDialog<void>(
+        context: context,
+        builder: (context) => SimpleDialog(
+          title: Text(strings.settingsDateFormat),
+          children: [
+            RadioGroup<DateOrder>(
+              groupValue: chosen,
+              onChanged: (order) {
+                if (order != null) {
+                  ref.read(settingsProvider.notifier).setDateFormat(order);
+                }
+                Navigator.pop(context);
+              },
+              child: Column(
+                children: [
+                  for (final order in DateOrder.values)
+                    RadioListTile<DateOrder>(
+                      value: order,
+                      title: Text(name(order)),
+                      subtitle: Text(
+                        Formats(strings, order: order).date(_sample),
+                      ),
+                    ),
                 ],
               ),
             ),

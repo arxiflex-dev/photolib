@@ -166,4 +166,91 @@ void main() {
     await tester.pumpWidget(const SizedBox());
     await tester.pump(Duration.zero);
   });
+
+  Future<MemoryStore> pumpWithPhoto(WidgetTester tester, String stored) async {
+    final db = Replica(NativeDatabase.memory());
+    addTearDown(db.close);
+    await db
+        .into(db.localAsset)
+        .insert(
+          LocalAssetCompanion.insert(
+            id: Uint8List(16),
+            source: 'folder',
+            volume: const Value('/p'),
+            sourceId: '1',
+            path: const Value('1.jpg'),
+            size: 1,
+            mtime: 0,
+            takenLocal: const Value('2024-05-03T12:00:00'),
+          ),
+        );
+    final store = MemoryStore(stored);
+    await pumpApp(
+      tester,
+      size: const Size(800, 1800),
+      replica: (_) => db,
+      settings: store,
+      overrides: [
+        thumbnailPipelineProvider.overrideWith(
+          (ref) async => ThumbnailPipeline(),
+        ),
+      ],
+    );
+    return store;
+  }
+
+  testWidgets('Settings offers the date format with a sample each; a choice '
+      'changes every date at once, in the language of the app, and is kept', (
+    tester,
+  ) async {
+    final store = await pumpWithPhoto(tester, jsonEncode({'language': 'de'}));
+    expect(find.text('3. Mai 2024'), findsOneWidget);
+    await tester.tapAndSettle(find.byTooltip(arb('de', 'settingsTitle')));
+    expect(find.text(arb('de', 'dateFormatDefault')), findsOneWidget);
+    await tester.tapAndSettle(find.text(arb('de', 'settingsDateFormat')));
+    final options = find.byType(RadioListTile<DateOrder>);
+    expect(
+      [
+        for (final tile in tester.widgetList<RadioListTile<DateOrder>>(options))
+          (
+            tile.value,
+            (tile.title! as Text).data,
+            (tile.subtitle! as Text).data,
+          ),
+      ],
+      [
+        (
+          DateOrder.languageDefault,
+          arb('de', 'dateFormatDefault'),
+          '24. Dez. 2025',
+        ),
+        (DateOrder.dmy, arb('de', 'dateFormatDmy'), '24 Dez. 2025'),
+        (DateOrder.mdy, arb('de', 'dateFormatMdy'), 'Dez. 24, 2025'),
+        (DateOrder.ymd, arb('de', 'dateFormatYmd'), '2025 Dez. 24'),
+      ],
+    );
+    await tester.tapAndSettle(find.text(arb('de', 'dateFormatYmd')));
+    expect(options, findsNothing, reason: 'the choice closes the list');
+    expect(find.text(arb('de', 'dateFormatYmd')), findsOneWidget);
+    expect(jsonDecode(store.value!), containsPair('dateFormat', 'ymd'));
+    await tester.tapAndSettle(find.byType(BackButton));
+    expect(find.text('2024 Mai 3'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(Duration.zero);
+  });
+
+  for (final (stored, shown) in [
+    ('dmy', '3 May 2024'),
+    ('iso', 'May 3, 2024'),
+    (7, 'May 3, 2024'),
+  ]) {
+    testWidgets('a stored date format of "$stored" shows $shown', (
+      tester,
+    ) async {
+      await pumpWithPhoto(tester, jsonEncode({'dateFormat': stored}));
+      expect(find.text(shown), findsOneWidget);
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump(Duration.zero);
+    });
+  }
 }

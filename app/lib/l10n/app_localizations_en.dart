@@ -891,6 +891,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commandPaletteHint => 'Type a command';
 
   @override
+  String get dateFormatDefault => 'Language default';
+
+  @override
+  String get dateFormatDmy => 'Day-month-year';
+
+  @override
+  String get dateFormatMdy => 'Month-day-year';
+
+  @override
+  String get dateFormatYmd => 'Year-month-day';
+
+  @override
   String deleteBoth(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -2822,6 +2834,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsBackground => 'Behind transparent images';
 
   @override
+  String get settingsDateFormat => 'Date format';
+
+  @override
   String get settingsDefaultTab => 'Folders and albums open on';
 
   @override
@@ -4408,6 +4423,18 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get commandPaletteHint => '[Ţýþé å çöɱɱåñð one two]';
+
+  @override
+  String get dateFormatDefault => '[Ļåñĝûåĝé ðéƒåûļţ one two]';
+
+  @override
+  String get dateFormatDmy => '[Ðåý-ɱöñţĥ-ýéåŕ one two]';
+
+  @override
+  String get dateFormatMdy => '[Ṁöñţĥ-ðåý-ýéåŕ one two]';
+
+  @override
+  String get dateFormatYmd => '[Ýéåŕ-ɱöñţĥ-ðåý one two]';
 
   @override
   String deleteBoth(int count) {
@@ -6409,6 +6436,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get settingsBackground => '[Ɓéĥîñð ţŕåñšþåŕéñţ îɱåĝéš one two three]';
+
+  @override
+  String get settingsDateFormat => '[Ðåţé ƒöŕɱåţ one two]';
 
   @override
   String get settingsDefaultTab => '[Ƒöļðéŕš åñð åļƀûɱš öþéñ öñ one two three]';

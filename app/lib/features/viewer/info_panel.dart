@@ -108,7 +108,7 @@ class InfoPanel extends ConsumerWidget {
 
   Widget _rows(BuildContext context, WidgetRef ref, InfoFacts facts) {
     final strings = AppLocalizations.of(context);
-    final formats = Formats(strings);
+    final formats = Formats.of(context);
     final a = asset;
     final camera = [?a.make, ?a.model].join(' ');
     return ListView(

@@ -57,6 +57,8 @@ void main() {
 
   // A scanning folder's progress never settles.
   Future<void> open(WidgetTester tester, Finder finder) async {
+    await tester.ensureVisible(finder);
+    await tester.pump();
     await tester.tap(finder);
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
