@@ -16,6 +16,16 @@ import 'package:video_player_platform_interface/video_player_platform_interface.
 import 'package:video_player_web/src/video_player.dart' as web_player;
 import 'package:web/web.dart' as web;
 
+/// The native app's self-test (mpv.dart); the web has none.
+typedef SelfTest = ({String video, String result});
+
+/// Never asked for on the web.
+SelfTest? selfTestOf(List<String> args) => null;
+
+/// Never called: [selfTestOf] is null on the web.
+Future<int> runSelfTest(SelfTest test) =>
+    throw UnsupportedError('no self-test on the web');
+
 /// A player of [item], a file of a folder the browser lets the app read
 /// (`folder:`).
 Future<VideoPlayerController> folderVideo(ThumbnailItem item) async {

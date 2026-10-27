@@ -23,6 +23,9 @@ import 'core/providers.dart';
 
 Future<void> main([List<String> args = const []]) async {
   WidgetsFlutterBinding.ensureInitialized();
+  // The release pipeline plays a video with the bundled libmpv on a clean
+  // machine, headless (tools/windows/smoke.sh).
+  if (selfTestOf(args) case final test?) exit(await runSelfTest(test));
   LicenseRegistry.addLicense(() async* {
     yield LicenseEntryWithLineBreaks([
       'Roboto',

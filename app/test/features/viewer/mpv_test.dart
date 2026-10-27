@@ -53,4 +53,29 @@ void main() {
       reason: 'only Windows bundles them',
     );
   });
+
+  test('--self-test-play <video> <result> asks the app to play a video '
+      'and report; any other arguments are files to open', () {
+    final test = selfTestOf(['--self-test-play', 'a.mp4', 'r.txt']);
+    expect((test?.video, test?.result), ('a.mp4', 'r.txt'));
+    expect(selfTestOf(const []), isNull);
+    expect(selfTestOf(['a.mp4', 'b.jpg']), isNull);
+    expect(
+      () => selfTestOf(['--self-test-play', 'a.mp4']),
+      throwsArgumentError,
+      reason: 'a half-given test must not start the app',
+    );
+  });
+
+  test('a self-test of a video that is not there fails and says so in its '
+      'result file, before libmpv is loaded', () async {
+    final dir = await Directory.systemTemp.createTemp('self-test-');
+    addTearDown(() => dir.delete(recursive: true));
+    final test = (video: '${dir.path}/none.mp4', result: '${dir.path}/r.txt');
+    expect(await runSelfTest(test), 1);
+    expect(
+      File(test.result).readAsStringSync(),
+      startsWith('failed: ${dir.path}/none.mp4 does not exist'),
+    );
+  });
 }

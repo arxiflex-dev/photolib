@@ -10,10 +10,9 @@ void main() {
       'among them (ADR-0229)', (tester) async {
     LicenseRegistry.addLicense(
       () => Stream.value(
-        LicenseEntryWithLineBreaks(
-          ['libmpv and FFmpeg'],
-          'GNU Lesser General Public License, version 2.1 or later',
-        ),
+        const LicenseEntryWithLineBreaks([
+          'libmpv and FFmpeg',
+        ], 'GNU Lesser General Public License, version 2.1 or later'),
       ),
     );
     await pumpApp(tester);
