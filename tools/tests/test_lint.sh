@@ -176,6 +176,45 @@ for absent in "test/a_test.dart" "halstead" "source-lines-of-code" "inner" "a.g.
   [[ $OUT != *"$absent"* ]] && ok "not counted: $absent" || fail "counted $absent: $OUT"
 done
 
+# dart_code_linter prints its JSON on stdout beside a spinner, an "Update available" notice once pub.dev has a newer
+# release (CI run 40422019567: "Extra data"), and no JSON at all when it finds nothing. The stub prints $UNUSED_CODE
+# for check-unused-code and $UNUSED_FILES for check-unused-files, verbatim, and nothing else to count.
+cat >"$SANDBOX/stubs/dart" <<'STUB'
+#!/bin/bash
+case "$*" in
+  *" analyze "*)
+    for arg; do [[ $arg == --json-path=* ]] && json=${arg#--json-path=}; done
+    echo '{"records": []}' >"$json" ;;
+  *check-unused-code*) printf '%s' "$UNUSED_CODE" ;;
+  *check-unused-files*) printf '%s' "$UNUSED_FILES" ;;
+esac
+STUB
+DONE=$'\n\xe2\x9c\x94 Analysis is completed. Preparing the results: 4.3s\n\n'
+CODE='{"formatVersion":3,"unusedCode":[{"path":"lib/a.dart","issues":[{"declarationName":"g","line":9}]}]}'
+NOTICE=$'\n\xf0\x9f\x86\x95 Update available! 4.4.2 -> 4.4.3\n\xf0\x9f\x86\x95 Changelog: https://example.org/{v4.4.3}\n'
+dart_lint() { UNUSED_CODE=$1 UNUSED_FILES=$2 lint dart dart; }
+dart_lint "$DONE$CODE$NOTICE" "$DONE"
+expect_result "text after the JSON of check-unused-code does not hide its finding" failure \
+  "dart/lib/a.dart: unused-code: 1, baseline 0"
+[[ $OUT != *Traceback* ]] && ok "no traceback after trailing text" || fail "traceback: $OUT"
+dart_lint "$DONE$CODE"$'\n{"formatVersion":3,"unusedCode":[]}\n' "$DONE"
+expect_result "only the first of two JSON documents is read" failure "dart/lib/a.dart: unused-code: 1, baseline 0"
+dart_lint $'progress {1/2}\n'"$CODE$NOTICE" "$DONE"
+expect_result "a brace in text before the JSON is skipped" failure "dart/lib/a.dart: unused-code: 1, baseline 0"
+dart_lint "$DONE" "$DONE$NOTICE"
+expect_result "a clean run (no JSON, completion line) has only the analyzer's findings" failure \
+  "dart/lib/a.dart: avoid_dynamic_calls: 1, baseline 0"
+[[ $OUT != *unused* && $OUT != *"no JSON"* ]] && ok "a clean run reports no unused code and no error" || fail "$OUT"
+dart_lint "" "$DONE"
+expect_result "empty output is an error naming the command and the package, not a traceback" failure \
+  "check-unused-code" "in dart" "no output"
+[[ $OUT != *Traceback* ]] && ok "no traceback for empty output" || fail "traceback: $OUT"
+dart_lint "$DONE" $'Could not resolve the package config {x}\nbye'
+expect_result "output with neither JSON nor completion line is an error showing its head" failure \
+  "check-unused-files" "in dart" "Could not resolve the package config"
+dart_lint "$DONE"$'{"unusedCode": [\n' "$DONE"
+expect_result "a truncated JSON document is an error showing its head" failure "check-unused-code" "in dart" "unusedCode"
+
 # --- the pinned linters: a missing prerequisite fails loudly
 mkdir -p "$SANDBOX/bin"
 for tool in bash uname id dirname; do ln -s "$(command -v "$tool")" "$SANDBOX/bin/$tool"; done

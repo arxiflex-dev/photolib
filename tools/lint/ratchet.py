@@ -119,6 +119,23 @@ def dart(directory):
     return found
 
 
+JSON_START = re.compile(r'\{\s*["}]')
+
+
+def first_json(out, what):
+    """The first complete JSON object of a tool's stdout, which also holds a spinner and, once pub.dev has a newer
+    release, an update notice. dart_code_linter prints no JSON when it finds nothing, only its completion line."""
+    starts = [m.start() for m in JSON_START.finditer(out)]
+    for start in starts:
+        try:
+            return json.JSONDecoder().raw_decode(out, start)[0]
+        except ValueError:
+            continue
+    if not starts and "Analysis is completed" in out:
+        return {}
+    raise Failed(f"{what} printed no JSON document; the head of its output: {out.strip()[:600] or '(no output)'!r}")
+
+
 def dart_code_linter(cwd, dirs):
     """Its rules, the functions over DART_LIMITS, and unused code and files."""
     dcl, found = ["dart", "run", "dart_code_linter:metrics"], []
@@ -134,7 +151,7 @@ def dart_code_linter(cwd, dirs):
                   for m in entity["metrics"] if m["metricsId"] in DART_LIMITS and m["level"] in ("warning", "alarm")]
     for command, key in (("check-unused-code", "unusedCode"), ("check-unused-files", "unusedFiles")):
         out = run([*dcl, command, *dirs, "--reporter=json", "--no-fatal-unused"], cwd=cwd)
-        for entry in json.loads(out[out.find("{"):] if "{" in out else "{}").get(key, []):
+        for entry in first_json(out, f"{command} in {rel(cwd)}").get(key, []):
             for issue in entry.get("issues", [{"line": 1, "declarationName": "no file imports it"}]):
                 found.append(Finding(rel(entry["path"], cwd), command[6:], issue["line"], issue["declarationName"]))
     return found
