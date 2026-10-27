@@ -40,7 +40,7 @@ for arg in "$@"; do
 done
 case $TIER in quick) RANK_MAX=1 ;; default) RANK_MAX=2 ;; full) RANK_MAX=3 ;; esac
 REMOTE=$(bash "$(dirname "${BASH_SOURCE[0]}")/remote.sh") || exit 2
-export REMOTE PHOTOLIB_REMOTE=$REMOTE
+export PREQUEUE_REMOTE=$REMOTE
 BASE=${PREQUEUE_BASE:-$REMOTE/dev}
 OTHERS=${PREQUEUE_OTHERS-$REMOTE/wi/* $REMOTE/mergify/merge-queue/*}
 BUDGET=${PREQUEUE_BUDGET:-$([[ $TIER == full ]] && echo 420 || echo 300)}
@@ -441,7 +441,7 @@ here = git("rev-parse", "--abbrev-ref", "HEAD").strip()
 head = git("rev-parse", "HEAD").strip()
 bad = []
 for ref in refs(others):
-    if ref.removeprefix(os.environ["REMOTE"] + "/") == here or git("rev-parse", ref).strip() == head:
+    if ref.removeprefix(os.environ["PREQUEUE_REMOTE"] + "/") == here or git("rev-parse", ref).strip() == head:
         continue
     theirs = taken(ref)
     for kind in mine:
@@ -715,7 +715,7 @@ add 2 rustl "cargo deny" "cargo deny --locked check bans licenses sources in eac
 s_migrations() {
   local dir=$TMP/mig rc
   [[ -n $(changed 'server/migrations/*' tools/migrations.sh tools/squawk.sh | head -n 1) ]] || na "no migration changed"
-  [[ $(git rev-parse "$BASE") == "$(git rev-parse -q --verify refs/remotes/$REMOTE/dev)" ]] ||
+  [[ $(git rev-parse "$BASE") == "$(git rev-parse -q --verify "refs/remotes/$REMOTE/dev")" ]] ||
     skipped "tools/migrations.sh compares with $REMOTE/dev, which is not $BASE"
   if [[ -z $TREE_ONLY ]] && (($(git rev-list --count HEAD.."$BASE") > 0)); then
     # migrations.sh compares with $REMOTE/dev: a branch behind it would call dev's newer migrations deleted, so it runs on

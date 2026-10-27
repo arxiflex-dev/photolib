@@ -2,6 +2,7 @@
 # tools/remote.sh, the one place that names the git remote the gate and the pre-queue tools compare with
 # (`<remote>/dev`): $PHOTOLIB_REMOTE, else the only remote, else `origin`; and the pre-queue script in a repository
 # whose only remote is not called `origin`. Offline, in throwaway repositories.
+# shellcheck disable=SC2016 # the shell lines run in a child shell
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 require_tool git
