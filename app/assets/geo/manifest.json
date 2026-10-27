@@ -1,6 +1,6 @@
 {
   "counts": {
-    "cities": 34189,
+    "cities": 31806,
     "countries": 252,
     "countries_with_borders": 237,
     "regions": 2764
@@ -12,88 +12,88 @@
   },
   "packs": {
     "names-ar.bin": {
-      "bytes": 208277,
-      "sha256": "75b2196f584af15ae098394f27a3322b103f83ce278e16838b3c1553c52bc250"
+      "bytes": 206041,
+      "sha256": "ceaae1a22aac3937eee0b753a029d08137d59fd655d11997edfb577daf89841d"
     },
     "names-de.bin": {
-      "bytes": 54376,
-      "sha256": "27174ab45acadd805f39850b3095bf4a9baabd2a971b86630d5701c93eeef921"
+      "bytes": 50561,
+      "sha256": "88aad00a4ef5b6994830bf2eea30d7545f335070295ec6bd0ead9adb0c75864c"
     },
     "names-es.bin": {
-      "bytes": 58830,
-      "sha256": "64a6c7a79dcbfe065c6ce3732443e71816ae312c016d07012efac05c9b4c22e1"
+      "bytes": 56331,
+      "sha256": "2d33c7a811d7db0fe50825ef83e4ae5cd1e3e3b894d615cd06b53d1b16c2db81"
     },
     "names-fr.bin": {
-      "bytes": 49009,
-      "sha256": "c37e66f59205624e232dcfe8e54ed790aa45d45a67336c8dfbead8a2c0b098e0"
+      "bytes": 44523,
+      "sha256": "bfb59eca8dad58e29f5bb053b42e630874460b597fa58751779f2a281b2b38da"
     },
     "names-he.bin": {
-      "bytes": 81164,
-      "sha256": "74e91abe2e705191daf603ac9e25b98366330943c2fcb404c0085a5cae042a31"
+      "bytes": 79665,
+      "sha256": "47d3905aa6a9b2e07546065932b31cc959e259e607467250fb8543c516e77145"
     },
     "names-hi.bin": {
-      "bytes": 161753,
-      "sha256": "0d2d1aa4803409ed78ce695d07018862100edeefecd0fa9dd0e864fa2699cec3"
+      "bytes": 161074,
+      "sha256": "90398efd30098b31658c78096a306f8170ee732caab16c4c4d73bea699abba9b"
     },
     "names-id.bin": {
-      "bytes": 37814,
-      "sha256": "1b413de1497a4ac3445bee3c64f3473e87f91fb40dbc80e797f4f0027d832081"
+      "bytes": 38343,
+      "sha256": "fa13f0785a9e8c43ef2aab684d12d9b2f7de77f42e16df8faa4ef0a1121f1ff2"
     },
     "names-it.bin": {
-      "bytes": 46906,
-      "sha256": "a4fd9dfd973c11b02031f483680e10396869feae97f032e6217a5390d37d186f"
+      "bytes": 46764,
+      "sha256": "e6267fc1485e7fbc83528f82bd98c08acc0f037e5ddbcddcfb321cebf1a56ed8"
     },
     "names-ja.bin": {
-      "bytes": 227954,
-      "sha256": "e3eca1a20bf908cd1e32427aa7d8e7ff10c2d3c71ae99184366c79fa6247f9ec"
+      "bytes": 223837,
+      "sha256": "71df7cedc977cc33d5d5467f9aa1fde051b2e214ac4c3ebfbae4d525be4deee0"
     },
     "names-ko.bin": {
-      "bytes": 122952,
-      "sha256": "704fa6b303d7d341f594b98b34a2c55e924847d0cb642af2a144212bf389770e"
+      "bytes": 121845,
+      "sha256": "58dd3ea35878d0e76fc7bc34ac5f7f1b96c0cd8043ccb70c6cd0f1a45bc12f9a"
     },
     "names-nl.bin": {
-      "bytes": 29406,
-      "sha256": "e23db51d0e9b59fffdcd13977443dd7e644045f10c8fafc94bd17a37eeda5bde"
+      "bytes": 26324,
+      "sha256": "79dfce1ba1fa76422e689b5425c06917f79744cf4e5108ebc84885c3bda7d3e7"
     },
     "names-pl.bin": {
-      "bytes": 45634,
-      "sha256": "72734f4e8fd63fe5e0914ee9029e219129eb9539a5ddd4d901f9a6673dee5fe7"
+      "bytes": 44189,
+      "sha256": "30bfffb3d8b1bc9c9275f414a3171ecbb161a315a34e6e1bc2427770135b0ffa"
     },
     "names-pt.bin": {
-      "bytes": 40508,
-      "sha256": "db44402762cb98dee4c78c306c5558eebfc805578b175f268de74b049a0fb26d"
+      "bytes": 36697,
+      "sha256": "ab2a7705698e5600c44f4d2ec5d3204f27fd8e582f861322523fa0ae870d9ec0"
     },
     "names-ru.bin": {
-      "bytes": 398905,
-      "sha256": "158d83a6e0da68eaa7eb1aba33655b60fe02e507552f84fb07e2e3e02e68e1ac"
+      "bytes": 377295,
+      "sha256": "4c173f2bd77d6774a3468ed9e4194199757f16cf208b04d0f95e0e8a345227d6"
     },
     "names-sv.bin": {
-      "bytes": 28474,
-      "sha256": "fbec7ec8a7dffb0db83ea2dc313f6ff3233aeb1bd09a78407271f98d51aea9b1"
+      "bytes": 24091,
+      "sha256": "11df1eb56e87280c85b75f2999f6f5c06b5a3e0fa8a2e0fdecdbd4e55c1cba89"
     },
     "names-tr.bin": {
-      "bytes": 34963,
-      "sha256": "da78f345bd6acc41bac63e0fae56b1e2724c28b1b960cce298fafdd549cd4cc3"
+      "bytes": 33849,
+      "sha256": "8dd20129cedca6c8d80f2482d198616144ce7f0aa0fe778ec9001cd891e71281"
     },
     "names-uk.bin": {
-      "bytes": 183360,
-      "sha256": "5f88c318bca65f9116a07d608e95526a4808cece7f9e16cb98953ce59ffb8f40"
+      "bytes": 178889,
+      "sha256": "de3482c1fc19c04346bb6af116a5390fd216b1dd93e54e7a44bea64d1935eb5f"
     },
     "names-vi.bin": {
-      "bytes": 29382,
-      "sha256": "602a2b3040e9ef719d8c958c629aaccbb6b8cc0c49bf6b0599833c43739f62b0"
+      "bytes": 26020,
+      "sha256": "91c11c7ca944240aee90acbe03699f001618e5b11129ca0f229e7b8d6526da7c"
     },
     "names-zh.bin": {
-      "bytes": 182826,
-      "sha256": "ab45c9e8eb9e5b9c24df6b440391e744b066ea26cd0ebe1685da45811ea3339a"
+      "bytes": 180713,
+      "sha256": "a064dde749f25575fb334b806635e892e93c1844a07affc6e00926ed8c9f41c1"
     },
     "names-zh_Hant.bin": {
-      "bytes": 180904,
-      "sha256": "8ee1df58d1c5f8856ee5edbd239cd3f216ac1f7e22c9aa230dba760406eda5e5"
+      "bytes": 178850,
+      "sha256": "b308dbf3d5c08c41de0886c8bc7d3f98eb7f4e50d3b0d90db6bd73e5b4ec8f46"
     },
     "places.bin": {
-      "bytes": 1701924,
-      "sha256": "dd4753b5cd9235f61b06948a6299011dcf9092f48df95dce1f1391c0bc50a271"
+      "bytes": 1603347,
+      "sha256": "6b2574d81e0f9cf8a6b11a702b0e29c1c14c6d055ce7be945b529d64a9ea3930"
     }
   },
   "sources": {

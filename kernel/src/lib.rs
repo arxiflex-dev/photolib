@@ -14,6 +14,7 @@ pub mod cluster;
 mod develop;
 mod edit;
 mod faces;
+mod geo;
 mod keys;
 mod live_photo;
 mod local;
@@ -76,6 +77,9 @@ pub struct Keyring {
     /// Map indexes (design doc 14) by handle: positions, not keys, living as long as the keyring.
     maps: BTreeMap<u32, cluster::ClusterIndex>,
     last_map: u32,
+    /// Places packs (ADR-0405) by handle: public data, held as long as the keyring.
+    packs: BTreeMap<u32, geo::Pack>,
+    last_pack: u32,
 }
 
 impl Keyring {
@@ -147,6 +151,10 @@ impl Keyring {
             Some(Method::MapQuery) => reply(map::query(self, &decode(request)?)?),
             Some(Method::MapAssets) => reply(map::assets(self, &decode(request)?)?),
             Some(Method::MapIndexDrop) => reply(map::forget(self, decode(request)?)?),
+            Some(Method::GeoLoad) => reply(geo::load(self, &decode(request)?)?),
+            Some(Method::GeoResolve) => reply(geo::resolve(self, &decode(request)?)?),
+            Some(Method::GeoTimezone) => reply(geo::timezone(self, &decode(request)?)?),
+            Some(Method::GeoDrop) => reply(geo::drop_pack(self, decode(request)?)?),
             Some(Method::PrepareFaceDetection) => reply(faces::prepare_detection(&decode(request)?)?),
             Some(Method::AlignFace) => reply(faces::align_face(&decode(request)?)?),
             Some(Method::NormalizeFaceEmbedding) => reply(faces::normalize_embedding(&decode(request)?)?),

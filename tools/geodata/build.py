@@ -126,12 +126,13 @@ def varint(n):
             return bytes(out)
 
 
-def pick(names, codes):
-    """The best name among (lang, name, preferred, short, colloquial, historic) rows for the language codes."""
+def pick(names, codes, short_first=False):
+    """The best name among (lang, name, preferred, short, colloquial, historic) rows for the language codes: the
+    preferred one, or for countries the short one ("Deutschland", not "Bundesrepublik Deutschland")."""
     for code in codes:
         rows = [r for r in names if r[0] == code and not r[4] and not r[5]]
         if rows:
-            rows.sort(key=lambda r: (not r[2], r[3]))
+            rows.sort(key=lambda r: (not r[3], not r[2]) if short_first else (not r[2], r[3]))
             return rows[0][1]
     return None
 
@@ -139,6 +140,8 @@ def pick(names, codes):
 def build(directory):
     with zipfile.ZipFile(directory / "cities15000.zip") as z:
         cities = [line.split("\t") for line in z.read("cities15000.txt").decode().splitlines()]
+    # Sections of a town (arrondissements, boroughs: PPLX) are not places a person names a photo's place by.
+    cities = [c for c in cities if c[7] != "PPLX"]
     cities.sort(key=lambda c: int(c[0]))
     countries = {}
     for line in (directory / "countryInfo.txt").read_text(encoding="utf-8").splitlines():
@@ -177,7 +180,8 @@ def build(directory):
     entities = [("country", c["id"], c["name"]) for c in (countries[k] for k in codes)]
     entities += [("region", regions[r]["id"], regions[r]["name"]) for r in used]
     entities += [("city", int(c[0]), c[1]) for c in cities]
-    english = [pick(names.get(gid, []), ["en"]) or default for _, gid, default in entities]
+    # GeoNames' main names are English ("Munich", "United States"); an alternate name only localises.
+    english = [default for _, _, default in entities]
 
     strings = Strings()
     zones = sorted({c[17] for c in cities})
@@ -200,7 +204,7 @@ def build(directory):
             out += struct.pack("<I", len(r)) + b"".join(struct.pack("<hh", *p) for p in r)
     base = len(codes)
     for i, r in enumerate(used):
-        out += struct.pack("<HII", country_index[r.split(".")[0]], strings.add(english[base + i]), regions[r]["id"])
+        out += struct.pack("<HII", country_index[r.split(".")[0]], strings.add(english[base + i]), strings.add(r.split(".")[1]))
     base += len(used)
     cols = {k: bytearray() for k in ("lat", "lon", "pop", "gid", "name", "country", "region", "tz")}
     for i, c in enumerate(cities):
@@ -224,7 +228,7 @@ def build(directory):
             entries, last = bytearray(), 0
             count = 0
             for i in range(lo, hi):
-                name = pick(names.get(entities[i][1], []), lang_codes)
+                name = pick(names.get(entities[i][1], []), lang_codes, short_first=i < len(codes))
                 if name and name != english[i]:
                     raw = name.encode()
                     entries += varint(i - lo - last) + varint(len(raw)) + raw

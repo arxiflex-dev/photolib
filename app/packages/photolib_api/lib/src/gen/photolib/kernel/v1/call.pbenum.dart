@@ -244,6 +244,22 @@ class Method extends $pb.ProtobufEnum {
   static const Method METHOD_RECIPE_FROM_DEVELOP =
       Method._(57, _omitEnumNames ? '' : 'METHOD_RECIPE_FROM_DEVELOP');
 
+  /// GeoLoadRequest to GeoLoadResponse; the places pack lives in the keyring until dropped.
+  static const Method METHOD_GEO_LOAD =
+      Method._(58, _omitEnumNames ? '' : 'METHOD_GEO_LOAD');
+
+  /// GeoResolveRequest to GeoResolveResponse.
+  static const Method METHOD_GEO_RESOLVE =
+      Method._(59, _omitEnumNames ? '' : 'METHOD_GEO_RESOLVE');
+
+  /// GeoTimezoneRequest to GeoTimezoneResponse.
+  static const Method METHOD_GEO_TIMEZONE =
+      Method._(60, _omitEnumNames ? '' : 'METHOD_GEO_TIMEZONE');
+
+  /// GeoDropRequest to GeoDropResponse.
+  static const Method METHOD_GEO_DROP =
+      Method._(61, _omitEnumNames ? '' : 'METHOD_GEO_DROP');
+
   static const $core.List<Method> values = <Method>[
     METHOD_UNSPECIFIED,
     METHOD_RESOLVE_CAPTURE_TIME,
@@ -302,10 +318,14 @@ class Method extends $pb.ProtobufEnum {
     METHOD_MAP_REGIONS,
     METHOD_RENDER_RECIPE,
     METHOD_RECIPE_FROM_DEVELOP,
+    METHOD_GEO_LOAD,
+    METHOD_GEO_RESOLVE,
+    METHOD_GEO_TIMEZONE,
+    METHOD_GEO_DROP,
   ];
 
   static final $core.List<Method?> _byValue =
-      $pb.ProtobufEnum.$_initByValueList(values, 57);
+      $pb.ProtobufEnum.$_initByValueList(values, 61);
   static Method? valueOf($core.int value) =>
       value < 0 || value >= _byValue.length ? null : _byValue[value];
 
