@@ -69,6 +69,14 @@ want = {
     ("heic-web-fill", "janky", "web"): ("max", 1),
     # M2-25's acceptance: the web timeline's frames over the 1M library, in Chrome, miss 60 Hz less than 1%.
     ("timeline-scroll-web", "janky", "web"): ("max", 1),
+    # ADR-0004's go/no-go figures of the kernel through each binding: the C ABI (native) and WebAssembly built by
+    # dart2js and by dart2wasm in Chrome; measured by tools/perf/measure.sh, never asserted by a test.
+    **{("kernel-binding", metric, target): (bound, limit) for metric, bound, native, web in
+       [("call_us", "max", 50, 200), ("decrypt_MiB_s", "min", 1024, 300), ("exif_files_s", "min", 1000, 1000),
+        ("argon2id_floor_ms", "max", 600, 600)] for target, limit in
+       [("native", native), ("dart2js", web), ("dart2wasm", web)]},
+    # Photolib-design#184: hls.js starts within 2 s on a 3 Mbit/s link, in each browser.
+    ("hls-start", "start_ms", "chrome"): ("max", 2000), ("hls-start", "start_ms", "firefox"): ("max", 2000),
 }
 got = {}
 for name, budget in budgets["budgets"].items():
@@ -109,7 +117,10 @@ assert measured == {("timeline-scroll", "fps"): frames, ("timeline-scroll", "jan
                     ("idle-cpu", "cpu"): frames, ("sphere-video", "fps"): ["headless"],
                     ("sphere-video", "flat"): ["headless"],
                     ("server-tiles", "cold_p95"): frames, ("server-tiles", "warm_blank"): frames,
-                    ("heic-web-fill", "janky"): ["web"], ("timeline-scroll-web", "janky"): ["web"]}, measured
+                    ("heic-web-fill", "janky"): ["web"], ("timeline-scroll-web", "janky"): ["web"],
+                    **{("kernel-binding", metric): ["native", "dart2js", "dart2wasm"]
+                       for metric in ["call_us", "decrypt_MiB_s", "exif_files_s", "argon2id_floor_ms"]},
+                    ("hls-start", "start_ms"): ["chrome", "firefox"]}, measured
 # Every janky share is measured again over its budget and less what an idle isolate missed (ADR-0140).
 janky = {(name, metric): spec.get("requires") for name, budget in budgets["budgets"].items()
          for metric, spec in budget["metrics"].items() if metric.endswith("janky")}
@@ -838,5 +849,29 @@ assert_prose "$ADR" '\* \*\*Status\*\*: Accepted — 2026-10-21\. The owner conf
   "is Accepted, recording the owner's confirmation (#608)"
 assert_matches docs/adr/README.md '\(0212-perf-part-in-half-the-time\.md\) \| [^|]* \| Accepted \(owner confirmed' \
   "the index lists ADR-0212 as Accepted"
+
+# tools/perf/measure.sh (PHO-232): a budget measured by a command of its own, whose `result:` lines are checked; no test
+# asserts a time.
+printf '%s\n' '#!/usr/bin/env bash' \
+  'echo "result: {\"budget\": \"hls-start\", \"metric\": \"start_ms\", \"target\": \"chrome\", \"value\": ${CHROME:-900}}"' \
+  '[[ -z ${FIREFOX:-} ]] || echo "result: {\"budget\": \"hls-start\", \"metric\": \"start_ms\", \"target\": \"firefox\", \"value\": $FIREFOX}"' \
+  '[[ -z ${BROKEN:-} ]] || { echo "the test failed"; exit 1; }' >"$TMP/measured.sh"
+measure() { capture bash tools/perf/measure.sh hls-start "$@" -- bash "$TMP/measured.sh"; }
+FIREFOX=1500 measure chrome firefox
+expect_result "measure.sh passes the results within their budgets" 0 "ok   hls-start start_ms chrome: 900 ms" \
+  "ok   hls-start start_ms firefox: 1500 ms"
+FIREFOX=2500 measure chrome firefox
+expect_result "measure.sh fails a result over its budget" 1 "FAIL hls-start start_ms firefox: 2500 ms (budget ≤ 2000 ms)"
+measure chrome firefox
+expect_result "measure.sh fails a series the command did not print" 1 "missing: hls-start start_ms firefox"
+BROKEN=1 measure chrome
+expect_result "measure.sh fails when the command fails" 1 "hls-start: exited 1 (the test failed)"
+capture bash tools/perf/measure.sh hls-start safari -- true
+expect_result "measure.sh fails a target the budget does not measure" 1 "measures no series of hls-start on safari"
+capture bash tools/perf/measure.sh hls-start chrome
+expect_result "measure.sh without a command says how to use it" 2 "usage: measure.sh"
+python3 tools/perf/perf.py series --units kernel-binding >"$TMP/units.jsonl"
+check "the kernel's series are a unit of their own (a PERF_UNITS share names them)" \
+  bash -c "grep -c '\"budget\": \"kernel-binding\"' $TMP/units.jsonl | grep -qx 12 && ! grep -qv kernel-binding $TMP/units.jsonl"
 
 finish

@@ -235,6 +235,23 @@
       "metrics": {
         "photos": {"unit": "photos/s/core", "min": {"server": 19}, "measured": ["server"]}
       }
+    },
+    "kernel-binding": {
+      "requirement": "NFR-PERF-1, ADR-0004 (docs/dev/kernel-go-no-go.md)",
+      "how": "app/packages/photolib_kernel/benchmark/{kernel,web}_bench_test.dart through tools/perf/measure.sh: the kernel through the C ABI (native, a release build) and through WebAssembly in Chrome built by dart2js and by dart2wasm, each result the fastest sample of a second (test/bench.dart), on the fastest cores and natively in the thread's CPU time. The budgets are for a performance core: hosted runners cannot measure them, so the step is advisory there. call_us is a call that does nothing, decrypt_MiB_s a 1 MiB PLB envelope in 64 KiB chunks, exif_files_s capture time from a 64 KiB JPEG head, argon2id_floor_ms the passcode floor (m = 64 MiB, t = 3), within the 600 ms unlock budget of design 21 §8",
+      "metrics": {
+        "call_us": {"unit": "µs", "max": {"native": 50, "dart2js": 200, "dart2wasm": 200}, "measured": ["native", "dart2js", "dart2wasm"]},
+        "decrypt_MiB_s": {"unit": "MiB/s", "min": {"native": 1024, "dart2js": 300, "dart2wasm": 300}, "measured": ["native", "dart2js", "dart2wasm"]},
+        "exif_files_s": {"unit": "files/s", "min": {"native": 1000, "dart2js": 1000, "dart2wasm": 1000}, "measured": ["native", "dart2js", "dart2wasm"]},
+        "argon2id_floor_ms": {"unit": "ms", "max": {"native": 600, "dart2js": 600, "dart2wasm": 600}, "measured": ["native", "dart2js", "dart2wasm"]}
+      }
+    },
+    "hls-start": {
+      "requirement": "photolib-design#184, ADR-0246",
+      "how": "server/crates/photolib-server/tests/hls.rs through tools/perf/measure.sh: hls.js in Chrome and in Firefox, from a cold cache, over a link of 3 Mbit/s with 40 ms round trips, shows its first frame of photolibd's ladder; start_ms from loadSource to that frame (hls.mjs)",
+      "metrics": {
+        "start_ms": {"unit": "ms", "max": {"chrome": 2000, "firefox": 2000}, "measured": ["chrome", "firefox"]}
+      }
     }
   }
 }

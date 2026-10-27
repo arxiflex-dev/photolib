@@ -839,15 +839,18 @@ web_sandbox
 FAIL_ON=$WEB_TEST run_gate web
 expect_result "failing browser vectors fail the gate" failure "failed: $WEB_TEST"
 
-# the kernel's timing test, tagged timing in its dart_test.yaml, is left out of that run and gets a step of its own
+# the kernel's speed through WebAssembly is measured by tools/perf/measure.sh in a step of its own (no test asserts a time)
 web_sandbox
-mkdir -p "$SANDBOX/app/packages/photolib_kernel"
-printf 'tags:\n  timing:\n' >"$SANDBOX/app/packages/photolib_kernel/dart_test.yaml"
+mkdir -p "$SANDBOX/app/packages/photolib_kernel/benchmark" "$SANDBOX/tools/perf"
+: >"$SANDBOX/app/packages/photolib_kernel/benchmark/web_bench_test.dart"
+stub_command "$SANDBOX/tools/perf/measure.sh" measure.sh
 run_gate web
-expect_calls "the kernel's web budget test, tagged timing, runs in a step of its own" \
+expect_calls "the kernel's web speed is measured by measure.sh against the series kernel-binding, after its vectors" \
   "$(locked_call app/packages/photolib_kernel)
-dart test -p chrome -c dart2js -c dart2wasm -j 1 --exclude-tags timing test/web_vectors_test.dart @/app/packages/photolib_kernel
-dart test -p chrome -c dart2js -c dart2wasm -j 1 --tags timing test/web_vectors_test.dart @/app/packages/photolib_kernel"
+$WEB_TEST @/app/packages/photolib_kernel
+measure.sh kernel-binding dart2js dart2wasm -- dart test -p chrome -c dart2js -c dart2wasm -j 1 benchmark/web_bench_test.dart @/app/packages/photolib_kernel"
+FAIL_ON="measure.sh kernel-binding dart2js dart2wasm -- dart test -p chrome -c dart2js -c dart2wasm -j 1 benchmark/web_bench_test.dart" run_gate web
+expect_result "a kernel speed over its budget fails the gate" failure "failed: bash $SANDBOX/tools/perf/measure.sh kernel-binding"
 
 gate_sandbox dart
 mkdir -p "$SANDBOX/app/packages/photolib_kernel"
@@ -1049,18 +1052,21 @@ hls_web_sandbox() {
   gate_sandbox cargo node
   mkdir -p "$SANDBOX/server/crates/photolib-server/tests"
   : >"$SANDBOX/server/crates/photolib-server/tests/hls.rs"
+  mkdir -p "$SANDBOX/tools/perf"
+  stub_command "$SANDBOX/tools/perf/measure.sh" measure.sh
 }
-HLS_TEST="cargo test --locked -p photolib-server --test hls -- --ignored"
+HLS_TEST="measure.sh hls-start chrome firefox -- cargo test --locked -p photolib-server --test hls -- --ignored --nocapture"
 
 hls_web_sandbox
 run_gate web
-expect_calls "'web' streams a video's ladder with hls.js in the browsers" "$HLS_TEST @/server"
+expect_calls "'web' streams a video's ladder with hls.js in the browsers, its start checked against hls-start" \
+  "$HLS_TEST @/server"
 
 missing_tools hls_web_sandbox web "the streaming browser test" fails cargo node
 
 hls_web_sandbox
 FAIL_ON=$HLS_TEST run_gate web
-expect_result "a failing streaming browser test fails the gate" failure "failed: $HLS_TEST"
+expect_result "a failing streaming browser test fails the gate" failure "failed: bash $SANDBOX/tools/perf/$HLS_TEST"
 
 # --- the app's players: every corpus video and motion photo plays with them on this desktop, Linux's libmpv here
 app_play_sandbox() {
@@ -1629,18 +1635,22 @@ $ALONE @/app
 $ALONE @/app
 $ALONE @/app"
 
-# --- tests tagged `timing` are left out of their suite's run and get a step of their own, which fails the gate here
-FLAKY="offline.sh flutter test --tags timing"
+# --- the kernel's speed through the C ABI is measured by tools/perf/measure.sh (series kernel-binding), alone, three
+# times when it misses; no test asserts a time, and no test is tagged for being flaky
 dart_sandbox test
-printf 'tags:\n  timing:\n' >"$SANDBOX/app/dart_test.yaml"
-FAIL_ON=$FLAKY run_gate dart
-expect_result "a failing flaky test fails the gate where CHECK_ADVISORY is not set" failure "offline.sh flutter test --tags timing"
-expect_calls "tests tagged timing run after the rest of their suite in a step of their own" \
-  "$(dart_calls app)
-offline.sh flutter test --exclude-tags timing @/app
-$FLAKY @/app"
-CHECK_ADVISORY='--tags timing' FAIL_ON=$FLAKY run_gate dart
-expect_result "and passes it where CHECK_ADVISORY names the step" 0
+mkdir -p "$SANDBOX/tools/perf" "$SANDBOX/app/benchmark"
+stub_command "$SANDBOX/tools/perf/measure.sh" measure.sh
+: >"$SANDBOX/app/benchmark/kernel_bench_test.dart"
+MEASURE="measure.sh kernel-binding native -- bash $SANDBOX/tools/offline.sh flutter test benchmark/kernel_bench_test.dart"
+run_gate dart
+expect_calls "the kernel's native speed is measured by measure.sh after the suite" \
+  "$(dart_calls app test)
+measure.sh kernel-binding native -- bash $SANDBOX/tools/offline.sh flutter test benchmark/kernel_bench_test.dart @/app"
+FAIL_ON=$MEASURE run_gate dart
+expect_result "a kernel speed over its budget fails the gate where CHECK_ADVISORY is not set" failure \
+  "failed: bash $SANDBOX/tools/perf/measure.sh kernel-binding native"
+CHECK_ADVISORY='perf/measure\.sh' FAIL_ON=$MEASURE run_gate dart
+expect_result "and passes it where CHECK_ADVISORY names measure.sh" 0
 
 budget_sandbox
 printf 'tags:\n  alone:\n' >"$SANDBOX/app/packages/photolib_data/dart_test.yaml"

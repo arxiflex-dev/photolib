@@ -22,12 +22,14 @@ for threshold in '3 MB' '1 MB' '50 µs' '200 µs' '200 MB/s' '50 MB/s' '1,000 fi
   assert_prose "$REPORT" "$threshold" "measures against $threshold"
 done
 assert_prose "$REPORT" 'Argon2id at the device floor.*reference phone' "measures Argon2id calibration, phone included"
-assert_prose app/packages/photolib_kernel/test/bench.dart 'greaterThanOrEqualTo\(web \? 300 : 1024\)' \
-  "the benchmark fails below 300 MiB/s on the web and 1 GiB/s natively"
+check "the series kernel-binding fails PLB decrypt below 300 MiB/s on the web and 1 GiB/s natively" python3 -c "
+import json
+m = json.load(open('tools/perf/budgets.json'))['budgets']['kernel-binding']['metrics']['decrypt_MiB_s']
+assert m['min'] == {'native': 1024, 'dart2js': 300, 'dart2wasm': 300}, m"
 assert_prose "$REPORT" 'on a performance core \(the owner confirmed, photolib-design#333\)' \
   "holds PLB decrypt's budget on a performance core, as the owner confirmed"
-for pinned in vectors_test wasm_server; do
-  assert_prose "app/packages/photolib_kernel/test/$pinned.dart" 'pinToFastestCores\(pid\)' \
+for pinned in benchmark/kernel_bench_test test/wasm_server; do
+  assert_prose "app/packages/photolib_kernel/$pinned.dart" 'pinToFastestCores\(pid\)' \
     "$pinned benchmarks on the fastest cores"
 done
 assert_prose docs/dev/README.md 'kernel-go-no-go\.md' "the developer guide links the report"

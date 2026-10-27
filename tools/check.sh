@@ -394,17 +394,16 @@ check_dart() {
     [[ -z $own ]] || step "$dir" dart format $version --output=none --set-exit-if-changed $own
     [[ -n $later ]] || dart_lint "$dir"
     if [[ -d $dir/test ]]; then
-      local run=step alone=() flaky=()
+      local run=step alone=()
       [[ $FRAME_BUDGETS == *" $dir "* ]] && run=budget
       # Tests tagged `alone` in dart_test.yaml measure time on the whole machine: a budget step of their own.
       [[ -n $(sed -n '/^  alone:/p' "$dir/dart_test.yaml" 2>/dev/null) ]] && alone=(--exclude-tags alone)
-      # Tests tagged `timing` fail on a loaded or small machine without a fault in the code: a
-      # step of their own, which CI (CHECK_ADVISORY) reports without failing on and the train fails on.
-      [[ -n $(sed -n '/^  timing:/p' "$dir/dart_test.yaml" 2>/dev/null) ]] && flaky=(--exclude-tags timing)
       if exec_capable_build "$dir" && kernel_artifacts "$dir"; then
-        "$run" "$dir" bash "$ROOT/tools/offline.sh" flutter test ${alone[@]+"${alone[@]}"} ${flaky[@]+"${flaky[@]}"}
+        "$run" "$dir" bash "$ROOT/tools/offline.sh" flutter test ${alone[@]+"${alone[@]}"}
         ((${#alone[@]} == 0)) || budget "$dir" bash "$ROOT/tools/offline.sh" flutter test --tags alone -j 1
-        ((${#flaky[@]} == 0)) || step "$dir" bash "$ROOT/tools/offline.sh" flutter test --tags timing
+        # The kernel's speed through the C ABI: the series kernel-binding (budgets.json), measured alone
+        [[ ! -f $dir/benchmark/kernel_bench_test.dart ]] || budget "$dir" bash "$ROOT/tools/perf/measure.sh" \
+          kernel-binding native -- bash "$ROOT/tools/offline.sh" flutter test benchmark/kernel_bench_test.dart
       fi
     else
       echo "==> [$dir] no test/ directory: nothing for flutter test to run"
@@ -603,12 +602,11 @@ check_web() {
   if [[ -f kernel/wasm/Cargo.toml ]] && need cargo "the kernel's web build (kernel/wasm)" &&
     need rustup "the kernel's web build (kernel/wasm)" && need node "the size budget of the kernel's web build" &&
     need dart "the kernel's browser tests" && ready app/packages/photolib_kernel; then
-    local kernel=app/packages/photolib_kernel flaky=()
-    # Its timing test is tagged timing: a step of its own, as check_dart gives the tests of that tag
-    [[ -n $(sed -n '/^  timing:/p' "$kernel/dart_test.yaml" 2>/dev/null) ]] && flaky=(--exclude-tags timing)
-    step "$kernel" dart test -p chrome -c dart2js -c dart2wasm -j 1 ${flaky[@]+"${flaky[@]}"} test/web_vectors_test.dart
-    ((${#flaky[@]} == 0)) ||
-      step "$kernel" dart test -p chrome -c dart2js -c dart2wasm -j 1 --tags timing test/web_vectors_test.dart
+    local kernel=app/packages/photolib_kernel
+    step "$kernel" dart test -p chrome -c dart2js -c dart2wasm -j 1 test/web_vectors_test.dart
+    # Its speed through WebAssembly, in each compiler's build: the series kernel-binding (budgets.json), measured alone
+    [[ ! -f $kernel/benchmark/web_bench_test.dart ]] || budget "$kernel" bash "$ROOT/tools/perf/measure.sh" \
+      kernel-binding dart2js dart2wasm -- dart test -p chrome -c dart2js -c dart2wasm -j 1 benchmark/web_bench_test.dart
   fi
   if [[ -f $data/test/web_test.dart ]] && need dart "the local store's browser tests" &&
     need curl "the download of sqlite3mc.wasm (tools/data/web.sh)" && need cargo "the kernel the store's tests load" &&
@@ -686,10 +684,12 @@ check_web() {
     retried server cargo test --locked -p photolib-server --test passkeys -- --ignored
   fi
   # Adaptive streaming (ADR-0246): hls.js in Chrome and Firefox starts photolibd's ladder within 2 s on a 3 Mbit/s link
-  # and follows the link up and down without stalling; a test of photolibd's that the rust part skips, which times.
+  # and follows the link up and down without stalling; a test of photolibd's that the rust part skips. The start is no
+  # assertion: the test prints it and measure.sh checks it against the series hls-start (budgets.json).
   if [[ -f server/crates/photolib-server/tests/hls.rs ]] && need cargo "photolibd's streaming browser test" &&
     need node "the driver of photolibd's streaming browser test"; then
-    budget server cargo test --locked -p photolib-server --test hls -- --ignored
+    budget server bash "$ROOT/tools/perf/measure.sh" hls-start chrome firefox -- \
+      cargo test --locked -p photolib-server --test hls -- --ignored --nocapture
   fi
   if [[ -f $editor/test/web_test.dart ]] && need flutter "the editor's browser tests" &&
     need cargo "the kernel's web build (kernel/wasm)" && need rustup "the kernel's web build (kernel/wasm)" &&

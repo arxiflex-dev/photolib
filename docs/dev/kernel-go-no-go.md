@@ -9,14 +9,16 @@ The gate re-measures on every run and fails below a threshold, so these numbers 
 
 * **Size**: `python3 tools/kernel/build.py` prints each library's bytes and fails over 3 MB; CI's `kernel-prebuilt`
   job runs it over all 11 targets. `tools/kernel/wasm.sh` fails the web module over 1 MB brotli.
-* **Speed**: `app/packages/photolib_kernel/test/bench.dart`, through the C ABI in `vectors_test.dart` (a release build
-  in `flutter test`, the bundled prebuilt library in `tools/kernel/probe.sh` on Linux, macOS and Windows in CI) and
-  through WebAssembly in `web_vectors_test.dart` (`bash tools/check.sh web`, in Chrome only for now:
-  photolib-design#288). Each result is the fastest sample (1 ms natively, 5 ms in a browser's coarser clock) of a
-  second, or of up to ten while it misses its threshold, since a loaded machine only slows a sample
-  (`test/bench_test.dart`; at the spike, the fastest of five 100 ms rounds). It is taken on the fastest cores: on
-  Linux, `lib/testing.dart` pins the test process or the browser to the cores with the highest top speed and natively
-  times the thread's CPU time, so that other work on a shared machine does not count. Each run prints one JSON line:
+* **Speed**: `app/packages/photolib_kernel/test/bench.dart`, through the C ABI in `benchmark/kernel_bench_test.dart` (a
+  release build in `flutter test`, the bundled prebuilt library in `tools/kernel/probe.sh` on Linux, macOS and Windows,
+  where it is printed only) and through WebAssembly in `benchmark/web_bench_test.dart` (`bash tools/check.sh web`, in
+  Chrome only for now: photolib-design#288). No test asserts a time: each prints `result:` lines and
+  `tools/perf/measure.sh` checks them against the series `kernel-binding` of `tools/perf/budgets.json`, alone and up to
+  three times, advisory on hosted runners. Each result is the fastest sample (1 ms natively, 5 ms in a browser's coarser
+  clock) of a second, since a loaded machine only slows a sample (`test/bench_test.dart`; at the spike, the fastest of
+  five 100 ms rounds). It is taken on the fastest cores: on Linux, `lib/testing.dart` pins the test process or the
+  browser to the cores with the highest top speed and natively times the thread's CPU time, so that other work on a
+  shared machine does not count. Each run prints one line per figure:
   * *call*: method 0 with an empty request, which only crosses the boundary and returns an error;
   * *decrypt*: at the spike, a whole two-chunk envelope (65,636 plaintext bytes in 64 KiB chunks) per call; MB is
     10⁶ bytes. Since crypto suite v1, [below](#crypto-suite-v1-m0-40);
