@@ -148,6 +148,37 @@ class _TrashPageState extends ConsumerState<TrashPage> {
     return confirmed ?? false;
   }
 
+  /// The app bar's buttons: what the selection can do, else empty the trash.
+  List<Widget> _actions(
+    AppLocalizations strings,
+    List<LocalAssetData>? rows,
+    int remote,
+    List<LocalAssetData> chosen,
+    List<LocalAssetData> gone,
+  ) => [
+    if (chosen.isNotEmpty && gone.length == chosen.length)
+      // Nothing is left to restore or delete, only the entry.
+      TextButton(
+        onPressed: () => _forget(gone),
+        child: Text(strings.trashRemoveGone),
+      )
+    else if (chosen.isNotEmpty) ...[
+      TextButton(
+        onPressed: () => _restore(chosen),
+        child: Text(strings.actionRestore),
+      ),
+      TextButton(
+        onPressed: () => _purge(chosen),
+        child: Text(strings.actionDeleteForever),
+      ),
+    ] else if ((rows, remote) case (final rows?, final remote)
+        when rows.isNotEmpty || remote > 0)
+      TextButton(
+        onPressed: () => _purge(rows, remote: remote),
+        child: Text(strings.trashEmptyAll),
+      ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     final strings = AppLocalizations.of(context);
@@ -171,29 +202,7 @@ class _TrashPageState extends ConsumerState<TrashPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(strings.trashTitle),
-        actions: [
-          if (chosen.isNotEmpty && gone.length == chosen.length)
-            // Nothing is left to restore or delete, only the entry.
-            TextButton(
-              onPressed: () => _forget(gone),
-              child: Text(strings.trashRemoveGone),
-            )
-          else if (chosen.isNotEmpty) ...[
-            TextButton(
-              onPressed: () => _restore(chosen),
-              child: Text(strings.actionRestore),
-            ),
-            TextButton(
-              onPressed: () => _purge(chosen),
-              child: Text(strings.actionDeleteForever),
-            ),
-          ] else if ((rows, remote) case (final rows?, final remote)
-              when rows.isNotEmpty || remote > 0)
-            TextButton(
-              onPressed: () => _purge(rows, remote: remote),
-              child: Text(strings.trashEmptyAll),
-            ),
-        ],
+        actions: _actions(strings, rows, remote, chosen, gone),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

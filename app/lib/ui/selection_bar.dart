@@ -105,25 +105,7 @@ class SelectionBar extends StatelessWidget implements PreferredSizeWidget {
             child: Text(strings.selectionCount(count)),
           ),
           actions: [
-            if (folded > 0)
-              PopupMenuButton<VoidCallback>(
-                tooltip: MaterialLocalizations.of(context).moreButtonTooltip,
-                onSelected: (action) => action(),
-                itemBuilder: (_) => [
-                  for (final button in buttons.take(folded))
-                    PopupMenuItem(
-                      enabled: button.onPressed != null,
-                      value: button.onPressed,
-                      child: Row(
-                        children: [
-                          button.icon,
-                          const SizedBox(width: 16),
-                          Flexible(child: Text(button.tooltip ?? '')),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
+            if (folded > 0) _overflow(context, buttons.take(folded)),
             ?selectAll,
             ...buttons.skip(folded),
             ...others,
@@ -132,6 +114,27 @@ class SelectionBar extends StatelessWidget implements PreferredSizeWidget {
       },
     );
   }
+
+  /// The menu the [folded] buttons are in, each as its icon and tooltip.
+  static Widget _overflow(BuildContext context, Iterable<IconButton> folded) =>
+      PopupMenuButton<VoidCallback>(
+        tooltip: MaterialLocalizations.of(context).moreButtonTooltip,
+        onSelected: (action) => action(),
+        itemBuilder: (_) => [
+          for (final button in folded)
+            PopupMenuItem(
+              enabled: button.onPressed != null,
+              value: button.onPressed,
+              child: Row(
+                children: [
+                  button.icon,
+                  const SizedBox(width: 16),
+                  Flexible(child: Text(button.tooltip ?? '')),
+                ],
+              ),
+            ),
+        ],
+      );
 }
 
 /// The width of a button of the bar.
