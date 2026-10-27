@@ -1,6 +1,7 @@
 # ADR-0290 — One source tree on every client: local folders as a nested tree with an eye per node
 
-* **Status**: **Proposed — owner to confirm** (photolib-design#642).
+* **Status**: Accepted — 2026-10-23 (PHO-213, photolib-design#642). The owner kept all four decisions as made (1, 2, 3, 4:
+  "Keep").
 * **Requirements**: R-APP-5, LIB-11, ORG-02. **Design**:
   client app,
   feature catalogue LIB-11;
@@ -38,7 +39,7 @@ way to act on a parent, and three places looked three ways (owner, 2026-10-21).
   Enter and type-ahead work it; a long press or a right click opens the menu. On a window 840 px wide or more the node
   in focus shows beside the tree with its menu as buttons.
 
-**Needs thinking**, answered provisionally with the issue's leans:
+**Needs thinking**, answered with the issue's leans and kept by the owner (2026-10-23):
 
 1. *An eye on single items?* No: hiding a photo is M1-16's per-item *hide*; this is *not showing a source*. The UI
    says *hide* for items and shows an eye only on sources.
@@ -46,6 +47,9 @@ way to act on a parent, and three places looked three ways (owner, 2026-10-21).
    and include and exclude lists both exist in folder galleries.
 3. *M2-18's backup choice: a second column or another copy of the widget?* A second per-node column of the same tree
    (back up, don't, inherit), one screen for what I see and what I back up.
+4. *Where both M1-37 lists name a folder, which wins in the one column?* The active mode's list; a folder on neither,
+   under a folder of the other value, keeps what the mode showed, so nothing the user sees changes on upgrade
+   (`migration_test`).
 
 **Out of scope.** iOS: PhotoKit albums are not a tree; M4-04 maps albums to nodes of kind album.
 
