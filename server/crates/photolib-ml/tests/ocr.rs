@@ -1,6 +1,10 @@
 //! PP-OCRv5 on ONNX Runtime reading the pictures of `testdata/ocr/`: Latin, Cyrillic, CJK and a payload of markup.
 
-use std::{collections::BTreeMap, path::Path, time::Instant};
+use std::{
+    collections::BTreeMap,
+    path::Path,
+    time::{Duration, Instant},
+};
 
 use photolib_ml::{
     MEMORY, Pool, Verdict,
@@ -30,6 +34,16 @@ fn squeezed(text: &str) -> String {
 
 #[test]
 fn the_pictures_of_every_script_and_a_payload_are_read_as_they_say() {
+    pictures_are_read(Duration::ZERO);
+}
+
+/// A machine too loaded to read a picture in 5 s reads the same text.
+#[test]
+fn a_slow_machine_reads_the_same_text() {
+    pictures_are_read(Duration::from_secs(2));
+}
+
+fn pictures_are_read(delay: Duration) {
     let (library, dir, models) = photolib_ml::testing::ocr();
     let ort = photolib_ml::Ort::load(&library).unwrap();
     let reports = self_test(ort, dir.path(), &models);
@@ -43,6 +57,7 @@ fn the_pictures_of_every_script_and_a_payload_are_read_as_they_say() {
     }
     let pool = Pool::new(ort, dir.path(), &reports, MEMORY, rss);
     let mut infer = |file: &str, input| {
+        std::thread::sleep(delay);
         let mut outputs = pool.run(file, &[vec![input]])?;
         outputs.pop().ok_or_else(|| "no output".to_owned())
     };
