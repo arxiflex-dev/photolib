@@ -41,6 +41,17 @@
       },
       "pending": "thumbnails over the LAN, with the server's renditions (M2-09); phones (device lab, M10-02)"
     },
+    "map-pan": {
+      "requirement": "M1-45, NFR-PERF-1, ADR-0403",
+      "how": "app/benchmark/map_perf.dart opens the map over the 1m fixture's located assets in the app's kernel isolate, sweeps the camera over the world, zooms into Berlin and pans at zooms 6, 10 and 14, 5 s each: janky is the share of those frames over the display's frame budget (a frame taking the slower of build and raster, build alone on headless, whose raster thread is a software GPU), each sweep drawn again after 5 s of rest while over it, up to three times, the least janky counting; query_p95 is the p95 of the kernel's viewport queries meanwhile; open is the time from opening the page to its first clusters",
+      "fixtures": ["1m"],
+      "metrics": {
+        "janky": {"unit": "%", "max": 1, "measured": ["desktop", "headless"], "requires": ["attempts"]},
+        "query_p95": {"unit": "ms", "max": {"desktop": 16, "headless": 25}, "measured": ["desktop", "headless"]},
+        "open": {"unit": "s", "max": {"desktop": 5, "headless": 10}, "measured": ["desktop", "headless"]}
+      },
+      "pending": "mid-range Android and iPhone (device lab, M10-02)"
+    },
     "timeline-scroll-web": {
       "requirement": "NFR-PERF-1",
       "how": "tools/timeline_bench.py chrome --wasm --check, in the web part: the timeline prototype over the 1M library in headless Chrome (dart2wasm, software GL) drags 8,000 px and flings three times, as the codec pipeline the web build uses: janky is the share of frames whose build and raster together miss 60 Hz's 16.7 ms, the worse of the two runs",

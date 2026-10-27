@@ -69,6 +69,11 @@ want = {
     ("heic-web-fill", "janky", "web"): ("max", 1),
     # M2-25's acceptance: the web timeline's frames over the 1M library, in Chrome, miss 60 Hz less than 1%.
     ("timeline-scroll-web", "janky", "web"): ("max", 1),
+    # M1-45's acceptance: 1M geotagged assets cluster and pan smoothly: the map's frames within 60 Hz, a query of the
+    # kernel's index within a frame (headless, loaded, 25 ms), the first clusters within 5 s (headless 10 s).
+    ("map-pan", "janky", "*"): ("max", 1), ("map-pan", "query_p95", "desktop"): ("max", 16),
+    ("map-pan", "query_p95", "headless"): ("max", 25), ("map-pan", "open", "desktop"): ("max", 5),
+    ("map-pan", "open", "headless"): ("max", 10),
 }
 got = {}
 for name, budget in budgets["budgets"].items():
@@ -109,11 +114,12 @@ assert measured == {("timeline-scroll", "fps"): frames, ("timeline-scroll", "jan
                     ("idle-cpu", "cpu"): frames, ("sphere-video", "fps"): ["headless"],
                     ("sphere-video", "flat"): ["headless"],
                     ("server-tiles", "cold_p95"): frames, ("server-tiles", "warm_blank"): frames,
-                    ("heic-web-fill", "janky"): ["web"], ("timeline-scroll-web", "janky"): ["web"]}, measured
+                    ("heic-web-fill", "janky"): ["web"], ("timeline-scroll-web", "janky"): ["web"],
+                    ("map-pan", "janky"): frames, ("map-pan", "query_p95"): frames, ("map-pan", "open"): frames}, measured
 # Every janky share is measured again over its budget and less what an idle isolate missed (ADR-0140).
 janky = {(name, metric): spec.get("requires") for name, budget in budgets["budgets"].items()
          for metric, spec in budget["metrics"].items() if metric.endswith("janky")}
-assert len(janky) == 9 and all(r == ["attempts"] for r in janky.values()), janky
+assert len(janky) == 10 and all(r == ["attempts"] for r in janky.values()), janky
 # Ingest throughput is checked against a reference measured beside it (ADR-0121).
 calibration = budgets["budgets"]["ingest-throughput"]["calibration"]
 assert calibration["how"] and 0 < calibration["quiet"] < 1, calibration
@@ -407,6 +413,7 @@ for name, budget in budgets.items():
                     {"video-swipe": "videos", "sphere-video": "sphere-video",
                      "server-tiles": "server-tiles"}.get(name, "folder-10k")
                 skip = name != alone if alone else name in ("cold-start", "idle-cpu")
+                skip = skip or (name == "map-pan") != bool(os.environ.get("MAP"))
                 if skip or test not in wanted:
                     continue
                 limit = spec.get("max", spec.get("min"))
@@ -439,6 +446,7 @@ if [[ $1 == drive ]]; then
   done
   [[ -n ${PERF_TESTS:-} ]] || PERF_TESTS="$(ls "$PERF_FIXTURES" | tr '\n' ,)folder-10k,videos,sphere-video,server-tiles"
   [[ ,$PERF_TESTS, != *,sphere-video,* || -f $PERF_FIXTURES/sphere.mp4 ]] || { echo "no sphere.mp4" && exit 1; }
+  [[ $* != *benchmark/map_perf.dart* ]] || { cd .. && MAP=1 python3 "$STUBS/report.py" "$PERF_TARGET" 1m; exit; }
   cd .. && python3 "$STUBS/report.py" "$PERF_TARGET" ${PERF_TESTS//,/ }
 elif [[ $* == *" -t benchmark/idle_cpu.dart "* ]]; then
   for arg; do
