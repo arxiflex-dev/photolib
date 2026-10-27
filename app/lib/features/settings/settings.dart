@@ -167,12 +167,14 @@ enum ViewerAction {
   keepOffline,
 }
 
-/// The actions pinned to the viewer's bar until the user changes them.
+/// The actions pinned to the viewer's bar until the user changes them: the
+/// owner's order (ADR-0245), a bar already saved keeps its own.
 const List<ViewerAction> defaultPins = [
   ViewerAction.favourite,
+  ViewerAction.share,
   ViewerAction.info,
-  ViewerAction.edit,
   ViewerAction.trash,
+  ViewerAction.edit,
   ViewerAction.filmstrip,
 ];
 

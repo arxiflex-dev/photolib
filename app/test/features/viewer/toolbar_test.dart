@@ -51,7 +51,14 @@ void main() {
       ),
   ];
 
-  const pins = ['Favourite', 'Info', 'Edit', 'Move to trash', 'Filmstrip'];
+  const pins = [
+    'Favourite',
+    'Share',
+    'Info',
+    'Move to trash',
+    'Edit',
+    'Filmstrip',
+  ];
 
   testWidgets('the bar has no date and the same buttons in the same slots for '
       'a photo, a video and a 360° item at every width, the last pins folded '
@@ -60,8 +67,8 @@ void main() {
       (320.0, 2),
       (390.0, 2),
       (520.0, 4),
-      (760.0, 5),
-      (1100.0, 5),
+      (760.0, 6),
+      (1100.0, 6),
     ]) {
       final slots = <List<(String?, Rect)>>[];
       for (final at in [0, 1, 2]) {
@@ -113,8 +120,9 @@ void main() {
         },
     ];
     expect(entries, [
-      'Edit',
+      'Info',
       'Move to trash',
+      'Edit',
       'Filmstrip',
       'Rotate',
       'Slideshow',
