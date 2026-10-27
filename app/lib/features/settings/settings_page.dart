@@ -185,7 +185,9 @@ class _DateFormat extends ConsumerWidget {
             RadioGroup<DateOrder>(
               groupValue: chosen,
               onChanged: (order) {
-                ref.read(settingsProvider.notifier).setDateFormat(order!);
+                if (order != null) {
+                  ref.read(settingsProvider.notifier).setDateFormat(order);
+                }
                 Navigator.pop(context);
               },
               child: Column(
