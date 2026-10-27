@@ -212,7 +212,7 @@ esac
 STUB
 ENV_LOG=$SANDBOX/dart-env.log
 : >"$ENV_LOG"
-ENV_LOG=$ENV_LOG HTTPS_PROXY=http://proxy.example:3128 http_proxy=http://proxy.example:3128 lint dart dart
+ENV_LOG=$ENV_LOG HTTPS_PROXY=proxy.invalid:3128 http_proxy=proxy.invalid:3128 lint dart dart
 REFUSED=http://127.0.0.1:9
 [[ $(wc -l <"$ENV_LOG") -eq 3 ]] && ok "dart_code_linter runs three commands" || fail "dart calls: $(cat "$ENV_LOG")"
 [[ $(sort -u "$ENV_LOG") == "$REFUSED $REFUSED $REFUSED $REFUSED $REFUSED" ]] &&
