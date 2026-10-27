@@ -167,6 +167,9 @@ curl -H 'Authorization: Bearer plk_3f9c…' -H 'Content-Type: application/json' 
   http://127.0.0.1:8080/photolib.api.v1.UserService/ListUsers -d '{}'
 ```
 
+Scripts have no OPAQUE client, so whoever runs the host makes the first key:
+`photolibd admin api-key <handle> [--scope view --scope contribute …] [--days 365]` prints one, shown once.
+
 Revoking a key, disabling or deleting its account, or its expiry stops it at once. Creating and revoking keys are
 audited.
 

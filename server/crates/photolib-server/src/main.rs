@@ -92,6 +92,17 @@ enum Admin {
     /// Print a password setup token (a link with public_url) for an account, such as the only administrator, whose
     /// owner forgot the password; the old password works until a new one is set
     PasswordSetup { handle: String },
+    /// Print a new API key (shown once) for an account, for scripts, `curl` and `photolib upload`
+    ApiKey {
+        handle: String,
+        #[arg(long, default_value = "host")]
+        name: String,
+        /// view, download, contribute, edit, delete, share, manage_users or manage_server; repeat for several
+        #[arg(long = "scope", default_values_t = ["view".to_string(), "download".to_string(), "contribute".to_string()])]
+        scopes: Vec<String>,
+        #[arg(long, default_value_t = 365)]
+        days: u32,
+    },
 }
 
 #[derive(Subcommand)]
@@ -173,6 +184,16 @@ fn main() -> ExitCode {
         }) => runtime
             .block_on(auth::host_password_setup(&config, &handle))
             .map(|setup| println!("{setup}")),
+        Some(Command::Admin {
+            action: Admin::ApiKey {
+                handle,
+                name,
+                scopes,
+                days,
+            },
+        }) => runtime
+            .block_on(photolib_server::keys::host_api_key(&config, &handle, &name, &scopes, days))
+            .map(|key| println!("{key}")),
         Some(Command::Models { action }) => models(&config, action, &runtime),
         Some(Command::MediaChild { .. }) => unreachable!("handled before the runtime starts"),
     };
