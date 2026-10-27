@@ -26,7 +26,7 @@ want = {
     ("semantic-search-100k", "query", "server"): ("max", 200), ("semantic-search-100k", "query", "desktop"): ("max", 200),
     ("semantic-search-100k", "query", "android"): ("max", 500), ("semantic-search-100k", "query", "ios"): ("max", 500),
     ("server-idle-rss", "rss", "server"): ("max", 150),
-    ("ingest-throughput", "photos", "server"): ("min", 19),
+    ("ingest-throughput", "photos", "server"): ("min", 19), ("ocr-read", "slowest", "server"): ("max", 5000),
     # docs/10 §3.7, M1-10's acceptance: at frame budget, as NFR-PERF-1 counts it.
     ("drag-select-5k", "janky", "*"): ("max", 1),
     # M1-37's acceptance: Settings' list of 5,000 device folders at frame budget.
@@ -99,6 +99,7 @@ assert measured == {("timeline-scroll", "fps"): frames, ("timeline-scroll", "jan
                        for run in ["1x", "3x", "fling"]},
                     ("server-idle-rss", "rss"): ["server"], ("ingest-throughput", "photos"): ["server"],
                     ("initial-sync-100k", "standard"): ["server"], ("initial-sync-100k", "incremental"): ["server"],
+                    ("ocr-read", "slowest"): ["server"],
                     ("viewer", "open"): frames, ("viewer", "open_cold"): frames,
                     ("viewer-folder", "warm"): frames, ("viewer-folder", "cold"): frames,
                     ("viewer", "chrome"): frames, ("viewer", "chrome_cold"): frames,
@@ -138,6 +139,7 @@ result() { # result <budget> <metric> <target> <value> [fixture]: a janky share 
   result ingest-throughput photos server 24.5
   result initial-sync-100k standard server 4.2
   result initial-sync-100k incremental server 9
+  result ocr-read slowest server 1200
   result cold-start first_frame desktop 420
 } >"$TMP/good.jsonl"
 capture python3 $PERF check "$TMP/good.jsonl"
@@ -397,7 +399,7 @@ measured, wanted = sys.argv[1], sys.argv[2:]
 # `result: <json>`, the server's tests append it to $PERF_RESULTS.
 alone = os.environ.get("ALONE")
 server = {"server-idle-rss": "photolibd_without_ml", "ingest-throughput": "ingest_throughput",
-          "initial-sync-100k": "initial_sync"}
+          "initial-sync-100k": "initial_sync", "ocr-read": "ocr_read"}
 out = open(os.environ["PERF_RESULTS"], "a") if measured == "server" else None
 for name, budget in budgets.items():
     for metric, spec in budget["metrics"].items():
@@ -464,7 +466,7 @@ rm -f "$TMP/rerun.jsonl"
 perf_run BAD="folder-scroll cold_janky"
 expect_result "a run measures every budget, and fails on one" 1 \
   "FAIL folder-scroll cold_janky headless" "ok   ingest-throughput photos server" "ok   cold-start first_frame headless" \
-  "ok   idle-cpu cpu headless 1m"
+  "ok   idle-cpu cpu headless 1m" "ok   ocr-read slowest server"
 [[ $(cat "$TMP/rerun.jsonl") == '{"budget": "folder-scroll", "metric": "cold_janky", "target": "headless", "fixture": "", "values": [3]}' ]] &&
   ok "and leaves what failed to rerun" || fail "it left to rerun: $(cat "$TMP/rerun.jsonl")"
 # The server's benchmarks and the 360° clip run beside the app's idle CPU, which counts CPU time, and end before the
