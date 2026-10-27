@@ -92,7 +92,7 @@ class SourceNode {
   /// Its own items.
   final int items;
 
-  /// Its items with those of every folder below; a root's offline ones too.
+  /// Its items with those of every folder below, the hidden and archived in none; an offline root's all.
   final int itemsBelow;
 
   /// The newest day, `yyyymmdd`, of its items and those below.
@@ -143,6 +143,10 @@ Future<SourceNode> sourceTree(Replica db, {Set<String> lost = const {}}) async {
   for (final f in await db.deviceFolders().get()) {
     (volumes[f.volume] ??= {})[f.path] = f;
   }
+  // Hidden and archived items leave the library's views, and so its counts.
+  final shownIn = {
+    for (final c in await db.shownInFolders().get()) c.folder: c,
+  };
   final shown = !await onlyChosen(db);
   final order = volumes.keys.toList()
     ..sort(
@@ -158,6 +162,7 @@ Future<SourceNode> sourceTree(Replica db, {Set<String> lost = const {}}) async {
         v,
         volumes[v]!,
         roots[v],
+        shownIn,
         lost: lost.contains(v),
       ).node('', above: shown),
   ];
@@ -201,7 +206,7 @@ final _appOwned = RegExp('^(Android|WhatsApp|Telegram|Signal|Viber)/');
 
 /// The nodes of one volume or root, from its [rows] by path.
 class _Fold {
-  _Fold(this.volume, this.rows, this.root, {required this.lost})
+  _Fold(this.volume, this.rows, this.root, this.shownIn, {required this.lost})
     : source = root == null
           ? 'mediastore:$volume'
           : '${_web ? 'fsa' : 'folder'}:$volume' {
@@ -219,6 +224,9 @@ class _Fold {
 
   /// The root's state and items, offline ones too; null for MediaStore.
   final FolderSummaryResult? root;
+
+  /// What each folder shows, by its row.
+  final Map<int, ShownInFoldersResult> shownIn;
   final bool lost;
   final _below = <String, Set<String>>{};
 
@@ -240,7 +248,8 @@ class _Fold {
     final children = [
       for (final k in _below[key] ?? const <String>{}) node(k, above: shown),
     ]..sort((a, b) => naturalCompare(a.name, b.name));
-    final items = row?.items ?? 0;
+    final shownHere = shownIn[row?.id];
+    final items = shownHere?.items ?? 0;
     final below = children.fold(items, (n, c) => n + c.itemsBelow);
     final top = key.isEmpty;
     return SourceNode(
@@ -255,8 +264,9 @@ class _Fold {
           : SourceKind.root,
       id: row?.id,
       items: items,
-      itemsBelow: top ? root?.items ?? below : below,
-      newest: _latest([row?.newest, for (final c in children) c.newest]),
+      // A root away counts what the scan found; else what the library shows.
+      itemsBelow: top && root?.state == 'offline' ? root!.items : below,
+      newest: _latest([shownHere?.newest, for (final c in children) c.newest]),
       state: _state(top, below),
       visibility: own,
       shown: shown,

@@ -19,6 +19,8 @@ const _unfiltered = {
   'extractionQueueOf': 'extraction of the items on screen',
   'folderContext': 'an item another app opens swipes through its own folder',
   'deviceFolders': 'the source tree lists every folder, shown or not',
+  'shownInFolders':
+      'the source tree counts what every folder shows, shown or not',
   'freshFolder': 'a new folder is told of, shown or not',
   'backupReasons': 'backup explains every item it has not sent, shown or not',
   'backupItems': 'the items of one of those reasons',
