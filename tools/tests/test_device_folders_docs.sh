@@ -29,4 +29,13 @@ assert_matches app/lib/features/folders/device_folders.dart '^const revealFor = 
 # 4. Folders after the first index, never junk, are announced once.
 assert_matches "$DATA/media_store.dart" 'fresh: Value\(_fresh && !junk \? 1 : 0\)' "a new folder but junk is announced"
 
+# ADR-0290 (M1-51) as the owner kept it (2026-10-23): all four decisions, Accepted, in the index too.
+TREE=docs/adr/0290-one-source-tree.md
+assert_prose "$TREE" '\* \*\*Status\*\*: Accepted — 2026-10-23 \(PHO-213, photolib-design#642\)\. The owner kept all four decisions' \
+  "ADR-0290 is Accepted, recording the owner's answer"
+assert_matches docs/adr/README.md '\(0290-one-source-tree\.md\) \| [^|]* \| Accepted \(owner confirmed, 2026-10-23\)' \
+  "the index lists ADR-0290 as Accepted"
+assert_prose "$TREE" '4\. \*Where both M1-37 lists name a folder' "ADR-0290 records the fourth decision, the one column"
+if grep -q 'Proposed' "$TREE"; then fail "ADR-0290 still says Proposed"; else ok "ADR-0290 says nothing is Proposed"; fi
+
 finish
