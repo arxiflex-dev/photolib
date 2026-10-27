@@ -50,6 +50,10 @@ made itself says why with `// deletion-ok: <reason>`.
 * A fingerprint is no content hash: two files equal in size, head and tail but not between share their state. M2's
   BLAKE3 `content_hash` can replace it with one more migration.
 * A browser's folders have no trash; Photolib's own bin stands in.
+* Media a folder's `.photolibignore` rules exclude are indexed with `hidden` 2: out of every view, shown with the
+  hidden by *Temporarily show hidden and excluded*, and let go when the rules do. The default junk (`@eaDir`,
+  `.thumbnails`...) is still never indexed.
+* Photolib's own trash keeps items 30, 60 (default) or 90 days as Settings says, fixed per item when trashed.
 * Nothing here runs the platforms' halves: Android's and iOS's requests, macOS's Trash (whose sandbox may refuse
   moving a file back) and Windows' shell call are verified on devices and in the smoke runs.
 

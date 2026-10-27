@@ -87,7 +87,8 @@ void folderTests(Uri Function() assets, Uint8List key) {
               .getSingle())
           .read<int>('n');
 
-  /// path → [what] of every folder item of [db], by default 'state size'.
+  /// path → [what] of every folder item of [db], by default 'state size', but
+  /// for those the ignore rules exclude (`hidden` 2).
   Future<Map<String, String>> items(
     Replica db, [
     String Function(LocalAssetData)? what,
@@ -95,7 +96,7 @@ void folderTests(Uri Function() assets, Uint8List key) {
     for (final a in await (db.select(
       db.localAsset,
     )..orderBy([(a) => OrderingTerm(expression: a.path)])).get())
-      a.path!: what?.call(a) ?? '${a.state} ${a.size}',
+      if (a.hidden != 2) a.path!: what?.call(a) ?? '${a.state} ${a.size}',
   };
 
   Future<Map<String, String>> folders(Replica db) async => {

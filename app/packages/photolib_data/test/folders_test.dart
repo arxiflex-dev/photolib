@@ -44,9 +44,11 @@ void main() {
     )..orderBy([(a) => OrderingTerm(expression: a.path)])).get();
   }
 
-  /// path → state of every folder item of [of], by default the test's replica.
+  /// path → state of every folder item of [of], by default the test's
+  /// replica, but for those the ignore rules exclude (`hidden` 2).
   Future<Map<String, String>> items([Replica? of]) async => {
-    for (final a in await byPath(of)) a.path!: a.state,
+    for (final a in await byPath(of))
+      if (a.hidden != 2) a.path!: a.state,
   };
 
   /// Waits until the items are [expected], which a watcher's scan makes them
@@ -496,11 +498,7 @@ void main() {
     write('2024/.photolibignore', '');
     write('.photolibignore', 'drafts/\nkeep.jpg\n');
     await indexer.scan(root, dir: '2024');
-    expect(await items(), {
-      '2024/c.jpg': 'present',
-      '2024/keep.jpg': 'missing',
-      'a.jpg': 'present',
-    });
+    expect(await items(), {'2024/c.jpg': 'present', 'a.jpg': 'present'});
   });
 
   /// Indexes `a.jpg` and `2024/drafts/b.jpg` under a rule `DRAFTS/`.
@@ -530,10 +528,10 @@ void main() {
     ];
     expect(first.logger, 'photolib.index');
     expect(first.fields, containsPair('root', root));
-    expect(first.fields, containsPair('directories', 1));
-    expect(first.fields, containsPair('seen', 5));
-    expect(first.fields, containsPair('indexed', 2));
-    expect(first.fields['skipped'], {'ignored': 1, 'not media': 2});
+    expect(first.fields, containsPair('directories', 2));
+    expect(first.fields, containsPair('seen', 6));
+    expect(first.fields, containsPair('indexed', 3));
+    expect(first.fields['skipped'], {'excluded': 1, 'not media': 2});
     expect(second.fields, containsPair('indexed', 0));
     expect(second.fields, containsPair('missing', 1));
   });
@@ -546,11 +544,7 @@ void main() {
     // link is, shows a case-insensitive volume.
     Process.runSync('ln', ['$root/a.jpg', '$root/A.JPG']);
     await indexer.scan(root);
-    expect(await items(), {
-      '2024/drafts/b.jpg': 'missing',
-      'A.JPG': 'present',
-      'a.jpg': 'present',
-    });
+    expect(await items(), {'A.JPG': 'present', 'a.jpg': 'present'});
   }, testOn: 'linux');
   test(
     'on a case-insensitive volume, ignore rules match names in any case',

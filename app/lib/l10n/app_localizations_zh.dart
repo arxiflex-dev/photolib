@@ -2753,6 +2753,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get settingsTrashKeep => 'Photolib 在回收站中保留项目的时间';
+
+  @override
   String get settingsViewerBar => '查看器栏中的按钮';
 
   @override
@@ -3135,6 +3138,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trashEmptyAll => '清空回收站';
 
   @override
+  String trashKeepDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    return '$daysString 天';
+  }
+
+  @override
   String trashMoved(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -3147,6 +3160,9 @@ class AppLocalizationsZh extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get trashRemoveGone => '从列表中移除';
 
   @override
   String trashRetention(int days) {
@@ -6128,6 +6144,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
+  String get settingsTrashKeep => 'Photolib 在垃圾桶中保留項目的時間';
+
+  @override
   String get settingsViewerBar => '檢視器列中的按鈕';
 
   @override
@@ -6510,6 +6529,16 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get trashEmptyAll => '清空垃圾桶';
 
   @override
+  String trashKeepDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    return '$daysString 天';
+  }
+
+  @override
   String trashMoved(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -6522,6 +6551,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
     );
     return '$_temp0';
   }
+
+  @override
+  String get trashRemoveGone => '從清單中移除';
 
   @override
   String trashRetention(int days) {

@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:photolib/core/deletion.dart';
@@ -128,6 +130,55 @@ void main() {
     );
   });
 
+  group('signed out', () {
+    Future<void> press(WidgetTester tester, ThumbnailItem item) async {
+      final db = Replica(NativeDatabase.memory());
+      addTearDown(db.close);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            serverProvider.overrideWithValue(const AsyncData(null)),
+            deletionProvider.overrideWith(
+              (ref) async => DeletionService(db, (_) => FakePlatform()),
+            ),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            home: Scaffold(
+              body: Consumer(
+                builder: (context, ref, _) => TextButton(
+                  onPressed: () => unawaited(
+                    deleteItems(context, ref, [item], chosen: () => context),
+                  ),
+                  child: const Text('delete'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('delete'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('an Apple Photos item still asks, and says iCloud Photos '
+        'follows, as Photos itself is the only other to say it', (
+      tester,
+    ) async {
+      await press(tester, item(Availability.notBackedUp, 5, scheme: 'ph'));
+      expect(find.textContaining('With iCloud Photos on'), findsOneWidget);
+      expect(find.text('Move to trash'), findsOneWidget);
+    });
+
+    testWidgets('a file on this device is trashed at once, as before', (
+      tester,
+    ) async {
+      await press(tester, item(Availability.notBackedUp, 5));
+      expect(find.textContaining('iCloud'), findsNothing);
+      expect(find.byType(AlertDialog), findsNothing);
+    });
+  });
+
   group('signed in, the trash asks', () {
     late Replica db;
     late FakePlatform platform;
@@ -222,7 +273,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byTooltip('Select all'));
       await tester.pumpAndSettle();
-      await tester.tap(find.byTooltip('Move to trash'));
+      await tester.tapAction('Move to trash');
       await tester.pumpAndSettle();
     }
 
@@ -286,7 +337,7 @@ void main() {
       expect(find.text('3 selected'), findsOneWidget);
       expect(platform.calls, isEmpty);
       expect(await trashed(), [false, false]);
-      await tester.tap(find.byTooltip('Move to trash'));
+      await tester.tapAction('Move to trash');
       await tester.pumpAndSettle();
       await tester.tap(find.text('Remove from this device'));
       await tester.pumpAndSettle();
@@ -305,7 +356,7 @@ void main() {
       await tester.tapAndSettle(find.text('DCIM'));
       await tester.longPress(find.byType(ThumbnailAt).first);
       await tester.tapAndSettle(find.byTooltip('Select all'));
-      await tester.tapAndSettle(find.byTooltip('Move to trash'));
+      await tester.tapAction('Move to trash');
       expect(find.text('Delete 2 items?'), findsOneWidget);
       expect(
         find.text('1 only on this device, not backed up · 1 kB'),

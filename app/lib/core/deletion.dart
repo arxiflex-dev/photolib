@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photolib/core/device_library.dart';
 import 'package:photolib/core/replica.dart';
+import 'package:photolib/features/settings/settings.dart';
 import 'package:photolib_data/photolib_data.dart';
 
 /// The platform of each source of device items (docs/10-client-app.md §5.4):
@@ -27,6 +28,9 @@ final deletionProvider = FutureProvider<DeletionService>(
   (ref) async => DeletionService(
     await ref.watch(replicaProvider.future),
     ref.watch(mediaPlatformProvider),
+    retention: Duration(
+      days: ref.watch(settingsProvider.select((s) => s.trashDays)),
+    ),
   ),
 );
 

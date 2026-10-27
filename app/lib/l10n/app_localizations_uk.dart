@@ -2944,6 +2944,10 @@ class AppLocalizationsUk extends AppLocalizations {
   }
 
   @override
+  String get settingsTrashKeep =>
+      'Як довго Photolib зберігає елементи в кошику';
+
+  @override
   String get settingsViewerBar => 'Кнопки на панелі перегляду';
 
   @override
@@ -3349,6 +3353,16 @@ class AppLocalizationsUk extends AppLocalizations {
   String get trashEmptyAll => 'Очистити кошик';
 
   @override
+  String trashKeepDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    return '$daysString днів';
+  }
+
+  @override
   String trashMoved(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -3364,6 +3378,9 @@ class AppLocalizationsUk extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get trashRemoveGone => 'Прибрати зі списку';
 
   @override
   String trashRetention(int days) {

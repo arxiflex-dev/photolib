@@ -103,7 +103,9 @@ void main() {
     await service.trash([id(1), id(2), id(3), id(4)]);
     expect(folders.calls, ['trash 1,2']);
     expect(store.calls, ['trash 3']);
-    final until = now.add(DeletionService.retention).millisecondsSinceEpoch;
+    final until = now
+        .add(DeletionService.defaultRetention)
+        .millisecondsSinceEpoch;
     expect(await rows(), [
       ('1', 1, until, 'bin/1'),
       ('2', 1, until, 'bin/2'),
@@ -112,6 +114,27 @@ void main() {
     ]);
     expect(await db.trashItems(false).get(), hasLength(4));
     expect(await db.timelineDays(true, null).get(), isEmpty);
+  });
+
+  test('Photolib keeps what it trashes for the retention given, fixed for '
+      'each item when it is trashed', () async {
+    await add(1);
+    await add(2);
+    DeletionService keeping(int days) => DeletionService(
+      db,
+      (_) => folders,
+      now: () => now,
+      retention: Duration(days: days),
+    );
+    await keeping(30).trash([id(1)]);
+    await keeping(90).trash([id(2)]);
+    int? at(int days) => now.add(Duration(days: days)).millisecondsSinceEpoch;
+    expect(await rows(), [
+      ('1', 1, at(30), 'bin/1'),
+      ('2', 1, at(90), 'bin/2'),
+    ]);
+    expect(DeletionService.defaultRetention, const Duration(days: 60));
+    expect(service.retention, DeletionService.defaultRetention);
   });
 
   test('what goes to a trash Photolib cannot restore from leaves the index, '
@@ -174,6 +197,19 @@ void main() {
     expect(await db.select(db.keptState).get(), isEmpty);
   });
 
+  test('forgets the entry of an item the platform no longer holds without '
+      'asking the platform, and only from the trash', () async {
+    await add(1);
+    await add(2, source: 'mediastore');
+    await service.trash([id(2)]);
+    store.refuse = true;
+    await expectLater(service.forget([id(1), id(2)]), throwsStateError);
+    expect(await rows(), [('1', 0, null, null), ('2', 1, 7, null)]);
+    await service.forget([id(2)]);
+    expect(await rows(), [('1', 0, null, null)]);
+    expect(store.calls, ['trash 2'], reason: 'no purge: it refuses them');
+  });
+
   test('purges what Photolib keeps past its retention, and leaves what the '
       'platform expires itself', () async {
     await add(1);
@@ -183,7 +219,7 @@ void main() {
     final later = DeletionService(
       db,
       (source) => source == 'folder' ? folders : store,
-      now: () => now.add(DeletionService.retention),
+      now: () => now.add(DeletionService.defaultRetention),
     );
     expect([for (final p in await later.purgeExpired()) p.sourceId], ['1']);
     expect(folders.calls.last, 'purge 1');

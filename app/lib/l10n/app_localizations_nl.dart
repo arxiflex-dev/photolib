@@ -2913,6 +2913,10 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get settingsTrashKeep =>
+      'Hoe lang Photolib items in de prullenbak bewaart';
+
+  @override
   String get settingsViewerBar => 'Knoppen in de balk van de viewer';
 
   @override
@@ -3311,6 +3315,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get trashEmptyAll => 'Prullenbak legen';
 
   @override
+  String trashKeepDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    return '$daysString dagen';
+  }
+
+  @override
   String trashMoved(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -3324,6 +3338,9 @@ class AppLocalizationsNl extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get trashRemoveGone => 'Uit lijst verwijderen';
 
   @override
   String trashRetention(int days) {
