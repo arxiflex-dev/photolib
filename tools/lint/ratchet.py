@@ -45,8 +45,8 @@ class Failed(Exception):
     pass
 
 
-def run(cmd, cwd=ROOT, ok=(0,)):
-    proc = subprocess.run(cmd, check=False, cwd=cwd, capture_output=True, text=True)
+def run(cmd, cwd=ROOT, ok=(0,), env=None):
+    proc = subprocess.run(cmd, check=False, cwd=cwd, capture_output=True, text=True, env=env)
     if proc.returncode not in ok:
         command = " ".join(map(str, cmd))
         raise Failed(f"{proc.stdout[-6000:]}{proc.stderr[-6000:]}\n{command} exited with {proc.returncode}")
@@ -136,12 +136,21 @@ def first_json(out, what):
     raise Failed(f"{what} printed no JSON document; the head of its output: {out.strip()[:600] or '(no output)'!r}")
 
 
+# dart_code_linter asks pub.dev for its latest release after every command and prints an update notice if there is one;
+# it has no flag to stop that. Its HTTP client takes the proxy from the environment, so a proxy that refuses ends the
+# check at once and silently (it ignores the failure): no notice, no wait, no dependence on pub.dev (PHO-239).
+NO_UPDATE_CHECK = dict.fromkeys(
+    ("http_proxy", "https_proxy", "all_proxy", "HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY"), "http://127.0.0.1:9")
+
+
 def dart_code_linter(cwd, dirs):
     """Its rules, the functions over DART_LIMITS, and unused code and files."""
     dcl, found = ["dart", "run", "dart_code_linter:metrics"], []
+    env = {**os.environ, **NO_UPDATE_CHECK}
     with tempfile.TemporaryDirectory() as tmp:
         report = Path(tmp) / "metrics.json"
-        run([*dcl, "analyze", *dirs, "--reporter=json", f"--json-path={report}", "--no-fatal-warnings"], cwd=cwd)
+        run([*dcl, "analyze", *dirs, "--reporter=json", f"--json-path={report}", "--no-fatal-warnings"],
+            cwd=cwd, env=env)
         records = json.loads(report.read_text())["records"]
     for record in records:
         path = rel(record["path"], cwd)
@@ -150,7 +159,7 @@ def dart_code_linter(cwd, dirs):
                   for kind in ("classes", "functions") for name, entity in record[kind].items()
                   for m in entity["metrics"] if m["metricsId"] in DART_LIMITS and m["level"] in ("warning", "alarm")]
     for command, key in (("check-unused-code", "unusedCode"), ("check-unused-files", "unusedFiles")):
-        out = run([*dcl, command, *dirs, "--reporter=json", "--no-fatal-unused"], cwd=cwd)
+        out = run([*dcl, command, *dirs, "--reporter=json", "--no-fatal-unused"], cwd=cwd, env=env)
         for entry in first_json(out, f"{command} in {rel(cwd)}").get(key, []):
             for issue in entry.get("issues", [{"line": 1, "declarationName": "no file imports it"}]):
                 found.append(Finding(rel(entry["path"], cwd), command[6:], issue["line"], issue["declarationName"]))
