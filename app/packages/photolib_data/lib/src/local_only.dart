@@ -95,14 +95,34 @@ Future<void> upgradeKeepingLocalOnly(
           await db.customStatement('DROP TABLE "$name"');
         }
         await m.createAll();
+        var foldedLists = false;
         for (final (name, _) in await _tables(backup)) {
           final current = await _columns(db, name);
+          final saved = await _columns(backup, name);
           final kept = [
-            for (final c in await _columns(backup, name))
+            for (final c in saved)
               if (current.contains(c)) c,
           ];
-          if (kept.isNotEmpty) await _copy(backup, db, name, kept);
+          // Schema 21 made the two folder lists one column: map them,
+          // not leave the default.
+          final lists =
+              name == 'device_folder' &&
+              !saved.contains('visibility') &&
+              saved.contains('excluded') &&
+              saved.contains('chosen');
+          if (kept.isNotEmpty) {
+            await _copy(
+              backup,
+              db,
+              name,
+              kept,
+              computed: lists ? {'visibility': visibilityFromLists} : const {},
+            );
+          }
+          foldedLists |= lists;
         }
+        // Needs every folder and the mode restored.
+        if (foldedLists) await db.customStatement(keepModeVisibility);
       });
     }
   } finally {
@@ -132,20 +152,26 @@ Future<void> _copy(
   List<String> columns, {
   String? where,
   Zone? readIn,
+  Map<String, String> computed = const {},
 }) async {
-  final names = columns.map((c) => '"$c"').join(', ');
+  final all = [...columns, ...computed.keys];
+  final names = all.map((c) => '"$c"').join(', ');
+  final select = [
+    ...columns.map((c) => '"$c"'),
+    for (final MapEntry(:key, :value) in computed.entries) '$value AS "$key"',
+  ].join(', ');
   final rows = await (readIn ?? Zone.current).run(
     () => from
         .customSelect(
-          'SELECT $names FROM "$table"${where == null ? '' : ' WHERE $where'}',
+          'SELECT $select FROM "$table"${where == null ? '' : ' WHERE $where'}',
         )
         .get(),
   );
   final insert =
-      'INSERT INTO "$table" ($names) VALUES (${List.filled(columns.length, '?').join(', ')})';
+      'INSERT INTO "$table" ($names) VALUES (${List.filled(all.length, '?').join(', ')})';
   await to.batch((batch) {
     for (final row in rows) {
-      batch.customStatement(insert, [for (final c in columns) row.data[c]]);
+      batch.customStatement(insert, [for (final c in all) row.data[c]]);
     }
   });
 }
