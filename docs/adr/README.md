@@ -139,7 +139,7 @@ here; the two share one numbering.
 | [0290](0290-one-source-tree.md) | One source tree on every client: local folders as a nested tree with an eye per node | Accepted (owner confirmed, 2026-10-23) |
 | [0311](0311-reaching-the-server.md) | Reaching the server without a network degree: discovery, pairing, guided tunnels and a relay later | Accepted (owner confirmed, 2026-10-23) |
 | [0312](0312-app-icon.md) | The app icon on every platform, written from the design's export set | **Proposed — owner to confirm** |
-| [0314](0314-language-setting.md) | Language setting: the device's language unless Settings chooses one | **Proposed — owner to confirm** |
+| [0314](0314-language-setting.md) | Language setting: the device's language unless Settings chooses one | Accepted (owner confirmed, 2026-10-23) |
 | [0331](0331-basic-edits-saved-as-copies.md) | Basic edits in the alpha: copies next to the original, lossless where the JPEG allows | **Proposed — owner to confirm** |
 | [0395](0395-design-21-section-6-recovery-and-rebuild.md) | Design 21 §6 for the L1 recovery code and the rebuild of a store whose keystore key is gone | **Proposed — owner to confirm** |
 | [0383](0383-viewer-chrome-and-panel.md) | The viewer's chrome, cues and information panel: the open choices of the owner's prototype | **Proposed — owner to confirm** |
@@ -154,6 +154,7 @@ here; the two share one numbering.
 | [0391](0391-edit-recipes-and-version-history.md) | Edit recipes and the version history: an `EditRecipe` per immutable version, derived data that follows | **Proposed — owner to confirm** |
 | [0394](0394-macos-desktop-build.md) | The macOS desktop app builds from a fresh checkout and runs with its network, libvips and orientation: the kernel built by the hook, `network.client`, libvips bundled by the Xcode build, upright HDR | **Proposed — owner to confirm** |
 | [0397](0397-m1-51-design-repository-amendments.md) | M1-51's amendments to the design repository, as text to apply | **Proposed — owner to confirm** |
+| [0400](0400-date-format-setting.md) | Date format setting: the order of dates, whatever the language | Accepted (owner, 2026-10-23) |
 
 To record a decision, copy [template.md](template.md) to the next number free in both repositories, set its status
 to *Proposed* (the owner accepts it) and add a row above. `tools/tests/test_adr.sh` checks that every ADR is listed

@@ -902,6 +902,18 @@ class AppLocalizationsUk extends AppLocalizations {
   String get commandPaletteHint => 'Введіть команду';
 
   @override
+  String get dateFormatDefault => 'Типово для мови';
+
+  @override
+  String get dateFormatDmy => 'День-місяць-рік';
+
+  @override
+  String get dateFormatMdy => 'Місяць-день-рік';
+
+  @override
+  String get dateFormatYmd => 'Рік-місяць-день';
+
+  @override
   String deleteBoth(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -2880,6 +2892,9 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get settingsBackground => 'Тло прозорих зображень';
+
+  @override
+  String get settingsDateFormat => 'Формат дати';
 
   @override
   String get settingsDefaultTab => 'Папки й альбоми відкриваються на вкладці';

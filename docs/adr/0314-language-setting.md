@@ -1,6 +1,8 @@
 # ADR-0314 — Language setting: the device's language unless Settings chooses one
 
-* **Status**: **Proposed — owner to confirm**.
+* **Status**: Accepted — 2026-10-23. The owner kept both decisions of the first question (the in-app choice is not
+  written back to the system) and changed the second: dates have a Date format setting of their own
+  ([ADR-0400](0400-date-format-setting.md)).
 * **Requirements**: F-13, NFR-I18N-1, I18N-17. **Design**:
   i18n and accessibility §2;
   amends [ADR-0030](0030-i18n-and-accessibility-scaffolding.md).

@@ -260,7 +260,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   Widget _chips(LocalQuery query) {
     final strings = AppLocalizations.of(context);
-    final formats = Formats(strings);
+    final formats = Formats.of(context);
     final (folder, camera) = (query.folder, query.camera);
     Widget facet(Facet f, String label) => FilterChip(
       label: Text(label),
@@ -532,7 +532,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         showDragHandle: true,
         builder: (context) {
           final md = AppTokens.of(context).md;
-          final formats = Formats(AppLocalizations.of(context));
+          final formats = Formats.of(context);
           return ListView.builder(
             itemCount: entries.length + 1,
             itemBuilder: (context, i) {

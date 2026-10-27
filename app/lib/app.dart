@@ -11,6 +11,7 @@ import 'package:photolib/features/servers/hints.dart';
 import 'package:photolib/features/servers/sync.dart';
 import 'package:photolib/features/settings/settings.dart';
 import 'package:photolib/l10n/app_localizations.dart';
+import 'package:photolib/l10n/formats.dart';
 import 'package:photolib/l10n/locales.dart';
 import 'package:photolib/router.dart';
 import 'package:photolib/ui/theme.dart';
@@ -76,8 +77,10 @@ class PhotolibApp extends ConsumerWidget {
       locale: ref.watch(settingsProvider).language,
       themeMode: ref.watch(settingsProvider).themeMode,
       routerConfig: ref.watch(routerProvider),
-      builder: (context, child) =>
-          InteractionReporter(child: child ?? const SizedBox.shrink()),
+      builder: (context, child) => DateOrderScope(
+        order: ref.watch(settingsProvider.select((s) => s.dateFormat)),
+        child: InteractionReporter(child: child ?? const SizedBox.shrink()),
+      ),
     );
   }
 }

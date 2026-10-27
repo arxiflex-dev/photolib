@@ -898,6 +898,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String get commandPaletteHint => 'Bir komut yazın';
 
   @override
+  String get dateFormatDefault => 'Dil varsayılanı';
+
+  @override
+  String get dateFormatDmy => 'Gün-ay-yıl';
+
+  @override
+  String get dateFormatMdy => 'Ay-gün-yıl';
+
+  @override
+  String get dateFormatYmd => 'Yıl-ay-gün';
+
+  @override
   String deleteBoth(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -2832,6 +2844,9 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get settingsBackground => 'Saydam görsellerin arkasında';
+
+  @override
+  String get settingsDateFormat => 'Tarih biçimi';
 
   @override
   String get settingsDefaultTab => 'Klasörler ve albümler şurada açılır';

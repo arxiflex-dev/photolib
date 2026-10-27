@@ -6,6 +6,7 @@ import 'package:photolib/core/replica.dart';
 import 'package:photolib/features/library/timeline/buckets.dart';
 import 'package:photolib/features/library/timeline/layout.dart';
 import 'package:photolib/features/library/timeline/pipeline.dart';
+import 'package:photolib/l10n/formats.dart' show DateOrder;
 import 'package:photolib/l10n/locales.dart';
 
 /// How the library's timeline is sorted (VIEW-06), grouped (VIEW-03) and
@@ -228,6 +229,7 @@ class Settings {
     this.startScreen = StartScreen.timeline,
     this.albumsFirst = false,
     this.language,
+    this.dateFormat = DateOrder.languageDefault,
   });
 
   /// The settings [json] holds: one it lacks, or holds in a form this version
@@ -319,7 +321,8 @@ class Settings {
       albumsFirst = json['albumsFirst'] == true,
       language = launchLocales
           .where((locale) => locale.toLanguageTag() == json['language'])
-          .firstOrNull;
+          .firstOrNull,
+      dateFormat = DateOrder.named(json['dateFormat']);
 
   /// Light, dark, or as the system is.
   final ThemeMode themeMode;
@@ -397,6 +400,9 @@ class Settings {
   /// longer ships the one stored.
   final Locale? language;
 
+  /// How dates are ordered, whatever the language (ADR-0400).
+  final DateOrder dateFormat;
+
   /// Whether [toggle] is on.
   bool isOn(Toggle toggle) => toggles[toggle] ?? toggle.byDefault;
 
@@ -435,6 +441,7 @@ class Settings {
     StartScreen? startScreen,
     bool? albumsFirst,
     (Locale?,)? language,
+    DateOrder? dateFormat,
   }) {
     final c = chrome ?? (bar: bar, filmstrip: filmstrip, maps: maps);
     T keep<T>(T? changed, T current) => changed ?? current;
@@ -461,6 +468,7 @@ class Settings {
       startScreen: startScreen ?? this.startScreen,
       albumsFirst: albumsFirst ?? this.albumsFirst,
       language: language == null ? this.language : language.$1,
+      dateFormat: dateFormat ?? this.dateFormat,
     );
   }
 
@@ -506,6 +514,7 @@ class Settings {
     'startScreen': startScreen.name,
     'albumsFirst': albumsFirst,
     if (language case final locale?) 'language': locale.toLanguageTag(),
+    if (dateFormat != DateOrder.languageDefault) 'dateFormat': dateFormat.name,
   };
 }
 
@@ -640,6 +649,10 @@ class SettingsNotifier extends StoredNotifier<Settings> {
   /// Shows the app in [language], or the device's when null.
   void setLanguage(Locale? language) =>
       change((s) => s._with(language: (language,)));
+
+  /// Orders dates as [order] does, in the language shown.
+  void setDateFormat(DateOrder order) =>
+      change((s) => s._with(dateFormat: order));
 
   /// The folder chosen last, once the stored settings are read.
   Future<String?> downloadFolder() => loaded.then((_) => state.downloadFolder);
