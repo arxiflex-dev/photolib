@@ -143,6 +143,7 @@ Future<void> _selfTest(WidgetTester tester) async {
     ..writeAsBytesSync(List.filled(4096, 7));
   for (final (video, code, report) in [
     (clip, 0, startsWith('played ')),
+    ('$_corpus/files/video/mjpeg.mov', 0, startsWith('played ')),
     (broken.path, 1, startsWith('failed: ')),
   ]) {
     final result = '${dir.path}/${video.split('/').last}.txt';

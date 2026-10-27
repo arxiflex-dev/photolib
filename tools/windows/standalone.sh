@@ -14,7 +14,11 @@ root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 [[ $# == 2 && -d $1 ]] || { echo "usage: tools/windows/standalone.sh <Release directory> <zip>" >&2; exit 2; }
 release=$1
 zip=$2
-python=$(command -v python3 || command -v python)
+# On Windows `python3` may be the Microsoft Store's stub; the runner's Python is `python`.
+case $(uname -s) in
+  MINGW* | MSYS*) python=$(command -v python || command -v python3) ;;
+  *) python=$(command -v python3 || command -v python) ;;
+esac
 scan() { "$python" -I "$root/tools/windows/deps_scan.py" "$@"; }
 
 stage=$(mktemp -d)
@@ -31,6 +35,7 @@ runtime='^(vcruntime|msvcp|concrt|vcomp)140[a-z0-9_]*\.dll$'
 redist=${VC_REDIST_DIR:-}
 if [[ -z $redist ]] && command -v vswhere >/dev/null 2>&1; then
   redist=$(vswhere -latest -find 'VC/Redist/MSVC/*/x64/Microsoft.VC*.CRT' | tr -d '\r' | sort | tail -n 1)
+  ! command -v cygpath >/dev/null 2>&1 || redist=$(cygpath -u "$redist")
 fi
 for round in 1 2; do
   for name in $(scan --missing "$package" | tr -d '\r'); do

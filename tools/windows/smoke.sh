@@ -20,7 +20,10 @@ for file in "$zip" "$video"; do
   [[ -f $file ]] || { echo "smoke.sh: $file does not exist" >&2; exit 1; }
 done
 timeout=${SMOKE_TIMEOUT:-120}
-python=$(command -v python3 || command -v python)
+case $(uname -s) in
+  MINGW* | MSYS*) python=$(command -v python || command -v python3) ;;
+  *) python=$(command -v python3 || command -v python) ;;
+esac
 native() { if command -v cygpath >/dev/null 2>&1; then cygpath -w "$1"; else echo "$1"; fi; }
 
 dest=$(mktemp -d)

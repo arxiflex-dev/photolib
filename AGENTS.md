@@ -665,7 +665,9 @@ sends gets its cause and next step there in every language, or `tools/tests/chec
   `MpvPlayers` (`mpv.dart`), the system's `libmpv-dev` on Linux; on Windows ours (ADR-0229), LGPL only and rendered in
   software, which `bash tools/video/libmpv.sh` builds reproducibly from the sources it pins and `app/windows/libmpv.cmake`
   takes by the SHA-256 `app/windows/libmpv.json` pins: change a pin, rebuild, commit the new pins, and the owner
-  publishes the archive. The viewer's players are made, played, paused and
+  publishes the archive. The post-merge `client-windows` job packs a standalone zip with `tools/windows/`, which
+  scans it for DLLs outside it and plays a corpus video from it on a fresh runner (ADR-0404). The viewer's players
+  are made, played, paused and
   disposed only by `VideoPlayers` (`video.dart`), while its route has opened and its pages rest; never in a widget's
   `initState`, `didUpdateWidget` or `dispose`. `perf_test.dart` swipes between videos (`video-swipe`). A motion photo
   plays the span extraction indexed (`local_asset.motion_offset`, `motion_length`), copied into the cache by
