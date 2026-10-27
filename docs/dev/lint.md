@@ -35,6 +35,16 @@ The baseline counts, per run (a linter over a directory), file and rule, the fin
 Tests are Rust's test and bench targets and `#[cfg(test)]` code, and elsewhere files under `test/`, `tests/`,
 `integration_test/`, `test_driver/`, `benchmark/`, `benches/` or `RunnerTests/`.
 
+## Clock reads when a test file is loaded
+
+`tools/lint/clock.py` fails a Python, JavaScript, TypeScript or Dart test file (under `test/`, `tests/`, `integration_test/`,
+`test_driver/`, `web_e2e/`, `web_probe/`, or named `*_test.*` / `test_*`) that reads the clock where it runs once, while
+the file loads: at module top level, in a class body or default value (Python), in the body of `main`, `group` or
+`describe`. CI starts a few minutes before 00:00 UTC and builds for six, so a day taken at load is the wrong day when the
+test uses it (PHO-235). Read the clock inside the test or `setUp`, or take the value from what the test made.
+`tools/lint/clock-baseline.json` lists the reads that remain per file with the reason; a count that differs fails, so it
+only shrinks. `tools/tests/test_clock_lint.sh` holds the fixtures.
+
 ## Failures tests used to swallow
 
 * Rust: the gate runs `cargo nextest run --success-output immediate` and `cargo test --doc -- --show-output` through

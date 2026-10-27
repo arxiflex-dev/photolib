@@ -154,7 +154,7 @@ void main() {
       pending: 0,
     );
     final day = const Duration(days: 1).inMilliseconds;
-    final now = DateTime.now().millisecondsSinceEpoch;
+    late int now;
 
     String saved({int? expires}) => jsonEncode(
       SavedServer(
@@ -172,6 +172,7 @@ void main() {
     );
 
     setUp(() {
+      now = DateTime.now().millisecondsSinceEpoch;
       db = Replica(NativeDatabase.memory());
       keystore = MemoryStore(saved(expires: now + 60 * day));
       settings = MemoryStore(
