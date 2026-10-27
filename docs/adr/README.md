@@ -141,6 +141,7 @@ here; the two share one numbering.
 | [0312](0312-app-icon.md) | The app icon on every platform, written from the design's export set | **Proposed — owner to confirm** |
 | [0314](0314-language-setting.md) | Language setting: the device's language unless Settings chooses one | **Proposed — owner to confirm** |
 | [0331](0331-basic-edits-saved-as-copies.md) | Basic edits in the alpha: copies next to the original, lossless where the JPEG allows | **Proposed — owner to confirm** |
+| [0395](0395-design-21-section-6-recovery-and-rebuild.md) | Design 21 §6 for the L1 recovery code and the rebuild of a store whose keystore key is gone | **Proposed — owner to confirm** |
 | [0383](0383-viewer-chrome-and-panel.md) | The viewer's chrome, cues and information panel: the open choices of the owner's prototype | **Proposed — owner to confirm** |
 | [0384](0384-map-view.md) | The map view: kernel clustering on the device, raster tiles on consent, area as a search filter | **Proposed — owner to confirm** |
 | [0385](0385-web-client-v1.md) | The web client v1: served by photolibd, driven in the browsers it supports | **Proposed — owner to confirm** |
