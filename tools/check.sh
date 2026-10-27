@@ -26,6 +26,9 @@ cd "$ROOT" || exit 1
 ulimit -c 0
 # Python writes through to a step's pipe as it goes: attempt hears it, and a step it kills keeps what it wrote.
 export PYTHONUNBUFFERED=1
+# On a hosted runner (CI) these steps are advisory as well: new, and still red until what they exercise is fixed
+# (CHECK_ADVISORY, which the lane sets, names more). Locally and in the release train they fail the gate.
+[[ -z ${CI:-} ]] || CHECK_ADVISORY="${CHECK_ADVISORY:+$CHECK_ADVISORY|}${CHECK_ADVISORY_CI-midnight\.mjs}"
 
 PARTS=(repo commits rust msrv dart web proto node docs lint perf)
 # Lanes run CHECK_JOBS at a time, the longest first, each its parts one after another; perf and the budget steps run
@@ -658,8 +661,12 @@ check_web() {
   if [[ -f tools/web_e2e/run.mjs ]] && need node "the web client's journey" && need npm "the web client's journey" &&
     need cargo "the web client's journey (photolibd)" && need rustup "the web client's journey (the kernel's WASM)" &&
     need flutter "the web client's journey (the app's build)" && ready app && bundled app; then
-    step tools/web_e2e node --test test/lib.test.mjs
+    step tools/web_e2e node --test test/lib.test.mjs test/clock.test.mjs
     step . node tools/web_e2e/run.mjs
+    # The same journey, in Chrome, under a clock that reaches 00:00 UTC seconds after the modules are imported
+    # (tools/web_e2e/clock.mjs): a bug at the day boundary fails here, not in the one queue run that crosses midnight
+    # (PHO-235). Advisory on a hosted runner at first (CHECK_ADVISORY_CI).
+    step . env WEB_E2E_ONLY=chromium WEB_E2E_CLOCK=midnight node --import ./tools/web_e2e/midnight.mjs tools/web_e2e/run.mjs
     # The web's cold start budget (tools/perf/budgets.json): the engine's first frame within 2.5 s of opening the page.
     step . node tools/web_e2e/cold_start.mjs
   fi
