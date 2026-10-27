@@ -5,10 +5,12 @@
 // tools/web_requests.py does), photolibd (`PHOTOLIBD`) and the directory of an FFmpeg that encodes H.264 (`FFMPEG_DIR`,
 // by default tools/video/ffmpeg.sh's). `CHROME_EXECUTABLE` picks Chrome; Playwright (tools/playwright.sh) fetches its Firefox on
 // first use. `PLAYWRIGHT_DIR` names a Playwright library to use instead of the pinned one.
+// `WEB_E2E_CLOCK` ("midnight", or an ISO time) sets the clock of the run and of the browsers, load it with `node --import ./tools/web_e2e/midnight.mjs`.
 // `WEB_E2E_ONLY` (chromium, firefox, webkit, phone, comma-separated) runs those alone. Screenshots and downloads go to `WEB_E2E_OUT` (default: a temporary directory, printed). Exit status 1 when a step fails.
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { browserClock } from './clock.mjs';
 import { journey } from './journey.mjs';
 import { clip, png, startServer } from './lib.mjs';
 import { build, chromium, devices, firefox, launch, webkit } from './setup.mjs';
@@ -37,6 +39,7 @@ async function visit(name, type, built, { mobile = false } = {}) {
         ? { ...devices['Pixel 7'], userAgent: `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${browser.version()} Safari/537.36` }
         : { viewport: { width: 1280, height: 800 } },
     );
+    await browserClock(context);
     const page = await context.newPage();
     if (mobile) {
       const cdp = await context.newCDPSession(page);

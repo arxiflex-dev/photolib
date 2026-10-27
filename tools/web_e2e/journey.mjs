@@ -75,7 +75,8 @@ export async function journey({ page, context, engine, url, token, photos, video
     const modified = await page.evaluate(async (encoded) => {
       const bytes = Uint8Array.from(atob(encoded), (c) => c.charCodeAt(0));
       const data = new DataTransfer();
-      const file = new File([bytes], `dropped-${Date.now()}.png`, { type: 'image/png' });
+      // The page's own clock: a File's default is the machine's, which a clock set for the page (WEB_E2E_CLOCK) does not move.
+      const file = new File([bytes], `dropped-${Date.now()}.png`, { type: 'image/png', lastModified: Date.now() });
       data.items.add(file);
       for (const type of ['dragover', 'drop']) document.dispatchEvent(new DragEvent(type, { dataTransfer: data, bubbles: true, cancelable: true }));
       return file.lastModified;

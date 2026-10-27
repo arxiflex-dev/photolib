@@ -21,7 +21,7 @@ gate_sandbox() {
 # not stubbed come from BASE_PATH (the real ones of sandbox_tools).
 unset CHECK_JOBS # not the CHECK_JOBS of a gate that runs this test
 # nor the filters and the report of a CI job that runs it
-unset CHECK_STEPS CHECK_STEPS_EXCEPT CHECK_ADVISORY CHECK_PARTITION CHECK_REPORT CHECK_RETRIES CHECK_BUDGET_ATTEMPTS
+unset CI CHECK_ADVISORY_CI CHECK_STEPS CHECK_STEPS_EXCEPT CHECK_ADVISORY CHECK_PARTITION CHECK_REPORT CHECK_RETRIES CHECK_BUDGET_ATTEMPTS
 run_gate() {
   OUT=$(cd "$SANDBOX" && CHECK_JOBS=${CHECK_JOBS-1} PATH="$SANDBOX/stubs:${BASE_PATH:-$BASE_BIN}" bash tools/check.sh "$@" 2>&1)
   STATUS=$?
@@ -1144,10 +1144,13 @@ ratchet.sh ruff . @
 ratchet.sh eslint . @
 ratchet.sh swiftlint . @
 ratchet.sh ktlint . @"
+CLOCK_CALL="python3 tools/lint/clock.py @"
 
 lint_sandbox
 run_gate lint
-expect_calls "'lint' runs shellcheck, ruff, eslint, SwiftLint and ktlint against the baseline" "$LINT_CALLS"
+expect_calls "'lint' runs shellcheck, ruff, eslint, SwiftLint and ktlint against the baseline, then the clock lint" \
+  "$LINT_CALLS
+$CLOCK_CALL"
 
 lint_sandbox
 stub_linux
@@ -1155,7 +1158,8 @@ mkdir -p "$SANDBOX/app/linux"
 : >"$SANDBOX/app/linux/CMakeLists.txt"
 run_gate lint
 expect_calls "on Linux, clang-tidy compiles the Linux runner" "$LINT_CALLS
-ratchet.sh clang-tidy app/linux @"
+ratchet.sh clang-tidy app/linux @
+$CLOCK_CALL"
 
 lint_sandbox
 FAIL_ON="ratchet.sh ruff ." run_gate lint
@@ -1948,5 +1952,11 @@ CHECK_ADVISORY='test_a\.sh' run_gate repo docs
 expect_result "a failed advisory step does not fail the gate" 0 "advisory, not counted: failed: bash tools/tests/test_a.sh"
 CHECK_ADVISORY='nothing matches this' run_gate repo docs
 expect_result "a failed step it does not match still fails the gate" failure "failed: bash tools/tests/test_a.sh"
+CI=true CHECK_ADVISORY_CI='test_a\.sh' run_gate repo docs
+expect_result "on a hosted runner (CI) the steps the gate itself names are advisory too" 0 "advisory, not counted: failed: bash tools/tests/test_a.sh"
+CI=true run_gate repo docs
+expect_result "and any other failed step still fails the gate there" failure "failed: bash tools/tests/test_a.sh"
+CI='' CHECK_ADVISORY_CI='test_a\.sh' run_gate repo docs
+expect_result "off a hosted runner they fail the gate" failure "failed: bash tools/tests/test_a.sh"
 
 finish
