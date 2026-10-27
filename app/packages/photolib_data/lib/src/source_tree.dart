@@ -92,7 +92,8 @@ class SourceNode {
   /// Its own items.
   final int items;
 
-  /// Its items with those of every folder below, the hidden and archived in none; an offline root's all.
+  /// Its items with those of every folder below, the hidden and archived in
+  /// none; an offline root's all.
   final int itemsBelow;
 
   /// The newest day, `yyyymmdd`, of its items and those below.

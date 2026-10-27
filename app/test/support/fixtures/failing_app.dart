@@ -4,7 +4,6 @@ import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:material_ui/material_ui.dart' show Offset, Size;
 import 'package:photolib/features/library/timeline/pipeline.dart';
 import 'package:photolib/features/library/timeline/providers.dart';
 import 'package:photolib/features/library/timeline/timeline_view.dart';

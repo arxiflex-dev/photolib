@@ -176,7 +176,7 @@ class FolderIndexer {
   }
 
   /// The ignore rules of the directories above [dir], and whether one the user
-  /// chose ignores it; null when the [junk] defaults do, which is never indexed.
+  /// chose ignores it; null when the [junk] defaults do: never indexed.
   Future<(IgnoreRules, bool)?> _rulesAbove(
     String root,
     String dir,

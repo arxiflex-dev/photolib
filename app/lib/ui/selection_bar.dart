@@ -79,17 +79,16 @@ class SelectionBar extends StatelessWidget implements PreferredSizeWidget {
       builder: (context, box) {
         // The close button and the count keep their room; what is left holds
         // 48 dp buttons, and the first that do not fit fold into one menu.
-        final int room =
+        final fit =
             ((box.maxWidth -
                         kToolbarHeight -
                         min(scale.scale(144), box.maxWidth * 0.4)) /
                     _slot)
-                .floor() -
-            others.length -
-            (selectAll == null ? 0 : 1);
-        final int folded = buttons.length <= room
+                .floor();
+        final room = fit - others.length - (selectAll == null ? 0 : 1);
+        final folded = buttons.length <= room
             ? 0
-            : min(buttons.length, buttons.length - max(0, room - 1));
+            : buttons.length - (room > 1 ? room - 1 : 0);
         return AppBar(
           backgroundColor: scheme.secondaryContainer,
           foregroundColor: scheme.onSecondaryContainer,

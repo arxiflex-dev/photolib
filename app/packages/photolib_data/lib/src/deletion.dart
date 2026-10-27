@@ -17,7 +17,7 @@ typedef Binned = ({String? bin, int? expires});
 /// when the user or the platform refuses, having changed nothing.
 abstract interface class MediaPlatform {
   /// Whether the platform deletes what is in its trash when it expires; else
-  /// Photolib does, after [retention].
+  /// Photolib does, after its retention.
   bool get expires;
 
   /// Whether Photolib can [restore] from the platform's trash; Photos'
