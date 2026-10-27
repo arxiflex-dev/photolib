@@ -1,6 +1,8 @@
 # ADR-0245 — One deletion path, the platforms' trashes, and Photolib's own state of device items
 
-* **Status**: **Proposed — owner to confirm** (photolib-design#64, roadmap M1-16).
+* **Status**: Accepted — 2026-10-23 (photolib-design#64, roadmap M1-16). The owner kept the first three choices
+  (Recently Deleted on iOS, 60 days, the size-and-ends fingerprint) and changed the fourth: the viewer's default bar
+  starts with Favourite, Share, Info and Move to trash, then the other pins in their present order.
 * **Requirements**: F-14, R-APP-4, R-REL-1. **Design**:
   client app §3.6, §5.4, §6.1,
   feature catalogue ORG-11, ORG-16, ORG-18,
@@ -39,8 +41,8 @@ made itself says why with `// deletion-ok: <reason>`.
 * Hidden items leave every view; archived ones only the timeline. Both show for 5 minutes on request, and never past
   the app going to the background.
 * Every grid's selection (the library's, a folder's, an album's, the favourites') and the viewer favourite, trash, hide
-  and archive alike, the viewer's as `ViewerAction`s the user arranges (ADR-0261); a folder's *Delete folder* trashes
-  its items through the same service.
+  and archive alike, the viewer's as `ViewerAction`s the user arranges (ADR-0261), its default bar the explicit
+  `defaultPins`; a folder's *Delete folder* trashes its items through the same service.
 
 ## Consequences
 

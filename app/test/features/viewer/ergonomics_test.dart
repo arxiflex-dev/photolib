@@ -258,9 +258,10 @@ void _bar() {
     expect(buttons(tester), [
       'Close',
       'Favourite',
+      'Share',
       'Info',
-      'Edit',
       'Move to trash',
+      'Edit',
       'Filmstrip',
       'More',
     ]);
