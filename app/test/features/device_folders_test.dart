@@ -255,7 +255,7 @@ void main() {
       ..add('b.png', 'Pictures/Screenshots/')
       ..add('c.jpg', 'WhatsApp/Media/WhatsApp Images/');
     await run(tester, () => device.index(db));
-    await pump(tester);
+    await pump(tester, size: const Size(400, 1000));
     await tap(tester, find.byTooltip('Settings'));
     await tap(tester, find.text('Device folders'));
     // Every node with an e, the three folders among them.
@@ -298,6 +298,7 @@ void main() {
     var fails = true;
     await pump(
       tester,
+      size: const Size(400, 1000),
       replica: (_) async =>
           fails ? throw StateError('database worker error') : db,
     );

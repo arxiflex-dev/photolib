@@ -895,6 +895,18 @@ class AppLocalizationsSv extends AppLocalizations {
   String get commandPaletteHint => 'Skriv ett kommando';
 
   @override
+  String get dateFormatDefault => 'Språkets standard';
+
+  @override
+  String get dateFormatDmy => 'Dag-månad-år';
+
+  @override
+  String get dateFormatMdy => 'Månad-dag-år';
+
+  @override
+  String get dateFormatYmd => 'År-månad-dag';
+
+  @override
   String deleteBoth(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -2832,6 +2844,9 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get settingsBackground => 'Bakom genomskinliga bilder';
+
+  @override
+  String get settingsDateFormat => 'Datumformat';
 
   @override
   String get settingsDefaultTab => 'Mappar och album öppnas på';

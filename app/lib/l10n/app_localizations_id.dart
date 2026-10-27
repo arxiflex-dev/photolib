@@ -887,6 +887,18 @@ class AppLocalizationsId extends AppLocalizations {
   String get commandPaletteHint => 'Ketik perintah';
 
   @override
+  String get dateFormatDefault => 'Bawaan bahasa';
+
+  @override
+  String get dateFormatDmy => 'Hari-bulan-tahun';
+
+  @override
+  String get dateFormatMdy => 'Bulan-hari-tahun';
+
+  @override
+  String get dateFormatYmd => 'Tahun-bulan-hari';
+
+  @override
   String deleteBoth(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -2812,6 +2824,9 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get settingsBackground => 'Di belakang gambar transparan';
+
+  @override
+  String get settingsDateFormat => 'Format tanggal';
 
   @override
   String get settingsDefaultTab => 'Folder dan album terbuka di';
