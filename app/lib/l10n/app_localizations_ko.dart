@@ -863,6 +863,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String get commandPaletteHint => '명령 입력';
 
   @override
+  String get dateFormatDefault => '언어 기본값';
+
+  @override
+  String get dateFormatDmy => '일-월-년';
+
+  @override
+  String get dateFormatMdy => '월-일-년';
+
+  @override
+  String get dateFormatYmd => '년-월-일';
+
+  @override
   String deleteBoth(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -2718,6 +2730,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get settingsBackground => '투명한 이미지의 배경';
+
+  @override
+  String get settingsDateFormat => '날짜 형식';
 
   @override
   String get settingsDefaultTab => '폴더와 앨범에서 먼저 여는 탭';

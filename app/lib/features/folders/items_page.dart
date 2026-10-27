@@ -375,7 +375,7 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
   );
 
   Widget _list(List<LocalAssetData> sorted, TimelinePages pages) {
-    final formats = Formats(AppLocalizations.of(context));
+    final formats = Formats.of(context);
     return ValueListenableBuilder(
       valueListenable: _selection,
       builder: (context, selected, _) => ListView.builder(
@@ -422,7 +422,7 @@ class _Tile extends StatelessWidget {
   Widget build(BuildContext context) {
     final thumbnail = ThumbnailAt(at, pages, thumbnails);
     if (!isVideo(item)) return thumbnail;
-    final formats = Formats(AppLocalizations.of(context));
+    final formats = Formats.of(context);
     final style = Theme.of(context).textTheme.labelSmall
         ?.copyWith(color: Colors.white);
     return Stack(
