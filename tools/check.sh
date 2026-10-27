@@ -762,6 +762,8 @@ check_lint() {
     step . bash tools/lint/ratchet.sh "$linter" .
   done
   [[ $(uname) != Linux || ! -f app/linux/CMakeLists.txt ]] || step . bash tools/lint/ratchet.sh clang-tidy app/linux
+  # No test file reads the clock when it is loaded (tools/lint/clock.py): a run that crosses midnight sees another day.
+  step . python3 tools/lint/clock.py
 }
 
 check_docs() {
