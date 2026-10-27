@@ -155,8 +155,11 @@ Future<void> deleteItems(
   required BuildContext Function() chosen,
 }) async {
   final signedIn = ref.read(serverProvider).value?.account != null;
-  final choice = signedIn
-      ? await confirmDeletion(context, DeletionPlan.of(items))
+  final plan = DeletionPlan.of(items);
+  // Signed out nothing asks first but the platform; yet where it is Apple
+  // Photos, whose own dialog is the only one that would say iCloud follows.
+  final choice = signedIn || plan.photos
+      ? await confirmDeletion(context, plan)
       : DeleteChoice.trash;
   if (choice == null || !context.mounted) return;
   final everywhere = choice == DeleteChoice.trash;

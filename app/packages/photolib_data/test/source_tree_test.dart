@@ -171,6 +171,40 @@ void main() {
     },
   );
 
+  test("a folder's hidden items are left out of its count and its root's, as "
+      'every other view leaves them out', () async {
+    final tmp = await Directory.systemTemp.createTemp('photolib-tree-');
+    addTearDown(() => tmp.delete(recursive: true));
+    final root = '${tmp.path}/Photos';
+    for (final path in ['a.jpg', 'b.jpg', 'sub/c.jpg']) {
+      File('$root/$path')
+        ..createSync(recursive: true)
+        ..writeAsStringSync(path);
+    }
+    await addFolder(db, root);
+    await FolderIndexer(db).scan(root);
+    Future<(int, int, int)> counts() async {
+      final nodes = await tree();
+      return (
+        nodes['$root:']!.itemsBelow,
+        nodes['$root:']!.items,
+        nodes['$root:sub/']!.items,
+      );
+    }
+
+    expect(await counts(), (3, 2, 1));
+    final b = await (db.select(
+      db.localAsset,
+    )..where((a) => a.path.equals('b.jpg'))).getSingle();
+    final c = await (db.select(
+      db.localAsset,
+    )..where((a) => a.path.equals('sub/c.jpg'))).getSingle();
+    await setHidden(db, [b.id, c.id], value: true);
+    expect(await counts(), (1, 1, 0));
+    await setHidden(db, [b.id], value: false);
+    expect(await counts(), (2, 2, 0));
+  });
+
   test('folders show in natural order, numbers as numbers, in any case, as '
       'the folders page sorts them', () async {
     for (final path in ['F10/', 'F2/', 'f1/', 'F2/b/', 'F2/A/']) {
