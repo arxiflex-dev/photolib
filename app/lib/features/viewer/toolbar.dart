@@ -33,6 +33,9 @@ bool onThisPlatform(ViewerAction action) {
     ViewerAction.share => sharesDownloads,
     ViewerAction.download => !sharesDownloads,
     ViewerAction.copy || ViewerAction.setAs => android,
+    ViewerAction.wallpaper ||
+    ViewerAction.editWith ||
+    ViewerAction.openWith => android,
     ViewerAction.reveal => !kIsWeb && !sharesDownloads,
     ViewerAction.addToAlbum || ViewerAction.map => !kIsWeb,
     ViewerAction.copyText ||
@@ -69,6 +72,9 @@ String actionLabel(ViewerAction action, AppLocalizations strings) =>
       ViewerAction.archive => strings.actionArchive,
       ViewerAction.addToAlbum => strings.actionAddToAlbum,
       ViewerAction.keepOffline => strings.offlineKeep,
+      ViewerAction.wallpaper => strings.galleryWallpaper,
+      ViewerAction.editWith => strings.galleryEditWith,
+      ViewerAction.openWith => strings.galleryOpenWith,
     };
 
 /// [action]'s icon.
@@ -91,6 +97,9 @@ IconData actionIcon(ViewerAction action) => switch (action) {
   ViewerAction.archive => Icons.archive_outlined,
   ViewerAction.addToAlbum => Icons.photo_album_outlined,
   ViewerAction.keepOffline => Icons.push_pin_outlined,
+  ViewerAction.wallpaper => Icons.wallpaper,
+  ViewerAction.editWith => Icons.edit_note,
+  ViewerAction.openWith => Icons.open_in_new,
 };
 
 const _shadows = [Shadow(blurRadius: 6, color: Color(0x99000000))];
@@ -109,6 +118,7 @@ class ViewerBar extends StatelessWidget {
     this.history,
     this.menu,
     this.onMenu,
+    this.readOnly = false,
     super.key,
   });
 
@@ -129,6 +139,10 @@ class ViewerBar extends StatelessWidget {
 
   /// Hears the menu open and close.
   final ValueChanged<bool>? onMenu;
+
+  /// Whether only the close button shows: items looked at over the lock
+  /// screen have no actions (ADR-0401).
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -168,22 +182,24 @@ class ViewerBar extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  for (final a in pins.take(shown))
-                    SizedBox(
-                      key: ValueKey('pin ${a.name}'),
-                      width: 44,
-                      height: 48,
-                      child: IconButton(
-                        icon: Icon(look(a).$2, shadows: _shadows),
-                        tooltip: look(a).$1,
-                        isSelected: actions[a]?.on,
-                        style: const ButtonStyle(
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  if (!readOnly)
+                    for (final a in pins.take(shown))
+                      SizedBox(
+                        key: ValueKey('pin ${a.name}'),
+                        width: 44,
+                        height: 48,
+                        child: IconButton(
+                          icon: Icon(look(a).$2, shadows: _shadows),
+                          tooltip: look(a).$1,
+                          isSelected: actions[a]?.on,
+                          style: const ButtonStyle(
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          onPressed: actions[a]?.run,
                         ),
-                        onPressed: actions[a]?.run,
                       ),
-                    ),
-                  SizedBox(width: 44, child: _more(strings, menu, look)),
+                  if (!readOnly)
+                    SizedBox(width: 44, child: _more(strings, menu, look)),
                 ],
               );
             },

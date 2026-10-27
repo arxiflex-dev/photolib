@@ -69,6 +69,11 @@ const _references = {
   'lib/features/viewer/info_facts.dart': 1,
   // The URI of a copy's original, by its id, to carry its faces onto it.
   'lib/features/editor/face_carry.dart': 1,
+  // The item another app asks to open, by its MediaStore id, whose folder
+  // siblings come from `folderContents`, which filters (ADR-0401).
+  'lib/features/gallery/open_plan.dart': 1,
+  // The items the user picked for another app, by their ids.
+  'lib/features/gallery/intent_handler.dart': 1,
   // The versions of the asset a device item is linked to, by that item's id:
   // the history of one item the user opened, so no folder filter applies.
   'packages/photolib_data/lib/src/versions.dart': 3,

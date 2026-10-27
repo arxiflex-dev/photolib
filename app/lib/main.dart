@@ -11,6 +11,7 @@ import 'package:photolib/core/on_device_ocr.dart';
 import 'package:photolib/core/share_inbox.dart';
 import 'package:photolib/core/widget_snapshot.dart';
 import 'package:photolib/features/desktop/file_drag.dart';
+import 'package:photolib/features/gallery/widgets.dart';
 import 'package:photolib/features/viewer/mpv.dart'
     if (dart.library.js_interop) 'package:photolib/features/viewer/mpv_web.dart';
 
@@ -48,6 +49,7 @@ Future<void> main([List<String> args = const []]) async {
     ..read(logStoreProvider)
     ..read(shareInboxProvider)
     ..read(widgetSnapshotProvider)
+    ..read(widgetPicturesProvider)
     // Without a view too, as when the OS runs the backlog in the background.
     ..listen(onDeviceMlProvider, (_, _) {})
     ..listen(onDeviceOcrProvider, (_, _) {})

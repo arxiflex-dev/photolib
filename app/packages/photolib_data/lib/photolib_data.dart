@@ -47,6 +47,7 @@ export 'src/replica.dart';
 export 'src/search.dart';
 export 'src/source_tree.dart';
 export 'src/sync.dart';
+export 'src/top_person.dart';
 export 'src/vault.dart';
 export 'src/vault_cache.dart';
 export 'src/versions.dart';

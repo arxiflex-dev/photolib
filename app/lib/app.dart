@@ -7,6 +7,7 @@ import 'package:photolib/core/keystore.dart';
 import 'package:photolib/core/on_device_ml.dart';
 import 'package:photolib/core/providers.dart';
 import 'package:photolib/core/replica.dart';
+import 'package:photolib/features/gallery/secure_review.dart';
 import 'package:photolib/features/servers/hints.dart';
 import 'package:photolib/features/servers/sync.dart';
 import 'package:photolib/features/settings/settings.dart';
@@ -76,8 +77,10 @@ class PhotolibApp extends ConsumerWidget {
       locale: ref.watch(settingsProvider).language,
       themeMode: ref.watch(settingsProvider).themeMode,
       routerConfig: ref.watch(routerProvider),
-      builder: (context, child) =>
-          InteractionReporter(child: child ?? const SizedBox.shrink()),
+      // The camera's review over the lock screen never shows the library.
+      builder: (context, child) => SecureReviewGate(
+        child: InteractionReporter(child: child ?? const SizedBox.shrink()),
+      ),
     );
   }
 }

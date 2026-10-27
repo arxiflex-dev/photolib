@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:photolib/features/desktop/file_drag.dart';
+import 'package:photolib/features/gallery/gallery_links.dart';
 import 'package:photolib/features/servers/accounts_ui.dart';
 import 'package:photolib/features/servers/servers.dart';
 import 'package:photolib/features/servers/setup_link.dart';
@@ -42,69 +43,71 @@ class AppShell extends ConsumerWidget {
         shell.goBranch(index, initialLocation: index == shell.currentIndex);
     void settings() => context.push('/settings');
 
-    return SetupLinks(
-      child: FileDrops(
-        child: Commands(
-          commands: [
-            for (final (i, (icon, label, shortcut)) in tabs.indexed)
-              Command(label, () => select(i), icon: icon, shortcut: shortcut),
-            Command(
-              strings.settingsTitle,
-              settings,
-              icon: Icons.settings_outlined,
-              shortcut: primary(LogicalKeyboardKey.comma),
-            ),
-          ],
-          child: Scaffold(
-            appBar: AppBar(
-              title: Text(strings.appTitle),
-              actions: [
-                const AccountSwitcher(),
-                IconButton(
-                  icon: const Icon(Icons.settings_outlined),
-                  tooltip: strings.settingsTitle,
-                  onPressed: settings,
-                ),
-              ],
-            ),
-            body: Column(
-              children: [
-                const StoreBanner(),
-                Expanded(
-                  child: Row(
-                    children: [
-                      if (size != WindowSize.compact)
-                        NavigationRail(
-                          extended: size == WindowSize.expanded,
-                          labelType: size == WindowSize.expanded
-                              ? null
-                              : NavigationRailLabelType.all,
-                          selectedIndex: shell.currentIndex,
-                          onDestinationSelected: select,
-                          destinations: [
-                            for (final (icon, label, _) in tabs)
-                              NavigationRailDestination(
-                                icon: Icon(icon),
-                                label: Text(label),
-                              ),
-                          ],
-                        ),
-                      Expanded(child: shell),
-                    ],
+    return GalleryLinks(
+      child: SetupLinks(
+        child: FileDrops(
+          child: Commands(
+            commands: [
+              for (final (i, (icon, label, shortcut)) in tabs.indexed)
+                Command(label, () => select(i), icon: icon, shortcut: shortcut),
+              Command(
+                strings.settingsTitle,
+                settings,
+                icon: Icons.settings_outlined,
+                shortcut: primary(LogicalKeyboardKey.comma),
+              ),
+            ],
+            child: Scaffold(
+              appBar: AppBar(
+                title: Text(strings.appTitle),
+                actions: [
+                  const AccountSwitcher(),
+                  IconButton(
+                    icon: const Icon(Icons.settings_outlined),
+                    tooltip: strings.settingsTitle,
+                    onPressed: settings,
                   ),
-                ),
-              ],
+                ],
+              ),
+              body: Column(
+                children: [
+                  const StoreBanner(),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        if (size != WindowSize.compact)
+                          NavigationRail(
+                            extended: size == WindowSize.expanded,
+                            labelType: size == WindowSize.expanded
+                                ? null
+                                : NavigationRailLabelType.all,
+                            selectedIndex: shell.currentIndex,
+                            onDestinationSelected: select,
+                            destinations: [
+                              for (final (icon, label, _) in tabs)
+                                NavigationRailDestination(
+                                  icon: Icon(icon),
+                                  label: Text(label),
+                                ),
+                            ],
+                          ),
+                        Expanded(child: shell),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              bottomNavigationBar: size == WindowSize.compact
+                  ? NavigationBar(
+                      selectedIndex: shell.currentIndex,
+                      onDestinationSelected: select,
+                      destinations: [
+                        for (final (icon, label, _) in tabs)
+                          NavigationDestination(icon: Icon(icon), label: label),
+                      ],
+                    )
+                  : null,
             ),
-            bottomNavigationBar: size == WindowSize.compact
-                ? NavigationBar(
-                    selectedIndex: shell.currentIndex,
-                    onDestinationSelected: select,
-                    destinations: [
-                      for (final (icon, label, _) in tabs)
-                        NavigationDestination(icon: Icon(icon), label: label),
-                    ],
-                  )
-                : null,
           ),
         ),
       ),

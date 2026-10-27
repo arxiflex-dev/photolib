@@ -1406,7 +1406,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get galleryButtons => 'Buttons';
 
   @override
+  String galleryCameraNote(String camera) {
+    return 'Your camera app ($camera) decides where its preview opens. Aperture, Open Camera and Fossify Camera open Photolib. The cameras of Pixel, Samsung, Xiaomi and Motorola open their own gallery.';
+  }
+
+  @override
   String get galleryChips => 'Chips';
+
+  @override
+  String get galleryEditNone => 'No app on this phone edits pictures.';
+
+  @override
+  String get galleryEditNotSaved => 'The edited picture could not be saved.';
+
+  @override
+  String get galleryEditWith => 'Edit with…';
+
+  @override
+  String get galleryEditorAsk => 'Ask every time';
+
+  @override
+  String get galleryEditorSetting => 'Editing app';
 
   @override
   String get galleryGrid => 'Grid';
@@ -1415,10 +1435,88 @@ class AppLocalizationsEn extends AppLocalizations {
   String get galleryMenus => 'Menus and sheets';
 
   @override
+  String get galleryOnboardIntro =>
+      'Every step is optional. Photolib never asks to run without battery limits, and never asks for access to all files.';
+
+  @override
+  String get galleryOnboardTitle => 'Make Photolib your gallery';
+
+  @override
+  String get galleryOpenWith => 'Open with…';
+
+  @override
+  String get galleryPickTitle => 'Choose photos';
+
+  @override
+  String get galleryShortcutAdd => 'Add to home screen';
+
+  @override
+  String get galleryShortcutFailed => 'Your launcher cannot add shortcuts.';
+
+  @override
   String get galleryShowSheet => 'Show a sheet';
 
   @override
+  String get galleryStepCamera => 'Camera';
+
+  @override
+  String get galleryStepDefault => 'Open photos with Photolib';
+
+  @override
+  String get galleryStepDefaultWhy =>
+      'Without this, a photo you tap in another app opens in another gallery.';
+
+  @override
+  String get galleryStepDone => 'Done';
+
+  @override
+  String get galleryStepManage => 'Fewer confirmation dialogs';
+
+  @override
+  String get galleryStepManageWhy =>
+      'Without this, Android asks you each time you trash or delete photos.';
+
+  @override
+  String get galleryStepMedia => 'Photos and videos';
+
+  @override
+  String get galleryStepMediaWhy =>
+      'Without access to all your photos and videos, Photolib cannot show your library.';
+
+  @override
+  String get galleryStepNotifications => 'Notifications';
+
+  @override
+  String get galleryStepNotificationsWhy =>
+      'Without them you will not see that a backup has stalled.';
+
+  @override
+  String get galleryStepOpen => 'Open settings';
+
+  @override
   String get galleryTitle => 'Components';
+
+  @override
+  String get galleryUninstallWarning =>
+      'Your library on this phone is encrypted with a key that uninstalling Photolib deletes. Keep your recovery code safe before you uninstall, or what only this phone holds is lost.';
+
+  @override
+  String get galleryWallpaper => 'Set as wallpaper';
+
+  @override
+  String get galleryWallpaperBoth => 'Home and lock screens';
+
+  @override
+  String get galleryWallpaperDone => 'Wallpaper set';
+
+  @override
+  String get galleryWallpaperFailed => 'The wallpaper could not be set.';
+
+  @override
+  String get galleryWallpaperHome => 'Home screen';
+
+  @override
+  String get galleryWallpaperLock => 'Lock screen';
 
   @override
   String hiddenCollections(int count) {
@@ -4938,7 +5036,29 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get galleryButtons => '[Ɓûţţöñš one]';
 
   @override
+  String galleryCameraNote(String camera) {
+    return '[Ýöûŕ çåɱéŕå åþþ ($camera) ðéçîðéš ŵĥéŕé îţš þŕéṽîéŵ öþéñš. Åþéŕţûŕé, Öþéñ Çåɱéŕå åñð Ƒöššîƒý Çåɱéŕå öþéñ Þĥöţöļîƀ. Ţĥé çåɱéŕåš öƒ Þîẋéļ, Šåɱšûñĝ, Ẋîåöɱî åñð Ṁöţöŕöļå öþéñ ţĥéîŕ öŵñ ĝåļļéŕý. one two three four five six seven one two three four five six seven one two]';
+  }
+
+  @override
   String get galleryChips => '[Çĥîþš one]';
+
+  @override
+  String get galleryEditNone =>
+      '[Ñö åþþ öñ ţĥîš þĥöñé éðîţš þîçţûŕéš. one two three four]';
+
+  @override
+  String get galleryEditNotSaved =>
+      '[Ţĥé éðîţéð þîçţûŕé çöûļð ñöţ ƀé šåṽéð. one two three four]';
+
+  @override
+  String get galleryEditWith => '[Éðîţ ŵîţĥ… one]';
+
+  @override
+  String get galleryEditorAsk => '[Åšķ éṽéŕý ţîɱé one two]';
+
+  @override
+  String get galleryEditorSetting => '[Éðîţîñĝ åþþ one two]';
 
   @override
   String get galleryGrid => '[Ĝŕîð one]';
@@ -4947,10 +5067,91 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get galleryMenus => '[Ṁéñûš åñð šĥééţš one two]';
 
   @override
+  String get galleryOnboardIntro =>
+      '[Éṽéŕý šţéþ îš öþţîöñåļ. Þĥöţöļîƀ ñéṽéŕ åšķš ţö ŕûñ ŵîţĥöûţ ƀåţţéŕý ļîɱîţš, åñð ñéṽéŕ åšķš ƒöŕ åççéšš ţö åļļ ƒîļéš. one two three four five six seven one two three]';
+
+  @override
+  String get galleryOnboardTitle =>
+      '[Ṁåķé Þĥöţöļîƀ ýöûŕ ĝåļļéŕý one two three]';
+
+  @override
+  String get galleryOpenWith => '[Öþéñ ŵîţĥ… one]';
+
+  @override
+  String get galleryPickTitle => '[Çĥööšé þĥöţöš one two]';
+
+  @override
+  String get galleryShortcutAdd => '[Åðð ţö ĥöɱé šçŕééñ one two]';
+
+  @override
+  String get galleryShortcutFailed =>
+      '[Ýöûŕ ļåûñçĥéŕ çåññöţ åðð šĥöŕţçûţš. one two three]';
+
+  @override
   String get galleryShowSheet => '[Šĥöŵ å šĥééţ one two]';
 
   @override
+  String get galleryStepCamera => '[Çåɱéŕå one]';
+
+  @override
+  String get galleryStepDefault => '[Öþéñ þĥöţöš ŵîţĥ Þĥöţöļîƀ one two three]';
+
+  @override
+  String get galleryStepDefaultWhy =>
+      '[Ŵîţĥöûţ ţĥîš, å þĥöţö ýöû ţåþ îñ åñöţĥéŕ åþþ öþéñš îñ åñöţĥéŕ ĝåļļéŕý. one two three four five six]';
+
+  @override
+  String get galleryStepDone => '[Ðöñé one]';
+
+  @override
+  String get galleryStepManage => '[Ƒéŵéŕ çöñƒîŕɱåţîöñ ðîåļöĝš one two three]';
+
+  @override
+  String get galleryStepManageWhy =>
+      '[Ŵîţĥöûţ ţĥîš, Åñðŕöîð åšķš ýöû éåçĥ ţîɱé ýöû ţŕåšĥ öŕ ðéļéţé þĥöţöš. one two three four five six]';
+
+  @override
+  String get galleryStepMedia => '[Þĥöţöš åñð ṽîðéöš one two]';
+
+  @override
+  String get galleryStepMediaWhy =>
+      '[Ŵîţĥöûţ åççéšš ţö åļļ ýöûŕ þĥöţöš åñð ṽîðéöš, Þĥöţöļîƀ çåññöţ šĥöŵ ýöûŕ ļîƀŕåŕý. one two three four five six seven]';
+
+  @override
+  String get galleryStepNotifications => '[Ñöţîƒîçåţîöñš one two]';
+
+  @override
+  String get galleryStepNotificationsWhy =>
+      '[Ŵîţĥöûţ ţĥéɱ ýöû ŵîļļ ñöţ šéé ţĥåţ å ƀåçķûþ ĥåš šţåļļéð. one two three four five]';
+
+  @override
+  String get galleryStepOpen => '[Öþéñ šéţţîñĝš one two]';
+
+  @override
   String get galleryTitle => '[Çöɱþöñéñţš one]';
+
+  @override
+  String get galleryUninstallWarning =>
+      '[Ýöûŕ ļîƀŕåŕý öñ ţĥîš þĥöñé îš éñçŕýþţéð ŵîţĥ å ķéý ţĥåţ ûñîñšţåļļîñĝ Þĥöţöļîƀ ðéļéţéš. Ķééþ ýöûŕ ŕéçöṽéŕý çöðé šåƒé ƀéƒöŕé ýöû ûñîñšţåļļ, öŕ ŵĥåţ öñļý ţĥîš þĥöñé ĥöļðš îš ļöšţ. one two three four five six seven one two three four five six seven one]';
+
+  @override
+  String get galleryWallpaper => '[Šéţ åš ŵåļļþåþéŕ one two]';
+
+  @override
+  String get galleryWallpaperBoth => '[Ĥöɱé åñð ļöçķ šçŕééñš one two three]';
+
+  @override
+  String get galleryWallpaperDone => '[Ŵåļļþåþéŕ šéţ one two]';
+
+  @override
+  String get galleryWallpaperFailed =>
+      '[Ţĥé ŵåļļþåþéŕ çöûļð ñöţ ƀé šéţ. one two three]';
+
+  @override
+  String get galleryWallpaperHome => '[Ĥöɱé šçŕééñ one two]';
+
+  @override
+  String get galleryWallpaperLock => '[Ļöçķ šçŕééñ one two]';
 
   @override
   String hiddenCollections(int count) {

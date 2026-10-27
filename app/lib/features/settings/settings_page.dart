@@ -6,6 +6,8 @@ import 'package:photolib/core/providers.dart';
 import 'package:photolib/features/admin/admin_page.dart';
 import 'package:photolib/features/backup/backup_page.dart';
 import 'package:photolib/features/folders/device_folders.dart';
+import 'package:photolib/features/gallery/gallery_prefs.dart';
+import 'package:photolib/features/gallery/intents.dart';
 import 'package:photolib/features/library/timeline/benchmark.dart';
 import 'package:photolib/features/offline/storage_page.dart';
 import 'package:photolib/features/people/people_section.dart';
@@ -103,6 +105,14 @@ class SettingsPage extends ConsumerWidget {
               title: Text(strings.settingsViewing),
               onTap: () => context.push('/settings/viewing'),
             ),
+            // Other apps ask a phone for pictures (ADR-0401).
+            if (ref.watch(galleryIntentsProvider))
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.add_to_home_screen),
+                title: Text(strings.galleryOnboardTitle),
+                onTap: () => context.push('/settings/gallery'),
+              ),
           ],
         ),
       ),
@@ -230,6 +240,22 @@ class ViewingPage extends ConsumerWidget {
               onSelectionChanged: (chosen) =>
                   notifier.setBackground(chosen.single),
             ),
+            if (ref.watch(galleryIntentsProvider))
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.edit_note),
+                title: Text(strings.galleryEditorSetting),
+                subtitle: Text(
+                  ref.watch(galleryPrefsProvider).editor?.label ??
+                      strings.galleryEditorAsk,
+                ),
+                // A tap forgets the editor: the next Edit with asks again.
+                onTap: ref.watch(galleryPrefsProvider).editor == null
+                    ? null
+                    : () => ref
+                          .read(galleryPrefsProvider.notifier)
+                          .setEditor(null),
+              ),
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.view_week_outlined),

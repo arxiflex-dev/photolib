@@ -13,6 +13,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Trash, delete and favourite requests without a dialog each, once the user allows it (MediaRequests.kt). -->
     <uses-permission android:name="android.permission.MANAGE_MEDIA" />
+    <!-- Set as wallpaper, for the home screen, the lock screen or both (GalleryActions.kt). -->
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <application
         android:label="Photolib"
         android:name=".PhotolibApplication"
@@ -41,6 +43,57 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- The default gallery's intents (ADR-0039, ADR-0401). A MIME type without a scheme means content: and
+                 file:. Xiaomi's camera sends VIEW and Open Camera REVIEW without a type, so MediaStore URIs are
+                 accepted typeless too. A review over the lock screen (REVIEW_SECURE) is SecureReviewActivity's. -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.APP_GALLERY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.provider.action.REVIEW" />
+                <action android:name="com.android.camera.action.REVIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.provider.action.REVIEW" />
+                <action android:name="com.android.camera.action.REVIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" android:host="media" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.EDIT" />
+                <action android:name="android.intent.action.ATTACH_DATA" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PICK" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+                <data android:mimeType="vnd.android.cursor.dir/image" />
+                <data android:mimeType="vnd.android.cursor.dir/video" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.OPENABLE" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
             <!-- Password setup links that photolibd's page hands the app (ADR-0243); Flutter routes them. -->
             <meta-data android:name="flutter_deeplinking_enabled" android:value="true" />
             <intent-filter>
@@ -50,6 +103,80 @@
                 <data android:scheme="photolib" />
             </intent-filter>
         </activity>
+        <!-- The camera's review over the lock screen (REVIEW_SECURE, ADR-0039): its own task, shown when the phone is
+             locked, showing only what the camera sent (SecureReviewActivity.kt). -->
+        <activity
+            android:name=".SecureReviewActivity"
+            android:exported="true"
+            android:launchMode="standard"
+            android:taskAffinity="org.photolib.photolib.secure"
+            android:excludeFromRecents="true"
+            android:showWhenLocked="true"
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
+            <meta-data
+              android:name="io.flutter.embedding.android.NormalTheme"
+              android:resource="@style/NormalTheme"
+              />
+            <intent-filter>
+                <action android:name="android.provider.action.REVIEW_SECURE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.provider.action.REVIEW_SECURE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" android:host="media" />
+            </intent-filter>
+        </activity>
+        <!-- Home-screen widgets (MOB-11, ADR-0401): PhotoWidget.kt shows a picture the app rendered. -->
+        <receiver
+            android:name=".MemoriesWidget"
+            android:exported="true"
+            android:label="@string/widget_memories_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_memories" />
+        </receiver>
+        <receiver
+            android:name=".PeopleWidget"
+            android:exported="true"
+            android:label="@string/widget_people_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_people" />
+        </receiver>
+        <receiver
+            android:name=".AlbumsWidget"
+            android:exported="true"
+            android:label="@string/widget_albums_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_albums" />
+        </receiver>
+        <receiver
+            android:name=".FavouritesWidget"
+            android:exported="true"
+            android:label="@string/widget_favourites_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_favourites" />
+        </receiver>
         <!-- Files of the app's cache that ViewerChannel.kt shares, such as the diagnostic bundle (ADR-0115). -->
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -72,6 +199,14 @@
 
          In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
     <queries>
+        <!-- The editors on the phone, for "Edit with" (GalleryActions.kt), and the default camera onboarding names. -->
+        <intent>
+            <action android:name="android.intent.action.EDIT"/>
+            <data android:mimeType="image/*"/>
+        </intent>
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE"/>
+        </intent>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
