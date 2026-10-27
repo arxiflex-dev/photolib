@@ -5,10 +5,11 @@
     "helpers:pinGitHubActionDigests"
   ],
   "timezone": "UTC",
+  "baseBranches": ["dev"],
   "schedule": ["before 6am on Monday"],
   "minimumReleaseAge": "7 days",
   "osvVulnerabilityAlerts": true,
-  "automerge": true,
+  "automerge": false,
   "prConcurrentLimit": 6,
   "labels": ["dependencies"],
   "semanticCommits": "enabled",
@@ -28,6 +29,11 @@
     }
   ],
   "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "addLabels": ["queue"],
+      "description": "Mergify queues labeled PRs to dev; majors stay manual"
+    },
     {
       "matchManagers": ["fvm"],
       "enabled": false,
