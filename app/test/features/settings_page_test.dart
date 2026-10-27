@@ -181,14 +181,14 @@ void main() {
     final decode = SettingsNotifier().decode;
     final saved = decode({
       'bar': ['info', 'favourite', 'trash'],
-    }) as Settings;
+    });
     expect(saved.bar, [
       ViewerAction.info,
       ViewerAction.favourite,
       ViewerAction.trash,
     ]);
-    expect((decode(<String, Object?>{}) as Settings).bar, defaultPins);
-    expect((decode(saved.toJson()) as Settings).bar, saved.bar);
+    expect(decode(<String, Object?>{}).bar, defaultPins);
+    expect(decode(saved.toJson()).bar, saved.bar);
     expect(const Settings().toJson().containsKey('bar'), isFalse);
   });
 
