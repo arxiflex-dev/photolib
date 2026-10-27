@@ -272,15 +272,15 @@ void main() {
     }
 
     await selectAll();
-    await tester.tapAndSettle(find.byTooltip('Favourite'));
+    await tester.tapAction('Favourite');
     expect(platform.calls, ['favorite true 1,2']);
     expect(find.byType(MarkBadges), findsNWidgets(2));
     await selectAll();
-    await tester.tapAndSettle(find.byTooltip('Favourite'));
+    await tester.tapAction('Favourite');
     expect(platform.calls.last, 'favorite false 1,2');
 
     await selectAll();
-    await tester.tapAndSettle(find.byTooltip('Move to trash'));
+    await tester.tapAction('Move to trash');
     expect(platform.calls.last, 'trash 1,2');
     expect(find.byType(ThumbnailAt), findsNothing);
     await tester.tapAndSettle(find.text('Undo'));

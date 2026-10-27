@@ -393,7 +393,7 @@ void main() {
     await type(tester, 'jpg');
     Future<List<String>> play() async {
       grey.asked.clear();
-      await tester.tapAndSettle(find.byTooltip('Slideshow'));
+      await tester.tapAction('Slideshow');
       expect(find.byType(SlideshowPage), findsOneWidget);
       for (var i = 0; i < 3; i++) {
         await tester.pump(const Duration(seconds: 5));

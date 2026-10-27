@@ -273,7 +273,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byTooltip('Select all'));
       await tester.pumpAndSettle();
-      await tester.tap(find.byTooltip('Move to trash'));
+      await tester.tapAction('Move to trash');
       await tester.pumpAndSettle();
     }
 
@@ -337,7 +337,7 @@ void main() {
       expect(find.text('3 selected'), findsOneWidget);
       expect(platform.calls, isEmpty);
       expect(await trashed(), [false, false]);
-      await tester.tap(find.byTooltip('Move to trash'));
+      await tester.tapAction('Move to trash');
       await tester.pumpAndSettle();
       await tester.tap(find.text('Remove from this device'));
       await tester.pumpAndSettle();
@@ -356,7 +356,7 @@ void main() {
       await tester.tapAndSettle(find.text('DCIM'));
       await tester.longPress(find.byType(ThumbnailAt).first);
       await tester.tapAndSettle(find.byTooltip('Select all'));
-      await tester.tapAndSettle(find.byTooltip('Move to trash'));
+      await tester.tapAction('Move to trash');
       expect(find.text('Delete 2 items?'), findsOneWidget);
       expect(
         find.text('1 only on this device, not backed up · 1 kB'),

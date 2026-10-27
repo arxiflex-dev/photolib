@@ -85,7 +85,7 @@ void main() {
     await pump(tester);
     await tester.longPressAt(cell(tester, 0));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Move to trash'));
+    await tester.tapAction('Move to trash');
     await tester.pumpAndSettle();
     expect(find.byType(AlertDialog), findsNothing);
     expect(platform.calls, ['trash 2']);
@@ -105,7 +105,7 @@ void main() {
     await pump(tester);
     await tester.longPressAt(cell(tester, 0));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Move to trash'));
+    await tester.tapAction('Move to trash');
     await tester.pumpAndSettle();
     expect(platform.calls, ['trash 1']);
     expect(find.text('1 item moved to the trash'), findsOneWidget);
@@ -120,7 +120,7 @@ void main() {
     await pump(tester);
     await tester.longPressAt(cell(tester, 0));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Favourite'));
+    await tester.tapAction('Favourite');
     await tester.pumpAndSettle();
     expect(platform.calls, ['favorite true 1']);
     // The timeline follows the index at most once a second.
@@ -275,7 +275,7 @@ void main() {
     final before = DateTime.now();
     await tester.longPressAt(cell(tester, 0));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Move to trash'));
+    await tester.tapAction('Move to trash');
     await tester.pumpAndSettle();
     final expires = (await db.trashItems(true).get()).single.expires!;
     final days = DateTime.fromMillisecondsSinceEpoch(expires)
