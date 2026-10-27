@@ -413,7 +413,7 @@ void main() {
     await pump(tester, pipeline: Grey());
     await tester.longPressAt(cell(tester, 1));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Slideshow'));
+    await tester.tapAction('Slideshow');
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('slide 1')), findsOneWidget);
     expect(find.byKey(const ValueKey('slide 0')), findsNothing);
