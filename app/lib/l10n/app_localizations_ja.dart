@@ -2783,6 +2783,9 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get settingsTrashKeep => 'Photolib がゴミ箱に項目を保管する期間';
+
+  @override
   String get settingsViewerBar => 'ビューアーのバーのボタン';
 
   @override
@@ -3167,6 +3170,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trashEmptyAll => 'ゴミ箱を空にする';
 
   @override
+  String trashKeepDays(int days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    return '$daysString 日';
+  }
+
+  @override
   String trashMoved(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -3179,6 +3192,9 @@ class AppLocalizationsJa extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get trashRemoveGone => 'リストから削除';
 
   @override
   String trashRetention(int days) {
