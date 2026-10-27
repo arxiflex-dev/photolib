@@ -17,7 +17,7 @@ typedef Binned = ({String? bin, int? expires});
 /// when the user or the platform refuses, having changed nothing.
 abstract interface class MediaPlatform {
   /// Whether the platform deletes what is in its trash when it expires; else
-  /// Photolib does, after [DeletionService.retention].
+  /// Photolib does, after [retention].
   bool get expires;
 
   /// Whether Photolib can [restore] from the platform's trash; Photos'
@@ -89,8 +89,12 @@ class AppBin implements MediaPlatform {
 /// anywhere else.
 class DeletionService {
   /// The service over [db], asking each source's platform of [platformOf].
-  DeletionService(this.db, this.platformOf, {DateTime Function()? now})
-    : _now = now ?? DateTime.now;
+  DeletionService(
+    this.db,
+    this.platformOf, {
+    DateTime Function()? now,
+    this.retention = defaultRetention,
+  }) : _now = now ?? DateTime.now;
 
   /// The replica whose items it deletes.
   final Replica db;
@@ -100,8 +104,12 @@ class DeletionService {
   final DateTime Function() _now;
 
   /// How long Photolib keeps what is in a trash that keeps no time of its
-  /// own (ORG-18).
-  static const retention = Duration(days: 60);
+  /// own, until the user chooses (ORG-18).
+  static const defaultRetention = Duration(days: 60);
+
+  /// How long it keeps an item from the moment it is trashed: each item's
+  /// expiry is fixed then, so that a later choice never moves it.
+  final Duration retention;
 
   /// Moves the items of [ids] that are not in the trash there, one request
   /// per source; returns whether Photolib can restore them all. What it
@@ -163,6 +171,17 @@ class DeletionService {
       await _forget(group);
     }
     return rows;
+  }
+
+  /// Drops the entries of [ids] from the trash without asking their platform,
+  /// which no longer holds the items (their bin was emptied, their time went
+  /// by): nothing is left to delete there. Only items in the trash.
+  Future<void> forget(List<Uint8List> ids) async {
+    final rows = await _rows(ids);
+    if (rows.any((r) => r.trashed == 0)) {
+      throw StateError('only items in the trash are forgotten');
+    }
+    await _forget(rows);
   }
 
   /// Purges what Photolib keeps in a trash past its time; returns it.

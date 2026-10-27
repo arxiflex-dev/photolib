@@ -3,7 +3,7 @@ import 'package:photolib_data/photolib_data.dart';
 /// A platform that keeps nothing but what it was asked, and asks first when
 /// [asks].
 class FakePlatform implements MediaPlatform {
-  new({this.asks = false, this.restores = true});
+  new({this.asks = false, this.restores = true, this.expires = false});
 
   final bool asks;
 
@@ -14,7 +14,7 @@ class FakePlatform implements MediaPlatform {
       calls.add('$what ${[for (final i in items) i.sourceId].join(',')}');
 
   @override
-  bool get expires => false;
+  final bool expires;
 
   @override
   final bool restores;

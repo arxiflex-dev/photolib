@@ -4247,6 +4247,12 @@ abstract class AppLocalizations {
   /// **'{toggle, select, edgeTaps{Tap the left or right edge for the previous or next item} oneFingerZoom{Double-tap and drag to zoom with one finger} swipes{Swipe up or down on a video\'s left side for brightness, right side for volume} maxBrightness{Full brightness while viewing} autoRotate{Turn to each photo\'s or video\'s orientation} mixAudio{Play videos over other audio instead of pausing it} autoplay{Play videos as they open} loop{Loop videos} autoNext{Go to the next item when a video ends} resume{Resume videos where they were left} other{Play animated images in the grid}}'**
   String settingsToggle(String toggle);
 
+  /// Heading of the choice of days Photolib keeps what it trashes where the platform keeps no time of its own
+  ///
+  /// In en, this message translates to:
+  /// **'How long Photolib keeps items in its trash'**
+  String get settingsTrashKeep;
+
   /// Opens a list in Settings where the user chooses which buttons the bar over a photo shown full screen holds, and in what order
   ///
   /// In en, this message translates to:
@@ -4745,11 +4751,23 @@ abstract class AppLocalizations {
   /// **'Empty trash'**
   String get trashEmptyAll;
 
+  /// One choice of how long Photolib keeps trashed items
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days'**
+  String trashKeepDays(int days);
+
   /// Says that photos went to the trash, with a way to undo it
   ///
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 item moved to the trash} other{{count} items moved to the trash}}'**
   String trashMoved(int count);
+
+  /// Removes entries from the trash whose items the platform no longer holds, without deleting anything
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from list'**
+  String get trashRemoveGone;
 
   /// The trash's retention, at the top of the trash
   ///

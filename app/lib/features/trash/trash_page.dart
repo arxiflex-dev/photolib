@@ -10,12 +10,13 @@ import 'package:photolib/features/library/timeline/thumbnail_at.dart';
 import 'package:photolib/features/library/timeline/thumbnails.dart';
 import 'package:photolib/features/search/search.dart' show itemOf;
 import 'package:photolib/features/servers/servers.dart' show sessionProvider;
+import 'package:photolib/features/settings/settings.dart';
 import 'package:photolib/features/trash/trash.dart';
 import 'package:photolib/l10n/app_localizations.dart';
 import 'package:photolib/ui/empty_state.dart';
 import 'package:photolib/ui/tokens.dart';
 import 'package:photolib_data/photolib_data.dart'
-    show DeletionService, LocalAssetData, Mutations;
+    show LocalAssetData, Mutations;
 
 /// The trash (docs/10 §5.4): what was moved there, each with the time it has
 /// left, restored or deleted for good from here only. Deleting for good asks
@@ -72,6 +73,15 @@ class _TrashPageState extends ConsumerState<TrashPage> {
     await tryChange(
       context,
       () => service.restore([for (final r in rows) r.id]),
+    );
+  }
+
+  Future<void> _forget(List<LocalAssetData> rows) async {
+    final service = await ref.read(deletionProvider.future);
+    if (!mounted) return;
+    await tryChange(
+      context,
+      () => service.forget([for (final r in rows) r.id]),
     );
   }
 
@@ -152,11 +162,23 @@ class _TrashPageState extends ConsumerState<TrashPage> {
         if (_selected.contains(i)) row,
     ];
     final now = DateTime.now().millisecondsSinceEpoch;
+    // Entries whose time went by and that are still here: the platform no
+    // longer holds the items.
+    final gone = [
+      for (final row in chosen)
+        if ((row.expires ?? now + 1) <= now) row,
+    ];
     return Scaffold(
       appBar: AppBar(
         title: Text(strings.trashTitle),
         actions: [
-          if (chosen.isNotEmpty) ...[
+          if (chosen.isNotEmpty && gone.length == chosen.length)
+            // Nothing is left to restore or delete, only the entry.
+            TextButton(
+              onPressed: () => _forget(gone),
+              child: Text(strings.trashRemoveGone),
+            )
+          else if (chosen.isNotEmpty) ...[
             TextButton(
               onPressed: () => _restore(chosen),
               child: Text(strings.actionRestore),
@@ -179,7 +201,7 @@ class _TrashPageState extends ConsumerState<TrashPage> {
           Padding(
             padding: EdgeInsets.all(AppTokens.of(context).md),
             child: Text(
-              strings.trashRetention(DeletionService.retention.inDays),
+              strings.trashRetention(ref.watch(settingsProvider).trashDays),
             ),
           ),
           Expanded(
