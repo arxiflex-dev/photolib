@@ -134,6 +134,8 @@ cell ([ADR-0214](../adr/0214-heic-and-hevc-without-a-system-decoder.md)).
 
 The [Android default-gallery matrix](android-gallery.md) records what each Android version and OEM lets the gallery
 do, and how a phone fills its open cells ([ADR-0039](../adr/0039-android-default-gallery.md)).
+[Android default gallery](android-default-gallery.md) is what answers those intents, its readiness gates and the Play
+declaration ([ADR-0401](../adr/0401-android-default-gallery-integration.md)).
 
 The [timeline spike report](timeline-spike.md) measures the timeline over a million assets per target;
 [ADR-0040](../adr/0040-timeline-image-pipeline.md) chose the image pipeline from it.

@@ -1349,7 +1349,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get galleryButtons => '按钮';
 
   @override
+  String galleryCameraNote(String camera) {
+    return 'Your camera app ($camera) decides where its preview opens. Aperture, Open Camera and Fossify Camera open Photolib. The cameras of Pixel, Samsung, Xiaomi and Motorola open their own gallery.';
+  }
+
+  @override
   String get galleryChips => '纸片';
+
+  @override
+  String get galleryEditNone => 'No app on this phone edits pictures.';
+
+  @override
+  String get galleryEditNotSaved => 'The edited picture could not be saved.';
+
+  @override
+  String get galleryEditWith => 'Edit with…';
+
+  @override
+  String get galleryEditorAsk => 'Ask every time';
+
+  @override
+  String get galleryEditorSetting => 'Editing app';
 
   @override
   String get galleryGrid => '网格';
@@ -1358,10 +1378,88 @@ class AppLocalizationsZh extends AppLocalizations {
   String get galleryMenus => '菜单和面板';
 
   @override
+  String get galleryOnboardIntro =>
+      'Every step is optional. Photolib never asks to run without battery limits, and never asks for access to all files.';
+
+  @override
+  String get galleryOnboardTitle => 'Make Photolib your gallery';
+
+  @override
+  String get galleryOpenWith => 'Open with…';
+
+  @override
+  String get galleryPickTitle => 'Choose photos';
+
+  @override
+  String get galleryShortcutAdd => 'Add to home screen';
+
+  @override
+  String get galleryShortcutFailed => 'Your launcher cannot add shortcuts.';
+
+  @override
   String get galleryShowSheet => '显示面板';
 
   @override
+  String get galleryStepCamera => 'Camera';
+
+  @override
+  String get galleryStepDefault => 'Open photos with Photolib';
+
+  @override
+  String get galleryStepDefaultWhy =>
+      'Without this, a photo you tap in another app opens in another gallery.';
+
+  @override
+  String get galleryStepDone => 'Done';
+
+  @override
+  String get galleryStepManage => 'Fewer confirmation dialogs';
+
+  @override
+  String get galleryStepManageWhy =>
+      'Without this, Android asks you each time you trash or delete photos.';
+
+  @override
+  String get galleryStepMedia => 'Photos and videos';
+
+  @override
+  String get galleryStepMediaWhy =>
+      'Without access to all your photos and videos, Photolib cannot show your library.';
+
+  @override
+  String get galleryStepNotifications => 'Notifications';
+
+  @override
+  String get galleryStepNotificationsWhy =>
+      'Without them you will not see that a backup has stalled.';
+
+  @override
+  String get galleryStepOpen => 'Open settings';
+
+  @override
   String get galleryTitle => '组件';
+
+  @override
+  String get galleryUninstallWarning =>
+      'Your library on this phone is encrypted with a key that uninstalling Photolib deletes. Keep your recovery code safe before you uninstall, or what only this phone holds is lost.';
+
+  @override
+  String get galleryWallpaper => 'Set as wallpaper';
+
+  @override
+  String get galleryWallpaperBoth => 'Home and lock screens';
+
+  @override
+  String get galleryWallpaperDone => 'Wallpaper set';
+
+  @override
+  String get galleryWallpaperFailed => 'The wallpaper could not be set.';
+
+  @override
+  String get galleryWallpaperHome => 'Home screen';
+
+  @override
+  String get galleryWallpaperLock => 'Lock screen';
 
   @override
   String hiddenCollections(int count) {
@@ -4708,7 +4806,27 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get galleryButtons => '按鈕';
 
   @override
+  String galleryCameraNote(String camera) {
+    return 'Your camera app ($camera) decides where its preview opens. Aperture, Open Camera and Fossify Camera open Photolib. The cameras of Pixel, Samsung, Xiaomi and Motorola open their own gallery.';
+  }
+
+  @override
   String get galleryChips => '方塊';
+
+  @override
+  String get galleryEditNone => 'No app on this phone edits pictures.';
+
+  @override
+  String get galleryEditNotSaved => 'The edited picture could not be saved.';
+
+  @override
+  String get galleryEditWith => 'Edit with…';
+
+  @override
+  String get galleryEditorAsk => 'Ask every time';
+
+  @override
+  String get galleryEditorSetting => 'Editing app';
 
   @override
   String get galleryGrid => '網格';
@@ -4717,10 +4835,88 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get galleryMenus => '選單和面板';
 
   @override
+  String get galleryOnboardIntro =>
+      'Every step is optional. Photolib never asks to run without battery limits, and never asks for access to all files.';
+
+  @override
+  String get galleryOnboardTitle => 'Make Photolib your gallery';
+
+  @override
+  String get galleryOpenWith => 'Open with…';
+
+  @override
+  String get galleryPickTitle => 'Choose photos';
+
+  @override
+  String get galleryShortcutAdd => 'Add to home screen';
+
+  @override
+  String get galleryShortcutFailed => 'Your launcher cannot add shortcuts.';
+
+  @override
   String get galleryShowSheet => '顯示面板';
 
   @override
+  String get galleryStepCamera => 'Camera';
+
+  @override
+  String get galleryStepDefault => 'Open photos with Photolib';
+
+  @override
+  String get galleryStepDefaultWhy =>
+      'Without this, a photo you tap in another app opens in another gallery.';
+
+  @override
+  String get galleryStepDone => 'Done';
+
+  @override
+  String get galleryStepManage => 'Fewer confirmation dialogs';
+
+  @override
+  String get galleryStepManageWhy =>
+      'Without this, Android asks you each time you trash or delete photos.';
+
+  @override
+  String get galleryStepMedia => 'Photos and videos';
+
+  @override
+  String get galleryStepMediaWhy =>
+      'Without access to all your photos and videos, Photolib cannot show your library.';
+
+  @override
+  String get galleryStepNotifications => 'Notifications';
+
+  @override
+  String get galleryStepNotificationsWhy =>
+      'Without them you will not see that a backup has stalled.';
+
+  @override
+  String get galleryStepOpen => 'Open settings';
+
+  @override
   String get galleryTitle => '元件';
+
+  @override
+  String get galleryUninstallWarning =>
+      'Your library on this phone is encrypted with a key that uninstalling Photolib deletes. Keep your recovery code safe before you uninstall, or what only this phone holds is lost.';
+
+  @override
+  String get galleryWallpaper => 'Set as wallpaper';
+
+  @override
+  String get galleryWallpaperBoth => 'Home and lock screens';
+
+  @override
+  String get galleryWallpaperDone => 'Wallpaper set';
+
+  @override
+  String get galleryWallpaperFailed => 'The wallpaper could not be set.';
+
+  @override
+  String get galleryWallpaperHome => 'Home screen';
+
+  @override
+  String get galleryWallpaperLock => 'Lock screen';
 
   @override
   String hiddenCollections(int count) {

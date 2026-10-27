@@ -12,6 +12,8 @@ import 'package:photolib/features/folders/file_ops.dart';
 import 'package:photolib/features/folders/folders_page.dart';
 import 'package:photolib/features/folders/sorting.dart';
 import 'package:photolib/features/folders/views.dart';
+import 'package:photolib/features/gallery/intents.dart';
+import 'package:photolib/features/gallery/shortcuts.dart';
 import 'package:photolib/features/library/deletion.dart';
 import 'package:photolib/features/library/library.dart' show veiledProvider;
 import 'package:photolib/features/library/timeline/pages.dart';
@@ -76,13 +78,17 @@ class ItemsSource {
 /// a picker that returns the ids of the items chosen.
 class ItemsPage extends ConsumerStatefulWidget {
   /// The page of [source].
-  const new(this.source, {super.key, this.pick = false});
+  const new(this.source, {super.key, this.pick = false, this.accepts});
 
   /// What it shows.
   final ItemsSource source;
 
   /// Whether it picks items for an album.
   final bool pick;
+
+  /// With [pick], whether an item of this MIME type may be picked; the
+  /// others do not show (a caller asked for photos only, ADR-0401).
+  final bool Function(String? mime)? accepts;
 
   @override
   ConsumerState<ItemsPage> createState() => _ItemsPageState();
@@ -123,7 +129,14 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
       unawaited(_rows?.cancel());
       _rows = _source
           ._items(db, veiled: veiled)
-          .listen((items) => setState(() => _items = items));
+          .listen(
+            (items) => setState(
+              () => _items = [
+                for (final a in items)
+                  if (widget.accepts?.call(a.mime) ?? true) a,
+              ],
+            ),
+          );
     }, fireImmediately: true);
   }
 
@@ -247,6 +260,12 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
             ),
           ),
         if (_source.album case final album?) AlbumHidingMenu(album: album),
+        if (ref.watch(galleryIntentsProvider) && _source.title != null)
+          IconButton(
+            icon: const Icon(Icons.add_to_home_screen),
+            tooltip: strings.galleryShortcutAdd,
+            onPressed: () => unawaited(addShortcut(context, ref, _source)),
+          ),
         _ViewMenu(view, onChanged: _setView, album: _source.album != null),
         if (_source.files)
           PopupMenuButton<void>(
@@ -288,7 +307,9 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
         if (widget.pick)
           action(
             Icons.check,
-            strings.actionAddToAlbum,
+            widget.accepts == null
+                ? strings.actionAddToAlbum
+                : strings.galleryPickTitle,
             () => Navigator.pop(context, [for (final a in chosen) a.id]),
           )
         else ...[

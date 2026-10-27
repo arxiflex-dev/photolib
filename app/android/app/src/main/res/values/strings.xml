@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Only what the system shows outside the Flutter app; the app localises everything else (ADR-0314). -->
+    <string name="app_name">Photolib</string>
+    <string name="widget_memories_label">Photolib memories</string>
+    <string name="widget_memories_description">A picture from this day in years past.</string>
+    <string name="widget_people_label">Photolib people</string>
+    <string name="widget_people_description">A person Photolib found in your photos.</string>
+    <string name="widget_albums_label">Photolib albums</string>
+    <string name="widget_albums_description">The cover of an album.</string>
+    <string name="widget_favourites_label">Photolib favourites</string>
+    <string name="widget_favourites_description">Your latest favourite.</string>
+</resources>

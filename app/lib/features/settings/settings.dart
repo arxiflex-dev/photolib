@@ -165,6 +165,18 @@ enum ViewerAction {
 
   /// Keeps the item whole on this device, or lets it go (ADR-0200 P2).
   keepOffline,
+
+  /// Sets the photo as the wallpaper of the home screen, the lock screen or
+  /// both, after a preview (Android, MOB-12).
+  wallpaper,
+
+  /// Edits the photo in another app, which the user picks once, and saves
+  /// the result as a copy (Android, MOB-13).
+  editWith,
+
+  /// Opens the item in another app, such as an external video player
+  /// (Android, MOB-13).
+  openWith,
 }
 
 /// The actions pinned to the viewer's bar until the user changes them.

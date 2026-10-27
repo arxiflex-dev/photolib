@@ -2,6 +2,7 @@
 // ignore_for_file: avoid_slow_async_io
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -58,6 +59,13 @@ Future<List<FileResult>> renameFiles(List<(String, String)> renames) async {
         error: refused ? 'exists' : null,
       ));
     } on FileSystemException catch (e) {
+      // A name the file system refuses (300 characters) must not leave the
+      // file under the name it was parked by: it goes back.
+      try {
+        await File(temp).rename(from);
+      } on FileSystemException {
+        // Parked under its temporary name, which nothing else holds.
+      }
       results.add((source: from, target: null, error: e.message));
     }
   }
@@ -179,6 +187,16 @@ class Transfer extends ChangeNotifier {
   }
 }
 
+/// Where the copy of [target], a file of the folder [dir], is written before
+/// it takes its name: a hidden file in the same folder, its name short and
+/// the same for the same target whatever the length of the target's own, which
+/// can be 255 bytes, so that a file with a long name moves and a killed copy
+/// leaves one partial file to write over, not a new one each time.
+@visibleForTesting
+String partOf(String dir, String target) =>
+    '$dir${Platform.pathSeparator}.photolib-'
+    '${sha1.convert(utf8.encode(target)).toString().substring(0, 16)}.part';
+
 final _pool = WorkerPool([_transfer], size: 1);
 const _transfer = Task<List<Object?>, String?>('transfer', _run);
 
@@ -205,7 +223,7 @@ Future<String?> _run(List<Object?> input, TaskContext context) async {
     }
   }
   final modified = await from.lastModified();
-  final part = File('$target.photolib-part');
+  final part = File(partOf(dir, target));
   try {
     final digest = await _copy(from, part, context);
     if (await sha256.bind(part.openRead()).single != digest) {
@@ -215,8 +233,14 @@ Future<String?> _run(List<Object?> input, TaskContext context) async {
     if (await _taken(target)) throw const _Refused('exists');
     await part.rename(target);
   } finally {
-    // deletion-ok: the partial copy this transfer made
-    if (await part.exists()) await part.delete();
+    // The error that stopped the copy (a full disk) is the one to report, not
+    // one of its clean-up.
+    try {
+      // deletion-ok: the partial copy this transfer made
+      if (await part.exists()) await part.delete();
+    } on FileSystemException {
+      // A partial file is hidden and written over by the next copy.
+    }
   }
   // deletion-ok: a move's original, once its copy is verified in place
   if (move) await from.delete();

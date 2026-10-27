@@ -2021,11 +2021,47 @@ abstract class AppLocalizations {
   /// **'Buttons'**
   String get galleryButtons;
 
+  /// Onboarding's note on the default camera; the placeholder is the camera app's name
+  ///
+  /// In en, this message translates to:
+  /// **'Your camera app ({camera}) decides where its preview opens. Aperture, Open Camera and Fossify Camera open Photolib. The cameras of Pixel, Samsung, Xiaomi and Motorola open their own gallery.'**
+  String galleryCameraNote(String camera);
+
   /// A section of the component gallery
   ///
   /// In en, this message translates to:
   /// **'Chips'**
   String get galleryChips;
+
+  /// Said when Edit with finds no editing app
+  ///
+  /// In en, this message translates to:
+  /// **'No app on this phone edits pictures.'**
+  String get galleryEditNone;
+
+  /// Said when the picture an editing app made could not be written as a copy
+  ///
+  /// In en, this message translates to:
+  /// **'The edited picture could not be saved.'**
+  String get galleryEditNotSaved;
+
+  /// Viewer action that hands the picture to another app's editor, and the title of the list of editors
+  ///
+  /// In en, this message translates to:
+  /// **'Edit with…'**
+  String get galleryEditWith;
+
+  /// Settings value when no editing app is remembered
+  ///
+  /// In en, this message translates to:
+  /// **'Ask every time'**
+  String get galleryEditorAsk;
+
+  /// Settings entry: the app Edit with opens, which a tap forgets
+  ///
+  /// In en, this message translates to:
+  /// **'Editing app'**
+  String get galleryEditorSetting;
 
   /// A section of the component gallery
   ///
@@ -2039,17 +2075,161 @@ abstract class AppLocalizations {
   /// **'Menus and sheets'**
   String get galleryMenus;
 
+  /// Onboarding's introduction
+  ///
+  /// In en, this message translates to:
+  /// **'Every step is optional. Photolib never asks to run without battery limits, and never asks for access to all files.'**
+  String get galleryOnboardIntro;
+
+  /// Title of the onboarding page and its entry in Settings
+  ///
+  /// In en, this message translates to:
+  /// **'Make Photolib your gallery'**
+  String get galleryOnboardTitle;
+
+  /// Viewer action that opens the item in another app, such as a video player
+  ///
+  /// In en, this message translates to:
+  /// **'Open with…'**
+  String get galleryOpenWith;
+
+  /// Title of the picker another app opens
+  ///
+  /// In en, this message translates to:
+  /// **'Choose photos'**
+  String get galleryPickTitle;
+
+  /// Pins a shortcut to a folder or album on the home screen
+  ///
+  /// In en, this message translates to:
+  /// **'Add to home screen'**
+  String get galleryShortcutAdd;
+
+  /// Said when the launcher refuses a pinned shortcut
+  ///
+  /// In en, this message translates to:
+  /// **'Your launcher cannot add shortcuts.'**
+  String get galleryShortcutFailed;
+
   /// A button of the component gallery that opens a bottom sheet
   ///
   /// In en, this message translates to:
   /// **'Show a sheet'**
   String get galleryShowSheet;
 
+  /// Onboarding step about the default camera
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get galleryStepCamera;
+
+  /// Onboarding step: set Photolib as the default for photos
+  ///
+  /// In en, this message translates to:
+  /// **'Open photos with Photolib'**
+  String get galleryStepDefault;
+
+  /// What breaks without Photolib being the default
+  ///
+  /// In en, this message translates to:
+  /// **'Without this, a photo you tap in another app opens in another gallery.'**
+  String get galleryStepDefaultWhy;
+
+  /// Marks an onboarding step that is already in place
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get galleryStepDone;
+
+  /// Onboarding step: let Photolib manage media
+  ///
+  /// In en, this message translates to:
+  /// **'Fewer confirmation dialogs'**
+  String get galleryStepManage;
+
+  /// What breaks without MANAGE_MEDIA
+  ///
+  /// In en, this message translates to:
+  /// **'Without this, Android asks you each time you trash or delete photos.'**
+  String get galleryStepManageWhy;
+
+  /// Onboarding step: access to the device's photos and videos
+  ///
+  /// In en, this message translates to:
+  /// **'Photos and videos'**
+  String get galleryStepMedia;
+
+  /// What breaks without media access
+  ///
+  /// In en, this message translates to:
+  /// **'Without access to all your photos and videos, Photolib cannot show your library.'**
+  String get galleryStepMediaWhy;
+
+  /// Onboarding step: allow notifications
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get galleryStepNotifications;
+
+  /// What breaks without notifications
+  ///
+  /// In en, this message translates to:
+  /// **'Without them you will not see that a backup has stalled.'**
+  String get galleryStepNotificationsWhy;
+
+  /// Button that opens the system screen of an onboarding step
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get galleryStepOpen;
+
   /// The component gallery, a tool for developers that shows every control of the app
   ///
   /// In en, this message translates to:
   /// **'Components'**
   String get galleryTitle;
+
+  /// Onboarding's warning that uninstalling the app deletes the vault's key
+  ///
+  /// In en, this message translates to:
+  /// **'Your library on this phone is encrypted with a key that uninstalling Photolib deletes. Keep your recovery code safe before you uninstall, or what only this phone holds is lost.'**
+  String get galleryUninstallWarning;
+
+  /// Viewer action and title of the wallpaper preview
+  ///
+  /// In en, this message translates to:
+  /// **'Set as wallpaper'**
+  String get galleryWallpaper;
+
+  /// Wallpaper target: both screens
+  ///
+  /// In en, this message translates to:
+  /// **'Home and lock screens'**
+  String get galleryWallpaperBoth;
+
+  /// Said when the wallpaper was set
+  ///
+  /// In en, this message translates to:
+  /// **'Wallpaper set'**
+  String get galleryWallpaperDone;
+
+  /// Said when setting the wallpaper failed
+  ///
+  /// In en, this message translates to:
+  /// **'The wallpaper could not be set.'**
+  String get galleryWallpaperFailed;
+
+  /// Wallpaper target: the home screen
+  ///
+  /// In en, this message translates to:
+  /// **'Home screen'**
+  String get galleryWallpaperHome;
+
+  /// Wallpaper target: the lock screen
+  ///
+  /// In en, this message translates to:
+  /// **'Lock screen'**
+  String get galleryWallpaperLock;
 
   /// No description provided for @hiddenCollections.
   ///

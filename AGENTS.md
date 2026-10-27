@@ -240,6 +240,9 @@ The MediaStore indexer (ADR-0045) is `MediaStoreIndexer` in `photolib_data`, tes
 its 100k budgets in `test/media_store_test.dart`; the gate compiles no Kotlin, so after changing `app/android/` run
 `flutter build apk --debug --flavor play` in `app/` (`ANDROID_HOME` and a JDK's `JAVA_HOME` set; add
 `--target-platform android-x64` when `app/build/kernel/` holds only that library).
+The default gallery's intents (ADR-0401): `app/lib/features/gallery/` decides and the Kotlin only extracts
+(`tools/tests/test_android_default_gallery.sh` checks the manifest and the runners as text);
+`docs/dev/android-default-gallery.md` holds the readiness gates, the device checklist and the Play declaration.
 
 ## Photo editor
 

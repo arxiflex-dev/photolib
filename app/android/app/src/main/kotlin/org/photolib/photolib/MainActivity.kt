@@ -7,9 +7,14 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 
 /** Shows the process's one engine (PhotolibApplication), which outlives it, and adds the channels that need it. */
-class MainActivity : FlutterActivity() {
+open class MainActivity : FlutterActivity() {
     private var mediaStore: MediaStoreChannel? = null
     private var requests: MediaRequests? = null
+    private var intents: GalleryIntents? = null
+    private var actions: GalleryActions? = null
+
+    /** Whether this is the activity over the lock screen (SecureReviewActivity): it shows what it was sent and no more. */
+    protected open val secure = false
 
     /** Whether main() ran before this activity, which then does not start it at its launch intent's route. */
     private var running = false
@@ -52,7 +57,14 @@ class MainActivity : FlutterActivity() {
         mediaStore = MediaStoreChannel(this, flutterEngine.dartExecutor.binaryMessenger)
         requests = MediaRequests(this, flutterEngine.dartExecutor.binaryMessenger)
         ViewerChannel(this, flutterEngine.dartExecutor.binaryMessenger)
+        intents = GalleryIntents(this, flutterEngine.dartExecutor.binaryMessenger, secure, running)
+        actions = GalleryActions(this, flutterEngine.dartExecutor.binaryMessenger)
         HdrLeafFactory.register(this, flutterEngine)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        intents?.onNewIntent(intent)
     }
 
     override fun onActivityResult(
@@ -62,6 +74,7 @@ class MainActivity : FlutterActivity() {
     ) {
         super.onActivityResult(requestCode, resultCode, data)
         requests?.onActivityResult(requestCode, resultCode)
+        actions?.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onRequestPermissionsResult(

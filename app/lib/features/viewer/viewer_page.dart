@@ -16,6 +16,9 @@ import 'package:photolib/features/editor/save_copy.dart';
 import 'package:photolib/features/editor/versions.dart';
 import 'package:photolib/features/folders/folders_page.dart'
     show addToChosenAlbum;
+import 'package:photolib/features/gallery/actions.dart';
+import 'package:photolib/features/gallery/edit_with_ui.dart';
+import 'package:photolib/features/gallery/wallpaper_page.dart';
 import 'package:photolib/features/library/deletion.dart';
 import 'package:photolib/features/library/timeline/pages.dart';
 import 'package:photolib/features/library/timeline/pipeline.dart';
@@ -65,6 +68,7 @@ Future<void> openInViewer(
   WidgetRef ref,
   List<ThumbnailItem> items, {
   int at = 0,
+  bool readOnly = false,
 }) {
   final thumbnails = Thumbnails((item, tier, tile) async {
     final pipeline = await ref.read(thumbnailPipelineProvider.future);
@@ -83,6 +87,7 @@ Future<void> openInViewer(
             count: items.length,
             position: ValueNotifier(at),
             thumbnails: thumbnails,
+            readOnly: readOnly,
           ),
         ),
       )
@@ -114,6 +119,7 @@ class ViewerPage extends ConsumerStatefulWidget {
     required this.count,
     required this.position,
     required this.thumbnails,
+    this.readOnly = false,
   });
 
   final TimelinePages pages;
@@ -122,6 +128,10 @@ class ViewerPage extends ConsumerStatefulWidget {
 
   /// The grid's, which the viewer shows first and in its filmstrip.
   final Thumbnails thumbnails;
+
+  /// Whether the items are only looked at: no actions, no info. The camera's
+  /// review over the lock screen (REVIEW_SECURE, ADR-0401) is.
+  final bool readOnly;
 
   /// A route whose page is laid out as it ends from its first frame, the
   /// photo flying from [from], an item's cell on the screen, while the rest
@@ -909,6 +919,27 @@ class _ViewerPageState extends ConsumerState<ViewerPage>
     });
   }
 
+  /// Hands the item shown to another app's editor and shows the copy it
+  /// makes in the item's place (MOB-13, ADR-0401).
+  Future<void> _editWith(ThumbnailItem item, LocalAssetData? row) async {
+    final at = _at;
+    final copy = await editWithOther(context, ref, item, row?.mime);
+    if (copy == null || !mounted) return;
+    setState(() {
+      _copies.value = {..._copies.value, at: copy};
+      _images.remove(at)?.dispose();
+      _sharp.remove(at);
+      _failed.remove(at);
+      _photos.remove(at);
+      _notice = AppLocalizations.of(context).editorSaved;
+      _preload();
+    });
+    _hide?.cancel();
+    _hide = Timer(const Duration(seconds: 4), () {
+      if (mounted) setState(() => _notice = null);
+    });
+  }
+
   _PhotoState? get _photo => _photos[_at]?.currentState;
 
   /// The info of [item], whose row is [row], scrolled by [scroll] in a sheet.
@@ -1246,7 +1277,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage>
     }
 
     // The actions the user arranges, as this item has them.
-    final actions = {
+    final every = {
       ViewerAction.info: Command(
         strings.viewerInfo,
         info,
@@ -1336,6 +1367,26 @@ class _ViewerPageState extends ConsumerState<ViewerPage>
           () => setAs(item, row?.mime),
           icon: Icons.wallpaper_outlined,
         ),
+      if (item != null && canSetAs(item))
+        ViewerAction.wallpaper: Command(
+          strings.galleryWallpaper,
+          () => unawaited(WallpaperPage.show(context, item)),
+          icon: Icons.wallpaper,
+        ),
+      if (item != null && canEditWith(item))
+        ViewerAction.editWith: Command(
+          strings.galleryEditWith,
+          () => unawaited(_editWith(item, row)),
+          icon: Icons.edit_note,
+        ),
+      if (item != null && canOpenWith(item))
+        ViewerAction.openWith: Command(
+          strings.galleryOpenWith,
+          () => unawaited(
+            ref.read(galleryPlatformProvider).openWith(item.uri, row?.mime),
+          ),
+          icon: Icons.open_in_new,
+        ),
       if (id != null && row != null)
         ViewerAction.favourite: Command(
           liked ? strings.actionUnfavourite : strings.actionFavourite,
@@ -1388,6 +1439,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage>
           icon: Icons.photo_album_outlined,
         ),
     };
+    final actions = widget.readOnly ? <ViewerAction, Command>{} : every;
     // What one kind of item alone has, which never enters the bar.
     final lenses = [
       if (item != null && sphere != null)
@@ -1703,6 +1755,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage>
                               onEnter: (_) => _onControl = true,
                               onExit: (_) => _onControl = false,
                               child: ViewerBar(
+                                readOnly: widget.readOnly,
                                 pins: [...settings.bar.where(onThisPlatform)],
                                 actions: actions,
                                 onCustomize: () => Navigator.of(context).push(
@@ -1712,7 +1765,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage>
                                 ),
                                 menu: _more,
                                 onMenu: (open) => _menuOpen = open,
-                                history: versions.isEmpty
+                                history: versions.isEmpty || widget.readOnly
                                     ? null
                                     : Command(
                                         strings.infoHistory,
@@ -1819,7 +1872,7 @@ class _ViewerPageState extends ConsumerState<ViewerPage>
             // A mouse drags the file out instead, where windows take files.
             mouse: !drags,
             onDismissed: _close,
-            onSwipeUp: () => setState(() => _info = true),
+            onSwipeUp: () => setState(() => _info = !widget.readOnly),
             // The route's flight shows the drag; its scrim, the background.
             onDrag: _route?.drag,
             child: _route == null

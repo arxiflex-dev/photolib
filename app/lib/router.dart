@@ -12,6 +12,8 @@ import 'package:photolib/features/collections/collections_page.dart';
 import 'package:photolib/features/folders/device_folders.dart';
 import 'package:photolib/features/folders/folders_page.dart';
 import 'package:photolib/features/folders/items_page.dart';
+import 'package:photolib/features/gallery/onboarding.dart';
+import 'package:photolib/features/gallery/shortcuts.dart';
 import 'package:photolib/features/library/library_page.dart';
 import 'package:photolib/features/map/map_page.dart';
 import 'package:photolib/features/offline/storage_page.dart';
@@ -100,9 +102,25 @@ final Provider<GoRouter> routerProvider = Provider((ref) {
             path: 'privacy',
             builder: (context, state) => const PrivacyPage(),
           ),
+          GoRoute(
+            path: 'gallery',
+            builder: (context, state) => const OnboardingPage(),
+          ),
         ],
       ),
       GoRoute(path: '/admin', builder: (context, state) => const AdminPage()),
+      // A home-screen shortcut or widget to a folder or an album
+      // (ADR-0401).
+      for (final kind in ['folder', 'album'])
+        GoRoute(
+          path: '/shortcut/$kind',
+          builder: (context, state) => switch (shortcutSource(state.uri)) {
+            final source? => ItemsPage(source),
+            null => ErrorView(
+              message: AppLocalizations.of(context).errorNotFound,
+            ),
+          },
+        ),
       // A password setup link (ADR-0243): SetupLinks opens it over the library.
       GoRoute(
         path: '/password-setup',
