@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { dayLabel, openApp, seen, tap, texts, type } from './lib.mjs';
+import { changed, dayLabel, dismiss, gone, openApp, painted, seen, settled, tap, texts, type, WAIT } from './lib.mjs';
 
 const password = 'correct horse battery';
 // A 1 x 1 PNG, which a drop gives the page.
@@ -22,7 +22,7 @@ export async function journey({ page, context, engine, url, token, photos, video
   // A playing video keeps the keyboard, so the viewer closes by its button.
   const closeViewer = async () => {
     await label('Close').first().click({ force: true, timeout: 5000 }).catch(() => page.keyboard.press('Escape'));
-    await page.waitForTimeout(1500);
+    await gone(page, /^Close$/);
   };
   const workers = [];
   page.on('worker', (worker) => workers.push(worker.url()));
@@ -40,22 +40,24 @@ export async function journey({ page, context, engine, url, token, photos, video
     await openApp(page, url);
     await label(/settings/i).first().click();
     await page.getByText('Add a server').first().click();
-    await page.waitForTimeout(800);
     await page.getByRole('button', { name: 'Connect' }).click();
     await page.getByText('Set up a new server').first().click();
   });
 
   await step('the first administrator is created in the browser and signed in', async () => {
-    await page.waitForTimeout(800);
     const boxes = page.getByRole('textbox');
+    await boxes.nth(5).waitFor({ timeout: WAIT });
     for (const [i, value] of [token, 'ann', 'Ann', 'ann@example.org', password, password].entries()) await type(page, boxes.nth(i), value);
     await label('Create administrator').click();
     await seen(page, /Signed in as ann/, 60_000);
     await shot('signed-in');
     for (let back = 0; back < 3; back++) {
       const button = label('Back');
-      if (await button.count()) await button.first().click();
-      await page.waitForTimeout(1200);
+      if (!(await button.count())) break;
+      const before = await texts(page);
+      await button.first().click();
+      await changed(page, before);
+      await settled(page);
     }
   });
 
@@ -91,20 +93,20 @@ export async function journey({ page, context, engine, url, token, photos, video
     // A phone's viewer has no pager text and its keys are a keyboard's: it shows the photo, which closes with its button.
     if (light) {
       await seen(page, /Close/, 60_000);
-      await page.waitForTimeout(3000);
+      await painted(page);
       await shot('viewer');
       await label('Close').first().click({ force: true });
-      await page.waitForTimeout(1500);
+      await gone(page, /^Close$/);
       return;
     }
     await seen(page, /1 of 3/, 30_000);
     await page.keyboard.press('ArrowRight');
-    await page.waitForTimeout(800);
+    await seen(page, /2 of 3/);
+    await painted(page);
     await shot('viewer');
     await page.keyboard.press('Shift+Slash');
     await seen(page, /Keyboard shortcuts/, 15_000);
-    await page.keyboard.press('Escape');
-    await page.waitForTimeout(500);
+    await dismiss(page, /Keyboard shortcuts/);
   });
 
   if (!light) await step('one photo downloads under its own name, whole', async () => {
@@ -121,10 +123,9 @@ export async function journey({ page, context, engine, url, token, photos, video
   });
 
   if (!light) await step('several photos download as one zip of their original names', async () => {
-    await page.keyboard.press('Escape');
-    await page.waitForTimeout(1200);
+    await dismiss(page, /^Close$/);
     await page.keyboard.press('Control+a');
-    await page.waitForTimeout(800);
+    await seen(page, /Clear selection/);
     const download = page.waitForEvent('download', { timeout: 60_000 });
     await label(/^Download/).first().click({ force: true });
     const saved = await download;
@@ -135,7 +136,7 @@ export async function journey({ page, context, engine, url, token, photos, video
     assert.deepEqual(listing, names);
     // A selection keeps the timeline it was made in: the next upload shows once it is cleared.
     await label('Clear selection').click({ force: true });
-    await page.waitForTimeout(800);
+    await gone(page, /Clear selection/);
   });
 
   if (video && !light) {
@@ -153,20 +154,20 @@ export async function journey({ page, context, engine, url, token, photos, video
       // the newest of its day (the dropped photo has a day of its own).
       let played = 0;
       for (let attempt = 0; attempt < 12 && !played; attempt++) {
-        await page.waitForTimeout(5000);
         // Back on the timeline, whatever an earlier attempt left open, and its first tile of that day is the video.
         for (let close = 0; close < 3; close++) {
           if (await seen(page, /Nov 14, 2023, 1 of 3/, 5000).then(() => true, () => false)) break;
           await closeViewer();
         }
         await tap(page, /Nov 14, 2023, 1 of 3/);
-        await page.waitForTimeout(4000);
+        // The viewer starts the video once the server has rendered the proxy, or offers Play; an attempt in which it does
+        // not advance closes the viewer and asks again.
         const play = label(/^Play$/).first();
-        if (await play.count()) {
-          await play.click({ force: true, timeout: 5000 }).catch(() => {});
-          await page.waitForTimeout(2500);
-          played = await page.evaluate(() => Math.max(0, ...[...document.querySelectorAll('video')].map((v) => v.currentTime)));
-        }
+        const advanced = page
+          .waitForFunction(() => Math.max(0, ...[...document.querySelectorAll('video')].map((v) => v.currentTime)) > 0.5 || false, undefined, { timeout: 10_000 })
+          .then(() => true, () => false);
+        if (await play.waitFor({ state: 'attached', timeout: 2000 }).then(() => true, () => false)) await play.click({ force: true, timeout: 5000 }).catch(() => {});
+        if (await advanced) played = await page.evaluate(() => Math.max(0, ...[...document.querySelectorAll('video')].map((v) => v.currentTime)));
         if (process.env.WEB_E2E_VERBOSE) await shot(`attempt-${attempt}`);
         if (process.env.WEB_E2E_VERBOSE) console.log(`  attempt ${attempt}: play button ${await play.count()}, video ${JSON.stringify(await page.evaluate(() => [...document.querySelectorAll('video')].map((v) => [v.currentTime, v.paused, v.readyState, v.error?.code])))}`);
         if (!played) await closeViewer();
@@ -187,7 +188,16 @@ export async function journey({ page, context, engine, url, token, photos, video
   });
 
   if (!light) await step('offline, the installed shell opens with the library', async () => {
-    await page.waitForTimeout(6000);
+    // The shell is kept once the worker controls the page and has been told what the page loaded.
+    await page.waitForFunction(
+      async () => {
+        if (!navigator.serviceWorker.controller) return false;
+        const kept = await (await caches.open('photolib-shell-1')).keys();
+        return kept.some((request) => /\/main\.dart\.(wasm|js)$/.test(request.url));
+      },
+      undefined,
+      { timeout: 60_000 },
+    );
     assert.ok((await page.evaluate(() => navigator.serviceWorker.getRegistrations())).length > 0, 'no service worker');
     await context.setOffline(true);
     await page.reload({ waitUntil: 'load', timeout: 60_000 });

@@ -197,6 +197,37 @@ dart_lint "$DONE$CODE$NOTICE" "$DONE"
 expect_result "text after the JSON of check-unused-code does not hide its finding" failure \
   "dart/lib/a.dart: unused-code: 1, baseline 0"
 [[ $OUT != *Traceback* ]] && ok "no traceback after trailing text" || fail "traceback: $OUT"
+# Nor may the notice have a source: dart_code_linter asks pub.dev for its latest release after every command (PHO-239:
+# a notice, a slow answer or none changes a CI run for no change in the repository), and has no flag to stop it, so
+# the ratchet runs it with every proxy variable pointing at a port that refuses, whatever the caller's were.
+cat >"$SANDBOX/stubs/dart" <<'STUB'
+#!/bin/bash
+echo "${HTTPS_PROXY-unset} ${https_proxy-unset} ${HTTP_PROXY-unset} ${http_proxy-unset} ${ALL_PROXY-unset}" >>"$ENV_LOG"
+case "$*" in
+  *" analyze "*)
+    for arg; do [[ $arg == --json-path=* ]] && json=${arg#--json-path=}; done
+    echo '{"records": []}' >"$json" ;;
+  *check-unused-*) echo '{}' ;;
+esac
+STUB
+ENV_LOG=$SANDBOX/dart-env.log
+: >"$ENV_LOG"
+ENV_LOG=$ENV_LOG HTTPS_PROXY=proxy.invalid:3128 http_proxy=proxy.invalid:3128 lint dart dart
+REFUSED=http://127.0.0.1:9
+[[ $(wc -l <"$ENV_LOG") -eq 3 ]] && ok "dart_code_linter runs three commands" || fail "dart calls: $(cat "$ENV_LOG")"
+[[ $(sort -u "$ENV_LOG") == "$REFUSED $REFUSED $REFUSED $REFUSED $REFUSED" ]] &&
+  ok "each runs with every proxy variable at a port that refuses, so its pub.dev update check cannot answer" ||
+  fail "proxy variables seen by dart_code_linter: $(sort -u "$ENV_LOG")"
+cat >"$SANDBOX/stubs/dart" <<'STUB'
+#!/bin/bash
+case "$*" in
+  *" analyze "*)
+    for arg; do [[ $arg == --json-path=* ]] && json=${arg#--json-path=}; done
+    echo '{"records": []}' >"$json" ;;
+  *check-unused-code*) printf '%s' "$UNUSED_CODE" ;;
+  *check-unused-files*) printf '%s' "$UNUSED_FILES" ;;
+esac
+STUB
 dart_lint "$DONE$CODE"$'\n{"formatVersion":3,"unusedCode":[]}\n' "$DONE"
 expect_result "only the first of two JSON documents is read" failure "dart/lib/a.dart: unused-code: 1, baseline 0"
 dart_lint $'progress {1/2}\n'"$CODE$NOTICE" "$DONE"
