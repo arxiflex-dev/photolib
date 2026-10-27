@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Enforces the Conventional Commits policy (see "Commits" in AGENTS.md).
 #
-#   tools/commitlint.sh <git-range>      lint every non-merge commit in the range, e.g. origin/dev..HEAD
+#   tools/commitlint.sh <git-range>      lint every non-merge commit in the range, e.g. <remote>/dev..HEAD
 #   tools/commitlint.sh --file <path>    lint a message file (commit-msg hook); '#' comment lines are ignored
 #   tools/commitlint.sh --stdin          lint a message read from standard input
 #

@@ -65,7 +65,9 @@ SINCE=(
 # decryption and the benchmark. Seek timings on a loaded machine would make every gate flaky.
 PLAYBACK=(app/packages/photolib_api/lib/media_proxy.dart app/packages/photolib_api/tool/decrypting_proxy.dart
   kernel/src/blob.rs 'tools/playback/*')
-BASE=origin/dev
+# The remote that holds dev (tools/remote.sh: $PHOTOLIB_REMOTE, else the only one, else origin), asked when needed.
+remote() { bash "$ROOT/tools/remote.sh"; }
+BASE=
 
 STATE=$(mktemp -d) || exit 1
 trap 'rm -rf "$STATE"' EXIT
@@ -699,6 +701,7 @@ check_web() {
 # playback_changed: whether the diff BASE...HEAD touches PLAYBACK; true when there is no diff to tell.
 playback_changed() {
   local paths path glob
+  BASE=${BASE:-$(remote)/dev}
   paths=$(git diff --name-only --no-renames "$BASE...HEAD" 2>/dev/null) || return 0
   while IFS= read -r path; do
     for glob in "${PLAYBACK[@]}"; do
@@ -722,20 +725,22 @@ check_proto() {
   step . bash tools/codegen.sh --check
 }
 
-# What this branch adds to origin/dev: Conventional Commits and, when it moves the Flutter pin, the
+# What this branch adds to $REMOTE/dev: Conventional Commits and, when it moves the Flutter pin, the
 # upgrade gates ticked in $PR_BODY.
 check_commits() {
   [[ -e .git ]] || return 0
   need git "the checks of this branch's commits" || return 0
-  if ! git rev-parse -q --verify origin/dev >/dev/null; then
-    note_failure "origin/dev is missing, so this branch's commits cannot be checked: git fetch origin dev"
+  local REMOTE
+  REMOTE=$(remote) || { note_failure "the remote that holds dev is unknown: set PHOTOLIB_REMOTE"; return 0; }
+  if ! git rev-parse -q --verify "$REMOTE/dev" >/dev/null; then
+    note_failure "$REMOTE/dev is missing, so this branch's commits cannot be checked: git fetch $REMOTE dev"
     return 0
   fi
-  step . bash tools/commitlint.sh origin/dev..HEAD
+  step . bash tools/commitlint.sh "$REMOTE/dev..HEAD"
   need python3 "the Flutter upgrade gate and the lint baseline" || return 0
-  step . python3 tools/flutter_upgrade_gate.py origin/dev HEAD
+  step . python3 tools/flutter_upgrade_gate.py "$REMOTE/dev" HEAD
   # The lint baseline only shrinks, unless a lint-accept: <reason> line says why it grew.
-  step . bash tools/lint/ratchet.sh --against origin/dev
+  step . bash tools/lint/ratchet.sh --against "$REMOTE/dev"
 }
 
 # TypeScript: installed from the lock file without install scripts, then type-checked, tested and licence-checked.

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # The checks that failed the merge queue, run before asking for it (each queue failure costs everyone ~25 minutes).
-# It does NOT replace the gate (`bash tools/check.sh --since origin/dev`); it catches the cheap, repeated failures first.
+# It does NOT replace the gate (`bash tools/check.sh --since <remote>/dev`); it catches the cheap, repeated failures first.
 #
 #   bash tools/prequeue.sh [--quick|--full] [--perf] [--list]
 #     (default)  the quick steps plus the Dart analyzer, the app guard tests and cargo check (about a minute)
@@ -11,8 +11,9 @@
 #     --perf     adds tools/perf/instructions.sh when kernel/ or server code changed: opt-in, outside the budget
 #     --list     prints the steps of the tier with their command and the failure class they catch, runs nothing
 #
-#   PREQUEUE_BASE=origin/dev      the ref the branch is compared with
-#   PREQUEUE_OTHERS='origin/wi/*' the refs whose kernel/ADR/schema numbers and files are compared with ours
+#   PHOTOLIB_REMOTE=<name>        the remote that holds dev (tools/remote.sh: else the only remote, else origin)
+#   PREQUEUE_BASE=<remote>/dev    the ref the branch is compared with
+#   PREQUEUE_OTHERS='<remote>/wi/*' the refs whose kernel/ADR/schema numbers and files are compared with ours
 #   PREQUEUE_NO_FETCH=1           do not `git fetch` first (offline)
 #   PREQUEUE_NO_GH=1              do not call `gh` (the PR title and the queued PRs are then skipped)
 #   PREQUEUE_ONLY=<name or regex> run only the steps whose name contains it or matches it (to run or time one)
@@ -38,8 +39,10 @@ for arg in "$@"; do
   esac
 done
 case $TIER in quick) RANK_MAX=1 ;; default) RANK_MAX=2 ;; full) RANK_MAX=3 ;; esac
-BASE=${PREQUEUE_BASE:-origin/dev}
-OTHERS=${PREQUEUE_OTHERS-origin/wi/* origin/mergify/merge-queue/*}
+REMOTE=$(bash "$(dirname "${BASH_SOURCE[0]}")/remote.sh") || exit 2
+export PREQUEUE_REMOTE=$REMOTE
+BASE=${PREQUEUE_BASE:-$REMOTE/dev}
+OTHERS=${PREQUEUE_OTHERS-$REMOTE/wi/* $REMOTE/mergify/merge-queue/*}
 BUDGET=${PREQUEUE_BUDGET:-$([[ $TIER == full ]] && echo 420 || echo 300)}
 [[ $BUDGET =~ ^[1-9][0-9]*$ ]] || { echo "prequeue: PREQUEUE_BUDGET must be a whole number of seconds" >&2; exit 2; }
 # PREQUEUE_TREE_ONLY: a nested run in a clone or a merge of branches: only the steps that read the tree.
@@ -399,7 +402,7 @@ s_collisions() {
   [[ -z $TREE_ONLY ]] || na "not repeated in a nested run"
   ! base_is_root || na "$BASE is a root commit: every number would be new"
   python3 - "$BASE" "$OTHERS" <<'PY'
-import re, subprocess, sys
+import os, re, subprocess, sys
 base, others = sys.argv[1], sys.argv[2].split()
 
 def git(*a):
@@ -438,7 +441,7 @@ here = git("rev-parse", "--abbrev-ref", "HEAD").strip()
 head = git("rev-parse", "HEAD").strip()
 bad = []
 for ref in refs(others):
-    if ref.split("origin/", 1)[-1] == here or git("rev-parse", ref).strip() == head:
+    if ref.removeprefix(os.environ["PREQUEUE_REMOTE"] + "/") == here or git("rev-parse", ref).strip() == head:
         continue
     theirs = taken(ref)
     for kind in mine:
@@ -501,7 +504,7 @@ s_conflicts() {
   done
   return 0
 }
-add 1 q "conflicts with other branches" "git merge-tree --write-tree HEAD <each origin/wi/* and queue branch>" \
+add 1 q "conflicts with other branches" "git merge-tree --write-tree HEAD <each $REMOTE/wi/* and queue branch>" \
   "two PRs editing one generated file or numbered registry (warning)" "" s_conflicts
 
 # A tool that reads a child's output without a limit fails in the CI's node (the default buffer is 1 MiB).
@@ -712,10 +715,10 @@ add 2 rustl "cargo deny" "cargo deny --locked check bans licenses sources in eac
 s_migrations() {
   local dir=$TMP/mig rc
   [[ -n $(changed 'server/migrations/*' tools/migrations.sh tools/squawk.sh | head -n 1) ]] || na "no migration changed"
-  [[ $(git rev-parse "$BASE") == "$(git rev-parse -q --verify refs/remotes/origin/dev)" ]] ||
-    skipped "tools/migrations.sh compares with origin/dev, which is not $BASE"
+  [[ $(git rev-parse "$BASE") == "$(git rev-parse -q --verify "refs/remotes/$REMOTE/dev")" ]] ||
+    skipped "tools/migrations.sh compares with $REMOTE/dev, which is not $BASE"
   if [[ -z $TREE_ONLY ]] && (($(git rev-list --count HEAD.."$BASE") > 0)); then
-    # migrations.sh compares with origin/dev: a branch behind it would call dev's newer migrations deleted, so it runs on
+    # migrations.sh compares with $REMOTE/dev: a branch behind it would call dev's newer migrations deleted, so it runs on
     # the branch merged with the base, as the queue builds its tree
     git worktree add -q --detach "$dir" HEAD || return 1
     if git -C "$dir" -c user.name=prequeue -c user.email=prequeue@invalid -c core.hooksPath=/dev/null merge -q --no-edit "$BASE" >/dev/null 2>&1; then
@@ -1183,7 +1186,7 @@ s_combined() {
   # the PRs labelled queued, and the merge queue's own branches (each holds the PRs stacked on it)
   while IFS=$'\t' read -r n name; do
     [[ $n != "$current" ]] || continue
-    ref=origin/$name
+    ref=$REMOTE/$name
     git rev-parse -q --verify "$ref" >/dev/null || { echo "WARN #$n ($name) is not fetched: not merged in"; continue; }
     [[ $(git rev-parse "$ref") != "$(git rev-parse HEAD)" ]] || continue
     git merge-base --is-ancestor "$ref" HEAD 2>/dev/null && continue
@@ -1298,9 +1301,9 @@ WARNS=0 SKIPS=0 FAILED=() NOTRUN=() CUT=()
 warn() { echo "warn $*"; WARNS=$((WARNS + 1)); }
 echo "== prequeue --$TIER: $(git rev-parse --abbrev-ref HEAD) against $BASE (budget ${BUDGET}s)"
 if [[ -z ${PREQUEUE_NO_FETCH:-} ]]; then
-  timeout 60 git fetch -q origin 2>/dev/null || warn "git fetch failed: comparing with the refs you have"
+  timeout 60 git fetch -q "$REMOTE" 2>/dev/null || warn "git fetch failed: comparing with the refs you have"
 fi
-git rev-parse -q --verify "$BASE" >/dev/null || { echo "FAIL $BASE is missing: git fetch origin" >&2; exit 1; }
+git rev-parse -q --verify "$BASE" >/dev/null || { echo "FAIL $BASE is missing: git fetch $REMOTE" >&2; exit 1; }
 behind=$(git rev-list --count HEAD.."$BASE")
 ((behind == 0)) || warn "$behind commits of $BASE are not in this branch: rebase or merge before queueing (generated code, ADR index and AGENTS.md conflict first)"
 [[ -z $(git status --porcelain --untracked-files=no) ]] || warn "uncommitted changes: this checks HEAD, the queue sees only what you push"

@@ -4,11 +4,12 @@
 # takes more than 10% more unless the pull request says why in a `perf-accept: <reason>` line: in $PR_BODY or in a
 # commit message since the base (ADR-0048). The base-against-branch table goes to stdout and, for the pull request's
 # description, to $PERF_REPORT when set. Needs git, cargo, python3 and valgrind.
-#   bash tools/perf/instructions.sh [base]    # default: the merge base with origin/dev
+#   bash tools/perf/instructions.sh [base]    # default: the merge base with <remote>/dev, tools/remote.sh
 set -euo pipefail
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 cd "$ROOT"
-base=$(git rev-parse --verify "${1:-$(git merge-base origin/dev HEAD)}^{commit}")
+remote=$(bash "$ROOT/tools/remote.sh")
+base=$(git rev-parse --verify "${1:-$(git merge-base "$remote/dev" HEAD)}^{commit}")
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 

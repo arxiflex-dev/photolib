@@ -81,6 +81,8 @@ replace `bash tools/check.sh --since origin/dev`.
 `INCOMPLETE` (exit 3) means the 420 s budget cut a step, which the Rust server tests do on a big diff: it is not a pass.
 Run each step it names alone, `PREQUEUE_BUDGET=1800 PREQUEUE_ONLY='rust tests (4 cores)' bash tools/prequeue.sh --full`,
 and paste that result with the `--full` line.
+The tools that compare with `origin/dev` (`check.sh`, `prequeue.sh`, `migrations.sh`, `proto_breaking.sh`) take the remote
+from `tools/remote.sh`: `$PHOTOLIB_REMOTE`, else the only remote (this repository's is `arxiflex-dev`), else `origin`.
 
 ## CI
 
