@@ -887,6 +887,18 @@ class AppLocalizationsHe extends AppLocalizations {
   String get commandPaletteHint => 'יש להקליד פקודה';
 
   @override
+  String get dateFormatDefault => 'ברירת המחדל של השפה';
+
+  @override
+  String get dateFormatDmy => 'יום-חודש-שנה';
+
+  @override
+  String get dateFormatMdy => 'חודש-יום-שנה';
+
+  @override
+  String get dateFormatYmd => 'שנה-חודש-יום';
+
+  @override
   String deleteBoth(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -2815,6 +2827,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settingsBackground => 'מאחורי תמונות שקופות';
+
+  @override
+  String get settingsDateFormat => 'תבנית תאריך';
 
   @override
   String get settingsDefaultTab => 'תיקיות ואלבומים נפתחים בכרטיסייה';

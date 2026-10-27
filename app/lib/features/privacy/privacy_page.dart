@@ -236,7 +236,7 @@ class _PrivacyPageState extends ConsumerState<PrivacyPage> {
   ];
 
   List<Widget> _health(AppLocalizations s, AccountKeys keys) {
-    final formats = Formats(s);
+    final formats = Formats.of(context);
     final now = DateTime.now();
     final verified = keys.hasRecoveryVerifiedAt();
     final due = verified && keys.drillDueAt.toDateTime().isBefore(now);

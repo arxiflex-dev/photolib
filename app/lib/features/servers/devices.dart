@@ -87,7 +87,7 @@ String _subtitle(BuildContext context, Device device) {
   final time = device.lastSeenAt.toDateTime().toLocal();
   final clock = MaterialLocalizations.of(context)
       .formatTimeOfDay(TimeOfDay.fromDateTime(time));
-  final seen = '${Formats(s).date(time)} $clock';
+  final seen = '${Formats.of(context).date(time)} $clock';
   return '${device.platform} · ${s.adminLastSeen(seen)}';
 }
 
