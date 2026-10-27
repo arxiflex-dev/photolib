@@ -160,20 +160,30 @@ class FolderIndexer {
         ),
       );
     }
-    _log.info(
-      'scanned',
-      fields: {
-        'root': root,
-        'dir': from,
-        'recursive': deep,
-        'resumed after': ?resume,
-        'ms': took.elapsedMilliseconds,
-        ...counts,
-        'skipped': skipped,
-      },
-    );
+    _logScan(root, from, deep, resume, took, counts, skipped);
     return true;
   }
+
+  void _logScan(
+    String root,
+    String from,
+    bool deep,
+    String? resume,
+    Stopwatch took,
+    Map<String, int> counts,
+    Map<String, int> skipped,
+  ) => _log.info(
+    'scanned',
+    fields: {
+      'root': root,
+      'dir': from,
+      'recursive': deep,
+      'resumed after': ?resume,
+      'ms': took.elapsedMilliseconds,
+      ...counts,
+      'skipped': skipped,
+    },
+  );
 
   /// The ignore rules of the directories above [dir], and whether one the user
   /// chose ignores it; null when the [junk] defaults do: never indexed.

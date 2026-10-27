@@ -266,7 +266,11 @@ class _Fold {
       id: row?.id,
       items: items,
       // A root away counts what the scan found; else what the library shows.
-      itemsBelow: top && root?.state == 'offline' ? root!.items : below,
+      itemsBelow: switch (root) {
+        FolderSummaryResult(state: 'offline', items: final away) when top =>
+          away,
+        _ => below,
+      },
       newest: _latest([shownHere?.newest, for (final c in children) c.newest]),
       state: _state(top, below),
       visibility: own,
