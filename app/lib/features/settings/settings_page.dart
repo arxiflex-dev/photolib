@@ -103,6 +103,12 @@ class SettingsPage extends ConsumerWidget {
               title: Text(strings.settingsViewing),
               onTap: () => context.push('/settings/viewing'),
             ),
+            // The licences the app registers: Roboto, and on Windows the LGPL
+            // notices of the libmpv and FFmpeg it bundles (ADR-0229).
+            AboutListTile(
+              icon: const Icon(Icons.info_outline),
+              applicationName: strings.appTitle,
+            ),
           ],
         ),
       ),
