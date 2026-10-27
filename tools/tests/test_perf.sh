@@ -853,6 +853,7 @@ assert_matches docs/adr/README.md '\(0212-perf-part-in-half-the-time\.md\) \| [^
 # tools/perf/measure.sh (PHO-232): a budget measured by a command of its own, whose `result:` lines are checked; no test
 # asserts a time.
 printf '%s\n' '#!/usr/bin/env bash' \
+  'echo "args: $*"' \
   'echo "result: {\"budget\": \"hls-start\", \"metric\": \"start_ms\", \"target\": \"chrome\", \"value\": ${CHROME:-900}}"' \
   '[[ -z ${FIREFOX:-} ]] || echo "result: {\"budget\": \"hls-start\", \"metric\": \"start_ms\", \"target\": \"firefox\", \"value\": $FIREFOX}"' \
   '[[ -z ${BROKEN:-} ]] || { echo "the test failed"; exit 1; }' >"$TMP/measured.sh"
@@ -864,6 +865,8 @@ FIREFOX=2500 measure chrome firefox
 expect_result "measure.sh fails a result over its budget" 1 "FAIL hls-start start_ms firefox: 2500 ms (budget ≤ 2000 ms)"
 measure chrome firefox
 expect_result "measure.sh fails a series the command did not print" 1 "missing: hls-start start_ms firefox"
+capture bash tools/perf/measure.sh hls-start chrome -- bash "$TMP/measured.sh" -- --ignored
+expect_result "measure.sh hands the command its own -- on" 0 "args: -- --ignored"
 BROKEN=1 measure chrome
 expect_result "measure.sh fails when the command fails" 1 "hls-start: exited 1 (the test failed)"
 capture bash tools/perf/measure.sh hls-start safari -- true

@@ -368,7 +368,12 @@ def main():
     sharing = commands.add_parser("series")
     sharing.add_argument("--units")
     sharing.add_argument("--except", dest="skip")
-    args = parser.parse_args()
+    argv, command = sys.argv[1:], None
+    if argv[:1] == ["watch"] and "--" in argv:  # argparse would drop a `--` of the command's own too
+        argv, command = argv[: argv.index("--")] + ["command"], argv[argv.index("--") + 1:]
+    args = parser.parse_args(argv)
+    if command:
+        args.app = command
     if args.command == "check" and args.history and not args.commit:
         parser.error("--history needs the --commit the results belong to")
     commands = {"check": check, "dashboard": dashboard, "instructions": instructions, "watch": watch,
