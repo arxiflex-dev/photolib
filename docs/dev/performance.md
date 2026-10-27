@@ -19,7 +19,8 @@ PERF_HISTORY=~/perf/history.jsonl bash tools/perf/run.sh  # a reference machine:
 fixtures (1M assets, a 300k timeline, 100k near-duplicates, 100k with one timestamp, 50k on one day, 5k folders,
 10k albums), measures photolibd's idle RSS without ML, its ingest throughput (the kernel's metadata, `thumb_s`,
 `thumb_m` and ThumbHash of 12 MP JPEGs, in CPU time on the fastest cores, [calibrated](#calibration)) and the sync of a
-100k-asset library and of one change through the Connect stack, drives `app/benchmark/perf_test.dart` in profile mode
+100k-asset library and of one change through the Connect stack, the slowest OCR read of a picture (`ocr-read`,
+advisory; the correctness test asserts no time), drives `app/benchmark/perf_test.dart` in profile mode
 over every fixture and traces the app's cold start. A timeline fixture becomes the device index, whose timeline is
 scrolled for 5 s, jumped to eight months (until the first frame and until every visible cell shows its thumbnail),
 opens the viewer from a cell (until its first frame, with the grid's thumbnails in memory and without) and is
