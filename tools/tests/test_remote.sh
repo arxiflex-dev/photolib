@@ -47,7 +47,7 @@ remote_in "$WORK/solo" PHOTOLIB_REMOTE=upstream
 git -C "$REPO_ROOT" rev-parse -q --verify HEAD >/dev/null || { fail "no commit to clone"; finish; }
 git init -q --bare "$WORK/up.git"
 git -C "$REPO_ROOT" push -q "$WORK/up.git" HEAD:refs/heads/dev 2>/dev/null || fail "cannot push HEAD to the scratch remote"
-git clone -q -o arxiflex-dev "$WORK/up.git" "$WORK/clone" 2>/dev/null || fail "cannot clone the scratch remote"
+git clone -q -o arxiflex-dev -b dev "$WORK/up.git" "$WORK/clone" 2>/dev/null || fail "cannot clone the scratch remote"
 # the clone is this checkout's HEAD, so it holds the tools under test; its branch equals dev, which a quick run passes
 git -C "$WORK/clone" checkout -q -b wi/sandbox
 [[ $(git -C "$WORK/clone" remote) == arxiflex-dev ]] && ok "the clone has no origin" || fail "remotes: $(git -C "$WORK/clone" remote)"
