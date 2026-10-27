@@ -153,6 +153,56 @@ void main() {
     );
 
     test(
+      'that fails restores the folder lists of an older schema as visibility',
+      () async {
+        // Schema 20 kept two lists (excluded, chosen) where schema 21 has one
+        // own visibility; the restore rebuilt at the current schema must map them.
+        final old = sqlite3.open('${dir.path}/replica');
+        old
+          ..execute('DROP VIEW hidden_folder')
+          ..execute('DROP VIEW excluded_folder')
+          ..execute('DROP INDEX device_folder_own')
+          ..execute('ALTER TABLE device_folder DROP COLUMN visibility')
+          ..execute(
+            'ALTER TABLE device_folder ADD COLUMN excluded INTEGER NOT NULL DEFAULT 0',
+          )
+          ..execute(
+            'ALTER TABLE device_folder ADD COLUMN chosen INTEGER NOT NULL DEFAULT 0',
+          )
+          ..execute(
+            "INSERT OR REPLACE INTO device_folder_mode (id, only_chosen) VALUES (0, 0)",
+          );
+        for (final (path, excluded, chosen) in [
+          ('DCIM/Camera/', 0, 1),
+          ('Android/media/com.whatsapp/', 1, 0),
+          ('Pictures/', 0, 0),
+          ('Android/media/com.whatsapp/Media/', 0, 0),
+          ('Both/', 1, 1),
+        ]) {
+          old.execute(
+            "INSERT INTO device_folder (volume, path, excluded, chosen) VALUES ('v', ?, ?, ?)",
+            [path, excluded, chosen],
+          );
+        }
+        old.close();
+
+        final db = _Broken(file('replica'), openBackup: openBackup);
+        addTearDown(db.close);
+        expect(await rows(db, 'device_folder'), [
+          for (final (id, path, visibility) in [
+            (1, 'DCIM/Camera/', 'shown'),
+            (2, 'Android/media/com.whatsapp/', 'hidden'),
+            (3, 'Pictures/', 'inherit'),
+            // Neither list, below a hidden folder, shown before: still shown.
+            (4, 'Android/media/com.whatsapp/Media/', 'shown'),
+            (5, 'Both/', 'hidden'),
+          ])
+            "[$id, v, $path, , $visibility, 0]",
+        ]);
+      },
+    );
+
+    test(
       'whose restore fails too leaves the replica untouched at its old version',
       () async {
         final old = Replica(file('replica'));
