@@ -149,6 +149,11 @@ app_play_sandbox() {
   echo '{"flutter": "3.47.7"}' >"$SANDBOX/app/.fvmrc"
   stub_command "$SANDBOX/tools/video/app_play.sh" app_play.sh
 }
+smoke_sandbox() {
+  gate_sandbox cargo python3
+  mkdir -p "$SANDBOX/tools/e2e"
+  stub_command "$SANDBOX/tools/e2e/server_client_smoke.sh" server_client_smoke.sh
+}
 node_sandbox() {
   gate_sandbox npm node python3
   mkdir -p "$SANDBOX/viewer"
@@ -165,6 +170,7 @@ retried_step "the renditions' playback" renditions_sandbox web 'video/play\.mjs'
 retried_step "the seek benchmark" playback_sandbox web 'bench\.mjs' "node tools/playback/bench.mjs"
 retried_step "the web request check" web_app_sandbox dart 'web_requests\.py' "python3 tools/web_requests.py app"
 retried_step "the app's playback of the corpus" app_play_sandbox dart 'app_play\.sh' "app_play.sh "
+retried_step "the server and client smoke" smoke_sandbox web 'server_client_smoke' "server_client_smoke.sh "
 retried_step "the Rust doc tests" rust_sandbox rust '--doc' \
   "offline.sh python3 SANDBOX/tools/lint/panics.py cargo test --locked --doc -- --show-output"
 retried_step "the TypeScript tests" node_sandbox node 'npm test' "offline.sh npm test"

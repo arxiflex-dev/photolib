@@ -92,7 +92,7 @@ runs:
         key: >-
           photolib-tools-${{ runner.os }}-${{ hashFiles('app/packages/photolib_data/pubspec.lock',
           'kernel/Cargo.lock', 'tools/buf.sh', 'tools/codegen.sh', 'tools/connect_conformance.sh',
-          'tools/data/web.sh', 'tools/garage.sh', 'tools/helm.sh', 'tools/hls/web.sh', 'tools/kernel/wasm.sh', 'tools/lint/tool.sh',
+          'tools/data/web.sh', 'tools/e2e/server_client_smoke.sh', 'tools/garage.sh', 'tools/helm.sh', 'tools/hls/web.sh', 'tools/kernel/wasm.sh', 'tools/lint/tool.sh',
           'tools/npm_tool.sh', 'tools/offline.sh', 'tools/package.sh', 'tools/playwright.sh', 'tools/postgres.sh',
           'tools/promtool.sh', 'tools/proxies.sh', 'tools/squawk.sh', 'tools/video/ffmpeg.sh') }}
     # The .deb files, kept between runs: with them here the mirror is asked for little, and its stalls cost nothing.
@@ -179,8 +179,9 @@ runs:
         # published against a locked crate whatever a branch changed, and an unreachable advisory database must not
         # fail a build either; the finding stays in the log. The web timeline's frame budget (tools/timeline_bench.py
         # --check, the web part) is a time measurement too: on a hosted runner without a GPU it read 4 to 47 % janky
-        # frames against its 1 % and failed 4 queue runs.
-        CHECK_ADVISORY: 'perf/run\.sh|--test hls|--tags timing|advisories\.py|timeline_bench\.py'
+        # frames against its 1 % and failed 4 queue runs. The server and client smoke (tools/e2e, PHO-240) is new and
+        # starts a server, PostgreSQL and FFmpeg: advisory until it has run on the queue without a flake.
+        CHECK_ADVISORY: 'perf/run\.sh|--test hls|--tags timing|advisories\.py|timeline_bench\.py|server_client_smoke\.sh'
         PERF_REPORT: ${{ runner.temp }}/perf.md
         CHECK_REPORT: ${{ runner.temp }}/report/${{ inputs.name }}.tsv
     - if: always() && hashFiles(inputs.guard) != ''

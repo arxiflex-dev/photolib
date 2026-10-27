@@ -29,6 +29,12 @@ photolibd serves Connect RPC: JSON or binary protobuf over HTTP POST, so `curl` 
 Errors carry a code and a `photolib.api.v1.ErrorDetail`, never a message; clients translate them. Call
 `GetServerInfo` first and check its capabilities. The decisions are in [ADR-0027](../adr/0027-connect-rpc.md).
 
+## Server and client together
+
+[Run a server and connect the app](server-client.md) takes a clean checkout to a running photolibd, the first
+administrator, uploaded photos and videos, an external folder and the desktop and web apps showing them, and says what
+works today. `bash tools/e2e/server_client_smoke.sh` repeats it on a throw-away server.
+
 ## Database migrations
 
 Schema changes are SQL files in `server/migrations/`, and rewrites of existing rows are data migrations; the rules

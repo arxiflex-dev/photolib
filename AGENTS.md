@@ -83,6 +83,8 @@ Run each step it names alone, `PREQUEUE_BUDGET=1800 PREQUEUE_ONLY='rust tests (4
 and paste that result with the `--full` line.
 The tools that compare with `origin/dev` (`check.sh`, `prequeue.sh`, `migrations.sh`, `proto_breaking.sh`) take the remote
 from `tools/remote.sh`: `$PHOTOLIB_REMOTE`, else the only remote (this repository's is `arxiflex-dev`), else `origin`.
+`bash tools/e2e/server_client_smoke.sh` runs a throw-away photolibd with uploads, an external folder and (`WEB_DIR`)
+browsers on its web client: [Run a server and connect the app](docs/dev/server-client.md); its step is in the `web` part.
 
 ## CI
 
