@@ -859,9 +859,10 @@ sends gets its cause and next step there in every language, or `tools/tests/chec
   of scratch under the target directory).
 * Image renditions (ADR-0084) are made only by the `render` job with libvips in the sandbox
   (`photolib_media::render`), from the specs of `render::specs()`: change a spec's output and its id changes, so the
-  reconciler renders it again. The `preview` has a `high` (full size, default) and a `standard` (2160 px) spec, chosen by
-  `libraries.rendition_quality` (`only_for`, `SetRenditionQuality`, ADR-0405). Building the server needs libvips ≥ 8.15 (`libvips-dev`, with `libheif-plugin-libde265`
-  for HEIC; the gate checks it). Media bytes go out only through `/media` (`media`), behind `photolib_authz::can`; a
+  reconciler renders it again. The `preview` has a `high` (full size, default) and a `standard` (2160 px) spec,
+  chosen by `libraries.rendition_quality` (`only_for`, `SetRenditionQuality`, ADR-0405). Building the server needs
+  libvips ≥ 8.15 (`libvips-dev`, with `libheif-plugin-libde265` for HEIC; the gate checks it). Media bytes go out only
+  through `/media` (`media`), behind `photolib_authz::can`; a
   refusal is an empty 404. A pooled renderer reuses its memory and decodes JPEGs sequentially (ADR-0122); the
   `Pooled` tests of `tests/renditions.rs` hold its page faults and peak through `/proc`.
 * A video's renditions are `transcode` jobs on `worker:transcode` (`video`, ADR-0085): FFmpeg and ffprobe from

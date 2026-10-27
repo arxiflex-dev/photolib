@@ -56,8 +56,9 @@ pub struct Spec {
     pub only_for: Option<&'static str>,
 }
 
-/// The library's rendition quality (M2-49): the universal JPEG at the original's size, or at 2160 px for small disks.
+/// A library's rendition quality (M2-49): the universal JPEG at the original's size.
 pub const HIGH: &str = "high";
+/// A library's rendition quality for small disks: the universal JPEG at 2160 px.
 pub const STANDARD: &str = "standard";
 /// What a library gets until its administrator says otherwise (the owner's answer to M1-44's question 4).
 pub const DEFAULT_QUALITY: &str = HIGH;

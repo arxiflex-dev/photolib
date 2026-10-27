@@ -74,6 +74,20 @@ class NoThumbnail implements Exception {
   String toString() => 'NoThumbnail(video: $video, cause: $cause)';
 }
 
+/// Whether a refused file at [uri] is a HEIC on Windows or Linux outside the
+/// browser: no codec ships there and none is to be installed (ADR-0214), so
+/// its cell names connected mode or a Mac. The web says its own reason.
+bool noHevcDecoder(Uri uri, {required bool video}) =>
+    !kIsWeb &&
+    !video &&
+    const {
+      'heic',
+      'heif',
+      'hif',
+    }.contains(uri.path.split('.').last.toLowerCase()) &&
+    (defaultTargetPlatform == TargetPlatform.windows ||
+        defaultTargetPlatform == TargetPlatform.linux);
+
 /// The source has no thumbnail of an item yet but will, for the [cause]: a
 /// rendition the server still makes, or a server out of reach. Its cells keep
 /// their ThumbHash, unmarked, and it is asked for again after a backoff.
