@@ -664,6 +664,8 @@ check_web() {
     step . node tools/web_e2e/run.mjs
     # The web's cold start budget (tools/perf/budgets.json): the engine's first frame within 2.5 s of opening the page.
     step . node tools/web_e2e/cold_start.mjs
+    # The journey's waits (tools/web_e2e/lib.mjs): a missed condition fails within 30 s saying what it waited for.
+    step tools/web_e2e node --test test/waits.test.mjs
   fi
   # The web timeline's frame budget over the 1M library (NFR-PERF-1): drag and fling in Chrome on the WASM build, which
   # times, so it runs alone.
