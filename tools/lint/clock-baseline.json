@@ -1,6 +1,1 @@
-{
-  "tools/web_e2e/journey.mjs": {
-    "reads": 1,
-    "reason": "PHO-235 (PR 17) removes it: the day of the dropped photo is read from the file; delete this entry when it lands"
-  }
-}
+{}
