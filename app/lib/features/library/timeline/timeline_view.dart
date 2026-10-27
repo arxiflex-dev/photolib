@@ -532,7 +532,7 @@ class TimelineViewState extends State<TimelineView>
   @override
   Widget build(BuildContext context) {
     final strings = AppLocalizations.of(context);
-    final formats = Formats(strings);
+    final formats = Formats.of(context);
     final style = Theme.of(context).textTheme.titleSmall;
     final grouping = density.grouping(widget.grouping);
     segments = widget.buckets.grouped(

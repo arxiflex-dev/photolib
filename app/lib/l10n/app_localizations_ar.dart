@@ -898,6 +898,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get commandPaletteHint => 'اكتب أمرًا';
 
   @override
+  String get dateFormatDefault => 'الافتراضي للغة';
+
+  @override
+  String get dateFormatDmy => 'يوم-شهر-سنة';
+
+  @override
+  String get dateFormatMdy => 'شهر-يوم-سنة';
+
+  @override
+  String get dateFormatYmd => 'سنة-شهر-يوم';
+
+  @override
   String deleteBoth(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -2887,6 +2899,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsBackground => 'خلف الصور الشفافة';
 
   @override
+  String get settingsDateFormat => 'تنسيق التاريخ';
+
+  @override
   String get settingsDefaultTab => 'تُفتح المجلدات والألبومات على';
 
   @override
@@ -4487,6 +4502,18 @@ class AppLocalizationsArXb extends AppLocalizationsAr {
 
   @override
   String get commandPaletteHint => '‏Type a command‏';
+
+  @override
+  String get dateFormatDefault => '‏Language default‏';
+
+  @override
+  String get dateFormatDmy => '‏Day-month-year‏';
+
+  @override
+  String get dateFormatMdy => '‏Month-day-year‏';
+
+  @override
+  String get dateFormatYmd => '‏Year-month-day‏';
 
   @override
   String deleteBoth(int count) {
@@ -6425,6 +6452,9 @@ class AppLocalizationsArXb extends AppLocalizationsAr {
 
   @override
   String get settingsBackground => '‏Behind transparent images‏';
+
+  @override
+  String get settingsDateFormat => '‏Date format‏';
 
   @override
   String get settingsDefaultTab => '‏Folders and albums open on‏';

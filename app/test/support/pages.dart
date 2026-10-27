@@ -170,6 +170,8 @@ Future<void> openPage(
     if (page == 'folders') {
       final library = find.byIcon(Icons.folder_special_outlined);
       await tester.scrollUntilVisible(library, 200);
+      await tester.ensureVisible(library);
+      await tester.pump();
       await tester.tap(library);
       // The scanning folder's progress never settles.
       await tester.pump();

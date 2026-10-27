@@ -906,6 +906,18 @@ class AppLocalizationsPl extends AppLocalizations {
   String get commandPaletteHint => 'Wpisz polecenie';
 
   @override
+  String get dateFormatDefault => 'Domyślny dla języka';
+
+  @override
+  String get dateFormatDmy => 'Dzień-miesiąc-rok';
+
+  @override
+  String get dateFormatMdy => 'Miesiąc-dzień-rok';
+
+  @override
+  String get dateFormatYmd => 'Rok-miesiąc-dzień';
+
+  @override
   String deleteBoth(int count) {
     final intl.NumberFormat countNumberFormat =
         intl.NumberFormat.decimalPattern(localeName);
@@ -2889,6 +2901,9 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get settingsBackground => 'Za przezroczystymi obrazami';
+
+  @override
+  String get settingsDateFormat => 'Format daty';
 
   @override
   String get settingsDefaultTab => 'Foldery i albumy otwierają się na karcie';
