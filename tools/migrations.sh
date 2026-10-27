@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Checks a migrations directory (default: server/migrations) for what CI rejects and PostgreSQL cannot see: squawk's
-# findings, and the release rules against origin/dev, where a merged migration counts as released. A released
+# findings, and the release rules against <remote>/dev (tools/remote.sh), where a merged migration counts as released. A released
 # migration and its upgrade fixtures (fixtures/<migration>.*) are never edited, renamed or deleted; a new migration is
 # numbered above the newest released one; and a release branch (the pull request's target or the current branch is
 # release/*) only carries migrations identical to main's.
@@ -19,8 +19,9 @@ DIR=${1:-server/migrations}
 
 cd "$(git rev-parse --show-toplevel)"
 
-if ! git rev-parse --verify --quiet refs/remotes/origin/dev >/dev/null; then
-  echo "migrations.sh: there is no origin/dev to compare $DIR with; fetch it (git fetch origin main)" >&2
+REMOTE=$(bash "$(dirname "${BASH_SOURCE[0]}")/remote.sh") || exit 1
+if ! git rev-parse --verify --quiet "refs/remotes/$REMOTE/dev" >/dev/null; then
+  echo "migrations.sh: there is no $REMOTE/dev to compare $DIR with; fetch it (git fetch $REMOTE dev)" >&2
   exit 1
 fi
 
@@ -30,11 +31,11 @@ reject() {
   FAILURES=$((FAILURES + 1))
 }
 
-released() { git ls-tree --name-only "origin/dev:$DIR" 2>/dev/null | grep -E '^[0-9]{4}_.+\.sql$' || true; }
-released_fixtures() { git ls-tree --name-only "origin/dev:$DIR/fixtures" 2>/dev/null | sed 's|^|fixtures/|'; }
+released() { git ls-tree --name-only "$REMOTE/dev:$DIR" 2>/dev/null | grep -E '^[0-9]{4}_.+\.sql$' || true; }
+released_fixtures() { git ls-tree --name-only "$REMOTE/dev:$DIR/fixtures" 2>/dev/null | sed 's|^|fixtures/|'; }
 current() { (cd "$DIR" && ls -- *.sql 2>/dev/null) || true; }
-is_released() { git cat-file -e "origin/dev:$DIR/$1" 2>/dev/null; }
-same_as_main() { is_released "$1" && git show "origin/dev:$DIR/$1" | cmp -s - "$DIR/$1"; }
+is_released() { git cat-file -e "$REMOTE/dev:$DIR/$1" 2>/dev/null; }
+same_as_main() { is_released "$1" && git show "$REMOTE/dev:$DIR/$1" | cmp -s - "$DIR/$1"; }
 
 NEWEST=$(released | tail -n 1 | cut -c1-4)
 NEWEST=${NEWEST:-0000}
