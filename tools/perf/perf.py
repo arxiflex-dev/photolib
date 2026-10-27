@@ -93,7 +93,7 @@ def series(result):
 
 
 # The budgets that are no test of perf_test.dart: the server's benchmarks, and what run.sh measures of the app alone
-SERVER = ("server-idle-rss", "ingest-throughput", "initial-sync-100k")
+SERVER = ("server-idle-rss", "ingest-throughput", "initial-sync-100k", "ocr-read")
 ALONE = ("cold-start", "idle-cpu")
 # The test of perf_test.dart that measures a budget over no fixture, as run.sh picks it for a rerun
 TESTS = {"video-swipe": "videos", "sphere-video": "sphere-video", "device-folders-scroll": "device-folders-5k",

@@ -235,6 +235,13 @@
       "metrics": {
         "photos": {"unit": "photos/s/core", "min": {"server": 19}, "measured": ["server"]}
       }
+    },
+    "ocr-read": {
+      "requirement": "PHO-247: the 5 s bound the OCR correctness test asserted until a loaded runner missed it",
+      "how": "server/crates/photolib-ml/tests/ocr.rs ocr_read: PP-OCRv5 reading each 800 x 128 picture of testdata/ocr (Latin, Cyrillic, CJK, a payload of markup, lines), the fastest of three reads of the slowest picture, in release",
+      "metrics": {
+        "slowest": {"unit": "ms", "max": {"server": 5000}, "measured": ["server"]}
+      }
     }
   }
 }
