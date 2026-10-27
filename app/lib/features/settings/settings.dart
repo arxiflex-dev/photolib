@@ -180,6 +180,9 @@ const List<ViewerAction> defaultPins = [
 /// its map loads.
 typedef _Chrome = ({List<ViewerAction> bar, bool? filmstrip, bool maps});
 
+/// The days Photolib's own trash can keep its items (ORG-18), 60 by default.
+const trashChoices = [30, 60, 90];
+
 /// How a slideshow runs (VIEW-21): each item's seconds, whether in a random
 /// order, and whether it starts over after the last.
 typedef Slideshow = ({int seconds, bool shuffle, bool loop});
@@ -216,6 +219,7 @@ class Settings {
     this.maps = false,
     this.indexWhileCharging = false,
     this.searchColumns = 4,
+    this.trashDays = 60,
     this.slideshow = _slideshow,
     this.indexBattery = 20,
     this.indexAllowSaver = false,
@@ -278,6 +282,10 @@ class Settings {
       },
       maps = json['maps'] == true,
       indexWhileCharging = json['indexWhileCharging'] == true,
+      trashDays = switch (json['trashDays']) {
+        final int days when trashChoices.contains(days) => days,
+        _ => 60,
+      },
       searchColumns = switch (json['searchColumns']) {
         final int columns => columns,
         _ => 4,
@@ -403,6 +411,10 @@ class Settings {
   /// The columns of search's results, as the last pinch or zoom left them.
   final int searchColumns;
 
+  /// The days Photolib keeps what it trashes in a trash of its own, one of
+  /// [trashChoices] (ORG-18).
+  final int trashDays;
+
   /// How slideshows run.
   final Slideshow slideshow;
 
@@ -425,6 +437,7 @@ class Settings {
     _Chrome? chrome,
     bool? indexWhileCharging,
     int? searchColumns,
+    int? trashDays,
     Slideshow? slideshow,
     int? indexBattery,
     bool? indexAllowSaver,
@@ -451,6 +464,7 @@ class Settings {
       maps: c.maps,
       indexWhileCharging: indexWhileCharging ?? this.indexWhileCharging,
       searchColumns: searchColumns ?? this.searchColumns,
+      trashDays: trashDays ?? this.trashDays,
       slideshow: slideshow ?? this.slideshow,
       indexBattery: keep(indexBattery, this.indexBattery),
       indexAllowSaver: keep(indexAllowSaver, this.indexAllowSaver),
@@ -480,6 +494,7 @@ class Settings {
     },
     'indexWhileCharging': indexWhileCharging,
     'searchColumns': searchColumns,
+    'trashDays': trashDays,
     if (toggles.isNotEmpty)
       'toggles': {
         for (final MapEntry(:key, :value) in toggles.entries) key.name: value,
@@ -582,6 +597,13 @@ class SettingsNotifier extends StoredNotifier<Settings> {
   /// Shows search's results in [columns].
   void setSearchColumns(int columns) =>
       change((s) => s._with(searchColumns: columns));
+
+  /// Keeps what Photolib trashes from now on for [days], one of
+  /// [trashChoices]; what is in the trash keeps its time.
+  void setTrashDays(int days) {
+    assert(trashChoices.contains(days), 'not a choice: $days');
+    change((s) => s._with(trashDays: days));
+  }
 
   /// Changes what is given of how slideshows run.
   void setSlideshow({int? seconds, bool? shuffle, bool? loop}) => change(

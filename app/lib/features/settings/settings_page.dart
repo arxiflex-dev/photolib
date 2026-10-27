@@ -49,6 +49,7 @@ class SettingsPage extends ConsumerWidget {
             SizedBox(height: tokens.sm),
             const _ThemePicker(),
             const _StartScreen(),
+            const _TrashKeep(),
             SizedBox(height: tokens.lg),
             Text(strings.settingsServer, style: textTheme.titleMedium),
             const ServerList(),
@@ -373,6 +374,44 @@ class _PrivacyTile extends StatelessWidget {
     title: Text(AppLocalizations.of(context).privacyTitle),
     onTap: () => context.push('/settings/privacy'),
   );
+}
+
+/// How long Photolib keeps what it trashes where the platform keeps no time of
+/// its own (ORG-18); what is in the trash keeps the time it had.
+class _TrashKeep extends ConsumerWidget {
+  const new();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = AppLocalizations.of(context);
+    final tokens = AppTokens.of(context);
+    final days = ref.watch(settingsProvider.select((s) => s.trashDays));
+    return Padding(
+      padding: EdgeInsets.only(top: tokens.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            strings.settingsTrashKeep,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          SizedBox(height: tokens.sm),
+          SegmentedButton<int>(
+            segments: [
+              for (final choice in trashChoices)
+                ButtonSegment(
+                  value: choice,
+                  label: Text(strings.trashKeepDays(choice)),
+                ),
+            ],
+            selected: {days},
+            onSelectionChanged: (s) =>
+                ref.read(settingsProvider.notifier).setTrashDays(s.single),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 /// What the app opens on, and the tab the folders and albums open on.
